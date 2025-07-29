@@ -1,0 +1,44 @@
+1. structure language mapped from user interface (constraints, opening times, go there as soon as possible but not later than, low priority, ...)
+	turn this into a very simple language (like booleans)
+2. 
+
+goals 
+bare minimum: I explain some sort of minimal language where can i express some things and then there must be some explanation of correlation to the user input
+write language
+deciding on some container language (JSON, YAML) [do at the beginning] so a dialect] - probably JSON
+constraints need to have mathematical content (clear description of when a file will be valid)
+clear about how to write a parser
+give a semantic to the language (if i have a schedule - assignment of tasks to timeslots i should be able to take this schedule and check if it checks the constraints of the language)
+	therefore one has to be able to check if anything meets the schedule
+make them comparable (with score or cost)
+encode it in a way that makes sense
+
+not goals
+time keeping
+no time zones
+nice time (no summer/winter-time)
+keep the amount of constraints (don't add information)
+no SAT and no optimization
+implementation
+
+
+extra points: 
+1. explain why it works/why it doesn'take
+2. actually implement a reduction to max-SAT
+
+
+
+
+
+first task: select some contstraints from the description 
+explain why you have done this representation (understand the solver methocd and show that you done) - maxSAT, linear programming, first order theorem provers, SMT
+
+
+General
+thesis:
+20-40 pages (is not important)
+some amount of reading/sources - several constraints and different ways to encode them - is going into a solver - need to be aware of those things are doing
+
+set up repository: GitHub 
+
+crappy solution by 1 week: and a small junk until next time
