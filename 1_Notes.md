@@ -141,7 +141,7 @@ The above section handles most of the basic scheduling needs, but for this thesi
 * After (x > int?, the task must be concluded after the given timestamp)
 * Before (x > int?, the task must be concluded before the given timestamp)
 * Dependency (x => y, the task must be scheduled after the given task y)
-* Reoccuring (x, has to be scheduled every month/week/tuesday/...)
+* Reoccuring (obj, has to be scheduled every month/week/tuesday/...)
 
 These previously defined constraints fail at tasks like:
 
@@ -149,3 +149,92 @@ These previously defined constraints fail at tasks like:
 - My flat is an mess because I keep putting off cleaning. Remind me to clean when I am at home and I have nothing else scheduled.
 
 So how does one schedule or even quantify such a task into any proper format?
+
+Additional constraints:
+* Duration (int, the amount of (uninterrupted?) timeslots required to be allocated to the task)
+* Priority (int, the higher the number ($0<x\leq100$) the higher the priority)
+* After ($x \geq int$, the timeslot(s) must be allocated after the given timeindex)
+* Before ($x \leq int$, the timeslot(s) must be allocated before the given timeindex)
+* Location (the timeslot must be allocated at this location or when another event at this location is planned)
+* PreferedAfter ($x \geq int$, the timeslot(s) can be allocated after the given timeindex but don't have to be (cost))
+* PreferedBefore ($x \leq int$, the timelot(s) can be allocated after the given timeindex but don't have to be (cost))
+* MinAmount (obj, the amount of minimum events per week one has to schedule)
+* MaxAmount (obj, the amount of maximum events per week one has to schedule)
+* Dependency ([], the array of tasks that have to be finished before this one can start)
+* Date (obj, date of scheduling (possible dates)) 
+  * Recurring can be embedded with the date
+
+For simplicity we stick with the division of a day into 24 timeslots of equal length (e.g. 1 hour).
+```json
+{
+    "TaskA": {
+        "duration": 2,
+        "priority": 100,
+        "afterTime": 7,
+        "beforeTime": 20,
+        "preferedTimeWindow": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0],
+        "minAmount": {
+            "perDay": 0,
+            "perWeek": 0,
+            "perMonth": 0,
+            "perYear": 0
+        },
+        "maxAmount": {
+            "perDay": 0,
+            "perWeek": 2,
+            "perMonth": 0,
+            "perYear": 0
+        },
+        "date": {
+            "daysOfWeek": [1,0,0,1,1,1,1],
+            "daysOfMonth": null,
+            "weeksOfMonth": null,
+            "monthsOfYear": null,
+            "everyYears": 1
+        },
+        "location": null,
+        "dependency": null
+    }
+}
+```
+*afterTime* and *beforeTime* can be combined into a single *timeWindow* which is a binary array, for this case:
+```json
+"timeWindow": [0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0]
+```
+
+So what the example of TaskA above actually says is: I want to do something schedule something twice a week that takes approximately two hours, it should be scheduled a maximum of twice a week between 07:00 and 20:00, but preferebly after 14:00. But don't schedule it on Tuesday or Wednesday.
+
+
+Value description:
+```json
+{
+    "TaskDescription": {
+        "duration": 2,      # An unsigned integer between 0 and the amount of simeslots-1
+        "priority": 100,    # An unsigned integer between 1 and 100 - quantifies the cost of not meeting 
+        "afterTime": 7,     # An unsigned integer - the index of earliest begining of the task
+        "beforeTime": 20,   # An unsigned integer - the index of latest end of the task
+        "preferedTimeWindow": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0], # A boolean array - timeframe of perefered assignment
+        "minAmount": {
+            "perDay": 0,    # An unsigned integer - minimum amount of this task scheduled per day
+            "perWeek": 0,   # An unsigned integer - minimum amount of this task scheduled per week
+            "perMonth": 0,  # An unsigned integer - minimum amount of this task scheduled per month
+            "perYear": 0    # An unsigned integer - minimum amount of this task scheduled per year
+        },
+        "maxAmount": {
+            "perDay": 0,    # An unsigned integer - maximum amount of this task scheduled per day
+            "perWeek": 0,   # An unsigned integer - maximum amount of this task scheduled per week
+            "perMonth": 0,  # An unsigned integer - maximum amount of this task scheduled per month
+            "perYear": 0    # An unsigned integer - maximum amount of this task scheduled per year
+        },
+        "date": {
+            "daysOfWeek": [],   # A boolean array of length 7 - depicts days of week
+            "daysOfMonth": [],  # A boolean array of length 31 - depicts days of month
+            "weeksOfMonth": [], # A boolean array of length 5 - depicts weeks of month
+            "monthsOfYear": [], # A boolean array of length 12 - depicts months of year
+            "everyYears": 1     # An unsigned integer - depicts repititions every x years
+        },
+        "location": null,   # (double, double) - depicts the location of the task
+        "dependency": null  # An array of tasks/task-ids - depicts which tasks have to be finished first before this one can be scheduled
+    }
+}
+```
