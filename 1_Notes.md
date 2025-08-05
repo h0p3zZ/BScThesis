@@ -238,3 +238,9 @@ Value description:
     }
 }
 ```
+
+### Meeting notes?
+Urgency is a task that has to happen soon?
+Important is a task that HAS to be scheduled and might kick out not-important tasks
+Think about what to do with reoccuring - maybe instead of modelling them, just schedule a lot of seperate tasks (from the frontend)
+Think about how to handle interrupted tasks (schedule multiple tasks?, just don't allow interrupted tasks?)
