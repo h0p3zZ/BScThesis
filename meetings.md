@@ -11,6 +11,10 @@ Some notes:
 - Instead of location, you could consider clustering constraints where some tasks happen preferably in clusters with each other.
 - Duration can have many different variations (variable duration, task splitting, preferred duration). You should think about which of these you can already express within your language, and which ones would need new features.
 
+## To do
+
+Reiterate the IR language design.
+
 # 29.07.2025
 
 The project will be focused on the intermediate representation.
