@@ -1,4 +1,4 @@
-# Notes of week 1 (29.08.-05.09.)
+# Notes of week 1 (29.07.-05.08.)
 
 The definition only handles Tasks from today into the future, no backward tasking (does not make any sense)
 

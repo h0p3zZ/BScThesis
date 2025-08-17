@@ -6,10 +6,10 @@ Some notes:
 - Priorities can take several forms: urgency != importance
 - After/Before might be better expressed as either a boolean array for allowed slots or a sequence of time intervals.
 - Let the front-end deal with dates and holidays
-- You need to find a good way to make this work with reocurrences.
-- Currently you can only express order dependencies (i.e. X happens before Y), but sometimes you also want time dependencies (X happens at most 1 week after and at least 2 days after Y).
+- You need to find a good way to make this work with reoccurrences.
+- Currently, you can only express order dependencies (i.e. X happens before Y), but sometimes you also want time dependencies (X happens at most 1 week after and at least 2 days after Y).
 - Instead of location, you could consider clustering constraints where some tasks happen preferably in clusters with each other.
-- Duration can have many different variations (variable duration, task splitting, preferred duration). You should think about which of these you can already express within your language, and which ones would need new features.
+- Duration can have many variations (variable duration, task splitting, preferred duration). You should think about which of these you can already express within your language, and which ones would need new features.
 
 ## To do
 
@@ -23,7 +23,7 @@ The project will be focused on the intermediate representation.
 
 Minimum goals:
 - Data format for the intermediate representation.
-- Precise description of valid files, possibly starting off some preexistent format.
+- Precise description of valid files, possibly starting off some preexisting format.
 - Mathematical semantics for each file. This includes:
     * The set of possible solutions
     * The feasible solutions for a given IR file.
