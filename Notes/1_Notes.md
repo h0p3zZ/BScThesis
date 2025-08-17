@@ -209,32 +209,32 @@ Value description:
 ```json
 {
     "TaskDescription": {
-        "duration": 2,      # An unsigned integer between 0 and the amount of simeslots-1
-        "priority": 100,    # An unsigned integer between 1 and 100 - quantifies the cost of not meeting 
-        "afterTime": 7,     # An unsigned integer - the index of earliest begining of the task
-        "beforeTime": 20,   # An unsigned integer - the index of latest end of the task
-        "preferedTimeWindow": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0], # A boolean array - timeframe of perefered assignment
+        "duration": 2,      /* An unsigned integer between 0 and the amount of simeslots-1 */
+        "priority": 100,    /* An unsigned integer between 1 and 100 - quantifies the cost of not meeting */
+        "afterTime": 7,     /* An unsigned integer - the index of earliest begining of the task */
+        "beforeTime": 20,   /* An unsigned integer - the index of latest end of the task */
+        "preferedTimeWindow": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0], /* A boolean array - timeframe of perefered assignment */
         "minAmount": {
-            "perDay": 0,    # An unsigned integer - minimum amount of this task scheduled per day
-            "perWeek": 0,   # An unsigned integer - minimum amount of this task scheduled per week
-            "perMonth": 0,  # An unsigned integer - minimum amount of this task scheduled per month
-            "perYear": 0    # An unsigned integer - minimum amount of this task scheduled per year
+            "perDay": 0,    /* An unsigned integer - minimum amount of this task scheduled per day */
+            "perWeek": 0,   /* An unsigned integer - minimum amount of this task scheduled per week */
+            "perMonth": 0,  /* An unsigned integer - minimum amount of this task scheduled per month */
+            "perYear": 0    /* An unsigned integer - minimum amount of this task scheduled per year */
         },
         "maxAmount": {
-            "perDay": 0,    # An unsigned integer - maximum amount of this task scheduled per day
-            "perWeek": 0,   # An unsigned integer - maximum amount of this task scheduled per week
-            "perMonth": 0,  # An unsigned integer - maximum amount of this task scheduled per month
-            "perYear": 0    # An unsigned integer - maximum amount of this task scheduled per year
+            "perDay": 0,    /* An unsigned integer - maximum amount of this task scheduled per day */
+            "perWeek": 0,   /* An unsigned integer - maximum amount of this task scheduled per week */
+            "perMonth": 0,  /* An unsigned integer - maximum amount of this task scheduled per month */
+            "perYear": 0    /* An unsigned integer - maximum amount of this task scheduled per year */
         },
         "date": {
-            "daysOfWeek": [],   # A boolean array of length 7 - depicts days of week
-            "daysOfMonth": [],  # A boolean array of length 31 - depicts days of month
-            "weeksOfMonth": [], # A boolean array of length 5 - depicts weeks of month
-            "monthsOfYear": [], # A boolean array of length 12 - depicts months of year
-            "everyYears": 1     # An unsigned integer - depicts repititions every x years
+            "daysOfWeek": [],   /* A boolean array of length 7 - depicts days of week */
+            "daysOfMonth": [],  /* A boolean array of length 31 - depicts days of month */
+            "weeksOfMonth": [], /* A boolean array of length 5 - depicts weeks of month */
+            "monthsOfYear": [], /* A boolean array of length 12 - depicts months of year */
+            "everyYears": 1     /* An unsigned integer - depicts repititions every x years */
         },
-        "location": null,   # (double, double) - depicts the location of the task
-        "dependency": null  # An array of tasks/task-ids - depicts which tasks have to be finished first before this one can be scheduled
+        "location": null,   /* (double, double) - depicts the location of the task */
+        "dependency": null  /* An array of tasks/task-ids - depicts which tasks have to be finished first before this one can be scheduled */
     }
 }
 ```
