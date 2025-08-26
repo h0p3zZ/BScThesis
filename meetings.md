@@ -1,3 +1,8 @@
+# 26.08.2025
+
+- We talked about the points I raised in the last review.
+- Duration: it doesn't seem to make much sense to "split" tasks but rather to have independent tasks that are in some way connected by constraints (dependencies, or locations).
+
 # Reviewing commit `dfb39b1ce14f26e1b641145f9a5f39b99c7a0707`
 
 Nice work! I think you got the point of the assignment. I really like that you wrote down your rationale for each design decision; this makes it very easy to follow what you did. I'm leaving some notes below. Regarding semantics, I believe they are alright, but they will become a bit clearer once the issues with time representation below are tackled.
