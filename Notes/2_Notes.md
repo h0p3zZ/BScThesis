@@ -190,3 +190,10 @@ The frontend can generate multiple tasks (as with reoccurrences) and split the t
 - Is a task which is scheduled but not with the full duration (e.g. 10 slots instead of 11) deemed completed?
 - What is reasonable addition of overhead for each junk the task is split in. 
 - Is a task that is split up actually only one task, or is it possible to separate those task beforehand.
+  
+
+# Notes from meeting
+Remove timeWindow (don't give the solver a notion of days)
+-> Replace by timeslots (frontend handles)
+
+prefered timeslots can be just the previous timeslots but with weights/benefits
