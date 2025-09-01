@@ -197,3 +197,5 @@ Remove timeWindow (don't give the solver a notion of days)
 -> Replace by timeslots (frontend handles)
 
 prefered timeslots can be just the previous timeslots but with weights/benefits
+
+Splitting tasks is not that important becasue the solver does not actually understands that a split task is (just seperate tasks that have to be scheduled)
