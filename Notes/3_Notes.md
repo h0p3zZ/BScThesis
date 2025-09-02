@@ -73,7 +73,7 @@ Additionally, we removed `timeWindow`. As this has to be handled by the Frontend
 These changes clearly make the semantical explanation a lot easier.
 
 * `duration` amount of uninterrupted time slots allocated to a task\
-  $\textit{duration} \in \N_0 | \textit{duration} < \textit{horizon}$
+  $\textit{duration} \in \N_0$
 * `importance` cost for not scheduling the task\
   $\textit{importance} \in \N_0 \cup \infty$
 * `urgency` cost factor multiplied by the default late-cost\
@@ -97,3 +97,12 @@ With late-cost mentioned above, we mean the cost increas which "naturally" occur
 > Naturally, tasks should be scheduled towards the beginning of the time horizon as most tasks will be knonwn rather later than sooner, which makes them easier to fit into the existing schedule.
 
 `horizon` is the last timeslot
+
+## Meeting
+Instead of current dependency use list of intervals with specific cost.
+
+Timeslots math description is wrong/cost is missing
+
+Location: math representation = list/map of possible locations
+
+Add horizon as global property
