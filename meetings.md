@@ -1,3 +1,22 @@
+# 02.09.2025
+
+- Currently your dependencies can only handle a hard delay interval (minAfter, maxAfter). You could pull off the same trick as with the timeslots and have multiple allowed delays with different costs.
+- Currently locations are missing costs. This is not too critical for now, just leaving it here as a reminder.
+- The constraint duration < horizon is not really needed, the solver can take care of that.
+- Beyond the list of tasks, there are some properties that are global for a problem (e.g. the horizon). These are currently not accommodated in your file format.
+- Specifying the semantics will become a lot easier if you separate your levels of abstraction:
+    1. What data defines a scheduling problem?
+    2. What data is a potential solution for a fixed scheduling problem? (i.e. the search space)
+    3. When is a potential solution an actual solution of a scheduling problem? (i.e. feasible solutions)
+    4. When is an solution preferable to another solution (i.e. optimal solutions)
+- Remember when writing the specifications above that math is not constrained by computation: you have access to constructions that do not exist as data structures, and it's ok to define constructions that you don't know how to compute (as long as they're unambiguously defined).
+
+## To do
+
+- Improve dependency delays in the file format.
+- Give a full file format description, including global features e.g. horizon.
+- Separate semantics in the levels described above.
+
 # 26.08.2025
 
 - We talked about the points I raised in the last review.
