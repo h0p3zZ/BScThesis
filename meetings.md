@@ -1,3 +1,9 @@
+# 17.09.2025
+
+- If you're defining some feature e.g. duration, for each task t, it makes sense to add t as a subscript.
+- Timeslots are currently defined close to their JSON representation, but it doesn't need to be like that. It might save you work if you define it in terms of a mathematical function (and similarly in other places).
+- Defining a search space is analogous to defining a data structure that will contain the type of your potential solutions.
+
 # 02.09.2025
 
 - Currently your dependencies can only handle a hard delay interval (minAfter, maxAfter). You could pull off the same trick as with the timeslots and have multiple allowed delays with different costs.
