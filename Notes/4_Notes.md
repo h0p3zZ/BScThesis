@@ -43,67 +43,50 @@ Again we summarize the problems of the previous week:
 ```
 
 The changes in short are:
-* Changed Object inside of the dependencies array to accomodate multiple different costs for different intervals.
+* Changed Object inside the dependencies array to accommodate multiple different costs for different intervals.
   * Instead of `minAfter` and `maxAfter`, we now use `interval`, as it is basically the same as the `interval` of `timeSlots` and therefore this way is more consistent. 
 * Added cost for the location (still only one location allowed per task, but the cost may very when not scheduling the same locations together)
 
 ## Data Description
-* `horizon` the horizon at which tasks can be scheduled (total amount of time slots)
+* `horizon` the horizon at which tasks can be scheduled (total amount of time slots)\
+$\textit{horizon} \in \N_0$\
 From now on the object we look at is the `tasks` dictionary:
-* `duration` amount of uninterrupted time slots allocated to a task
-* `importance` cost for not scheduling the task
-* `urgency` cost factor multiplied by the default late-cost
+* `duration` amount of uninterrupted time slots allocated to a task\
+  $\textit{duration}_t \in \N_0$
+* `importance` cost for not scheduling the task\
+  $\textit{importance}_t \in \N_0 \cup \infty$
+* `urgency` cost factor multiplied by the default late-cost\
+  $\textit{urgency}_t \in \N_0$
 * `timeSlots` all time slots at which the task can be scheduled
-  * `interval` on interval at which the task can be scheduled
-  * `cost` cost applied when the task is scheduled at this particular interval
+  * `interval` ($i \in \{0,1,\dots,count(intervals)-1\}$) an interval at which the task can be scheduled\
+    $[a,b] | a,b \in \N_0$
+  * `cost` cost applied when the task is scheduled at this particular interval\
+    $\textit{cost} \in \N_0$
 * `depencendies` specifying what task should/have to be scheduled beforehand
-  * `task` id of the task that has to be scheduled beforehand
+  * `task` id of the task that has to be scheduled beforehand\
+    $\textit{task} \in \Sigma^n$ where $\Sigma$ is the alphabet and $n \in \N_0$ is the length of the word/string.
   * `intervals`
-    * `interval` interval that defines at which time slots the task should be scheduled relative to the dependency
-    * `cost` cost for this particular interval
-  * `unmetCost` the cost applied if none of the intervals defined in `intervals` is met
-* `location`
-  * `id` id of the location the task should be scheduled at
-  * `unmetCost` cost applied when not scheduling this task with other tasks of this location (if present)
+    * `interval` interval that defines at which time slots the task should be scheduled relative to the dependency\
+    $[a,b]_{t,i} | a,b \in \N_0$
+    * `cost` cost for this particular interval\
+      $\textit{cost} \in \N_0$
+  * `unmetCost` the cost applied if none of the intervals defined in `intervals` is met\
+  $\textit{unmetCost}_{t,i} \in \N_0$ 
+* `location` ($l \in \{0,1,\dots,count(locations)-1\}$)
+  * `id` id of the location the task should be scheduled at\
+    $\textit{id}_{t,l} \in \N_0$
+  * `unmetCost` cost applied when not scheduling this task with other tasks of this location (if present)\
+    $\textit{unmetCost}_{t,l} \in \N_0$
 
 ## Mathematical Representation
 
-### Data Description
-* `horizon` $\textit{horizon} \in \N_0$\
-From now on the object we look at is the `tasks` dictionary:
-* `duration` $\textit{duration} \in \N_0$
-* `importance` $\textit{importance} \in \N_0 \cup \infty$
-* `urgency` $\textit{urgency} \in \N_0$
-* `timeSlots`
-  * `interval` $[a,b] | a,b \in \N_0$
-  * `cost` $\textit{cost} \in \N_0$
-* `depencendies` specifying what task should/have to be scheduled beforehand
-  * `task` $\textit{task} \in \Sigma^n$ where $\Sigma$ is the alphabet and $n \in \N_0$ is the length of the word/string.
-  * `intervals`
-    * `interval` $[a,b] | a,b \in \N_0$
-    * `cost` $\textit{cost} \in \N_0$
-  * `unmetCost` $\textit{unmetCost} \in \N_0$ 
-* `location` 
-    * `id` $\textit{id} \in \N_0$
-    * `unmetCost` $\textit{unmetCost} \in \N_0$
+### Data Definition
+We now need to define the data which describes our problem to have something to solve. 
 
-This now describes in computer science terms the basic data structure of the language and what types the containing variables have. In other words it defines the basic parsable/acceptable language.
+
 
 ### Search Space
 We have the description of the data and therefore a set of acceptable languages that meet the requirements of the Intermediate Representation. 
 
 We now want to specify the search space, meaning the space of possible solutions, which is a subset of the set of acceptable languages. 
 
-* `horizon` $\textit{horizon} \in \N_0$\
-From now on the object we look at is the `tasks` dictionary:
-* `duration` $\textit{duration} \in \N_0$
-* `importance` $\textit{importance} \in \N_0 \cup \infty$
-* `urgency` $\textit{urgency} \in \N_0$
-* `timeSlots` $\textit{timeSlots} = [[a,b] [b,c], ...] \rightarrow \textit{possibleSlots} = \bigcup\limits_{i \in \textit{timeSlots}} i$
-* `depencendies` 
-  * `task` $\textit{task.intervals} = [[a,b] [b,c], ...] \rightarrow \textit{specifiedIntervals} = \bigcup\limits_{i \in \textit{timeSlots}} i$\
-  $\textit{unmetInterval} = [\textit{taskB.actualIntervalEnd}, \textit{horizon}]$\
-  $\textit{possibleIntervals} = \textit{specifiedIntervals} \cup \textit{unmetInterval}$
-* `location` 
-    * `id` $\textit{id} \in \N_0$
-    * `unmetCost` $\textit{unmetCost} \in \N_0$
