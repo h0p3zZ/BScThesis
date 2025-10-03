@@ -87,7 +87,7 @@ We now need to define the data which describes our problem to have something to 
   * `horizon`: $H \in \N_0$
   * `time slot function` $t: T \times \N_0 \longrightarrow \N_0 \cup \infty$
     * maps every task at a given time slot to a cost
-  * `dependencie` $\textit{dep}_{a,b}: \N_0 \longrightarrow \N_0 \cup \infty$
+  * `dependencies` $\textit{dep}_{a,b}: \N_0 \longrightarrow \N_0 \cup \infty$
   * `location` $\textit{loc}: L \times L \rightarrow \N_0$
 
 Very unsure about this - was a short in the dark to see if I'm anywhere near what would work.
@@ -112,8 +112,19 @@ We now want to specify the search space, meaning the space of possible solutions
 ```cs
 public class Solution {
   public class Task {
+    public string id;
     public int startIndex;
     public int duration;
+    public int cost;
+  }
+
+  public int cost;
+
+  public class Dependency {
+    public string firstId;
+    public string secondId;
+    public int afterTimeSlots;
+    public int cost;
   }
 }
 ```
