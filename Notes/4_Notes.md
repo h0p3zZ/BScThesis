@@ -58,7 +58,7 @@ From now on the object we look at is the `tasks` dictionary:
 * `urgency` cost factor multiplied by the default late-cost\
   $\textit{urgency}_t \in \N_0$
 * `timeSlots` all time slots at which the task can be scheduled
-  * `interval` ($i \in \{0,1,\dots,count(intervals)-1\}$) an interval at which the task can be scheduled\
+  * `interval` ($i \in \{1,2,\dots,count(intervals)\}$) an interval at which the task can be scheduled\
     $[a,b] | a,b \in \N_0$
   * `cost` cost applied when the task is scheduled at this particular interval\
     $\textit{cost} \in \N_0$
@@ -72,7 +72,7 @@ From now on the object we look at is the `tasks` dictionary:
       $\textit{cost} \in \N_0$
   * `unmetCost` the cost applied if none of the intervals defined in `intervals` is met\
   $\textit{unmetCost}_{t,i} \in \N_0$ 
-* `location` ($l \in \{0,1,\dots,count(locations)-1\}$)
+* `location` ($l \in \{1,2,\dots,count(locations)\}$)
   * `id` id of the location the task should be scheduled at\
     $\textit{id}_{t,l} \in \N_0$
   * `unmetCost` cost applied when not scheduling this task with other tasks of this location (if present)\
@@ -83,10 +83,37 @@ From now on the object we look at is the `tasks` dictionary:
 ### Data Definition
 We now need to define the data which describes our problem to have something to solve. 
 
+  * `tasks`: $T = \{1,\dots, m\}$
+  * `horizon`: $H \in \N_0$
+  * `time slot function` $t: T \times \N_0 \longrightarrow \N_0 \cup \infty$
+    * maps every task at a given time slot to a cost
+  * `dependencie` $\textit{dep}_{a,b}: \N_0 \longrightarrow \N_0 \cup \infty$
+  * `location` $\textit{loc}: L \times L \rightarrow \N_0$
 
+Very unsure about this - was a short in the dark to see if I'm anywhere near what would work.
+
+Thoughts:
+* Tasks is needed anyways - without it there is nothing to solve 
+* Same goes for horizon as some form of time-constraint (horizon is needed)
+* `time slot function` combines: 
+  * importance
+  * urgency
+  * duration
+  * and time slots to one function that maps to cost.
+* `dependencies` are functions between Tasks a and b. It calculates a cost based on how many time slots b is scheduled after a.
+* `locations` maps two locations to a number of times lots needed between two tasks as travel time.
+* Using several functions (mappings) to cost will enable ILP to find the best solution - at least that's my theory.
 
 ### Search Space
 We have the description of the data and therefore a set of acceptable languages that meet the requirements of the Intermediate Representation. 
 
 We now want to specify the search space, meaning the space of possible solutions, which is a subset of the set of acceptable languages. 
 
+```cs
+public class Solution {
+  public class Task {
+    public int startIndex;
+    public int duration;
+  }
+}
+```
