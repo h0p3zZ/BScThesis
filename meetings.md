@@ -1,3 +1,49 @@
+# 03.10.2025
+
+I see you wrote two sections on data description. Just to be clear, what you need at this stage are three things.
+
+## Data format description
+
+This should be a detailed description of the fragment of JSON you would be targetting as a valid input file.
+This is roughly what you did in the first Data Description section.
+You can assume the input is valid *as a JSON file*; your goal is to describe unambiguously which valid JSON files
+are valid input files.
+
+What you wrote here is essentially correct; I wouldn't touch it anymore for the time being and come back to it fix what I write below.
+The data you described is expressed as math. This is appropriate for the next two sections, but at this point you are still dealing with a computer file.
+So, what I would expect to see is something along the lines of:
+
+```
+<file>: a JSON object containing exactly the following fields:
+    "horizon": a JSON integer
+    "duration" a JSON integer
+    "importance": either a JSON integer or the string "inf"
+    "timeSlots": a list of <timeslot>
+    ...
+
+<timeslot>: a JSON object containing exactly the following fields:
+    "interval": a list of JSON integers of length 2
+    "cost": a JSON integer
+...
+```
+
+## Mathematical problem definition
+
+I'm assuming this is what the second Data Description section does. This is quite good for a first approach! Some comments on this:
+- You can simply say that "tasks" is a finite set. A set of what, you may ask? Of whatever.
+In your formalization you only need to be able to tell when two tasks are the same or not, which is always assumed to be possible in math.
+- If I understand correctly, in "dependencies", you are trying to define the following idea:
+for *some* pairs of tasks a, b, there is a cost associated to scheduling b after a depending on how long the delay between the two tasks is.
+I think this is close to a good definition, but maybe it's better if you define it as a *partial* function `dep: T \times T \times \N_0 -> \N_0 U {\infty}`.
+Think about it and let's discuss it in our next meeting.
+- I don't think I understand what's going on with locations, but let's discuss that in the meeting.
+- I don't agree that the time slot function captures importance, duration and urgency, but I might be missing something.
+
+## Search space
+
+Here you wrote a class definition, but what we need is a mathematical description of "something we can start talking about whether it is a solution or not".
+Either way, don't worry too much, let's talk about it.
+
 # 17.09.2025
 
 - If you're defining some feature e.g. duration, for each task t, it makes sense to add t as a subscript.
