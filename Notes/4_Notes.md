@@ -128,3 +128,9 @@ public class Solution {
   }
 }
 ```
+
+## Notes
+dep is a partial function T x T ---> N0 ---> N0 U {inf}
+
+Mathematical definition - search space
+Mapping from some Tasks to some integers
