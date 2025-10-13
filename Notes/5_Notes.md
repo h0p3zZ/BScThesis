@@ -1,4 +1,4 @@
-# Notes of week 5 (6.11.-12.11.)
+# Notes of week 5 (6.10.-12.10.)
 
 we stick with the same JSON format as it for now seems to be (almost) complete - good enough for now.
 
@@ -40,7 +40,7 @@ As having a JSON and defining mathematical notations on it is quite ineffcient, 
 ```
 <file> a JSON object containing exactly the following fields:
     "horizon" a JSON integer
-    "tasks" a JSON object of type dictionary with a JSON string as a key and a <task> object as a value
+    "tasks" a JSON object of type dictionary with a JSON string as a key and a JSON object of type <task> as a value
 
 <task> a JSON object containing exactly the following fields:
     "name": a JSON string
@@ -66,15 +66,15 @@ For clarity everything in this JSON has to conform to the JSON standard (a valid
 ### Data Definiition
 * `tasks`: $T$ is a finite set
 * `horizon`: $H \in \N_0$
-* `time slot function` $slot: T \times \N \longrightarrow \N_0 \cup \infty$
+* `time slot function` $slot: T \times \Z \longrightarrow \N_0 \cup \infty$
   * maps every task at a given time slot to a cost
-* `dependencies` $\textit{dep}: T \times T \longrightarrow \N_0 \longrightarrow \N_0 \cup \infty$
+* `dependencies` $\textit{dep}: T \times T \longrightarrow \Z \longrightarrow \N_0 \cup \infty$
 * `locations` $\textit{loc}: L \times L \rightarrow \N_0 \cup \infty$
 
 To avoid having to deal with indices we changed our definition of `tasks` $T$ to be a finite set of any kind. Additionally, we changed `dependencies` $dep$ ot avoid having to deal with indecies and get away from a set of partial functions to a more convenient definition. 
 
 ### Search Space
-* `assignments`: $A: T \longrightarrow N$
+* `assignments`: $A: T \longrightarrow \N_0 \cup -1$
   * maps every task to its start time slot
 
 ### Semantics
@@ -89,7 +89,7 @@ An assignment $a \in A$ is valid iff:
 * $\forall t_1, t_2 \in T: loc(t_1, t_2) \in \N_0$
 
 #### Comparing by cost
-* `cost` $c: A \longrightarrow \N_0$
+* `cost` $c: A \longrightarrow \N_0 \cup \infty$
 * $c(a) = \sum_{t_1,t_2 \in T} slot(t_1, a(t_1)) + dep(t_1, t_2)(a(t_2)) + loc(t_1, t_2)$
 
 For any two given solutions (assignments) $a_1$ and $a_2$, $a_1$ is better iff:
@@ -101,3 +101,22 @@ We determine the best sollution by:
 Thoughts: Something has to be changed for location but I'm at this point not sure what. It needs some notion of the time slot assigned to the tasks to be able to give a cost.
 
 Unsure on how to handle the time slot with the existing appraoch on location (what time slot does it refer to?).
+
+# Meeting notes
+Whe handling location A after B can reduce cost of x
+but B after A can reduce cost of y > x.
+
+Add `duration` $d$
+Fix `dependencies` and  
+
+### `Assignments`
+When using $\N_0 \cup - 1$ you have to handle that seperately in the assignment/duration semantics
+
+### `Dependencies`
+Instead of using $\in N_0 just write \geq 0$
+
+### `Cost`
+Fix sum in cost function
+
+### `Locations`
+Maybe just define a set of locations?
