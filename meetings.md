@@ -1,3 +1,15 @@
+# 13.10.2025
+
+- Either `dep` should be a partial function at the `T x T` mapping,
+or `dep` should be a total function `T x T --> Z --> N U {inf}`.
+- `loc` has some weird behavior because it's not symmetric. We can either go with this and see if it creates an issue in the future, or alternatively include in the mathematical definition a finite set of locations `L`, and then `loc` is a function `T --> L x (N U {inf})`.
+- Probably you're going to need another function in the math description `dur` for duration `T --> N`.
+- Assignments need to account for unaccomplished tasks, e.g. by having `T --> N U {nope}`.
+- The feasibility condition on overlapping tasks should take into account the duration of the task. Same for the horizon condition.
+- The dependency condition will change depending on your new formalization.
+- The location condition is not taking into account when do two tasks happen one after another.
+- Cost: redo.
+
 # 03.10.2025
 
 I see you wrote two sections on data description. Just to be clear, what you need at this stage are three things.
