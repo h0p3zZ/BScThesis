@@ -4,7 +4,7 @@
 - `T_s` should be moved to the search space or to the semantics.
 - Use a special timeslot `u` for "unscheduled" in the assignments, and extend `slot` to a function of signature `T x (N U {u}) --> N U {inf}`.
 - Locations and travel are a bit tricky to express. Maybe choose some simplification and move on for purposes of finishing at some point.
-- Dependency costs and feasibility should depend of task pair offset.
+- Dependency costs and feasibility should depend on task pair offset.
 - You can encode "`t` immediately before `s`" as `a(t) + dur(t) = a(s)`.
 
 # 13.10.2025

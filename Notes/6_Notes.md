@@ -58,3 +58,5 @@ We determine the best sollution by:
 ## Meetings
 * remove $\infty$ in assignment an replace by another symbol
 * fix `slot` to be a function $\longrightarrow \N_0 \cup \text{symbol}$ instead of $\Z$
+* Postpone travel ($trav$) for now and focus on using $loc$
+* Skip the definition of urgency right now and focus on finishing, then if there is time left implement urgency in detail
