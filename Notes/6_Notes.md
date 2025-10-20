@@ -29,7 +29,7 @@
 
 ### Semantics
 An assignment $a \in A$ is valid iff:
-* $\forall t_1, t_2 \in T_s | t_1 \neq t_2, a(t_1): a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_2)$
+* $\forall t_1, t_2 \in T_s | t_1 \neq t_2: a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_1)$
 * $\forall t \in T_s: a(t) + \textit{dur}(t) \lt H$
 * $\forall t \in T: slot(t, a(t)) \in \N_0$
 * $\forall t_1, t_2 \in T: dep(t_1, t_2)(a(t_2)) \in \N_0$
@@ -45,7 +45,7 @@ An assignment $a \in A$ is valid iff:
 #### Comparing by cost
 * `cost` $c: A \longrightarrow \N_0 \cup \infty$
 * $c(a) = \sum_{t \in T} slot(t, a(t)) +\\
-\sum_{t_1, t_2 \in T | a(t_1) \leq a(t2)} dep(t_1, t_2)(a(t_2)) + \\
+\sum_{t_1, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1)) + \\
 \sum_{t_1, t_2 \in T_s | (a(t_1) < a(t_2) \land \forall t \in T: a(t) > a(t_1) \implies a(t) > a(t_2))} \textit{trav}(t_1, t_2)$
 
 For any two given solutions (assignments) $a_1$ and $a_2$, $a_1$ is better iff:
@@ -53,3 +53,8 @@ For any two given solutions (assignments) $a_1$ and $a_2$, $a_1$ is better iff:
 
 We determine the best sollution by:
 * $\min(c(a)) | a \in A$
+
+
+## Meetings
+* remove $\infty$ in assignment an replace by another symbol
+* fix `slot` to be a function $\longrightarrow \N_0 \cup \text{symbol}$ instead of $\Z$
