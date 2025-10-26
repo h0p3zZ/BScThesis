@@ -46,10 +46,10 @@ As having a JSON and defining mathematical notations on it is quite ineffcient, 
     "name": a JSON string
     "duration": a JSON integer
     "importance": a JSON integer
-    "urgendy": a JSON integer
+    "urgency": a JSON integer
     "timeSlots" a JSON array of type <interval>
     "dependencies" a JSON array of type <dependency>
-    "location" a JSON object of type dictionary with a JSON integer as key and a JSON integer as value
+    "location" a JSON object of type <location>
 
 <interval> a JSON object with exactly the following fields:
     "interval": a JSON array of type JSON integer of exactly two numbers
@@ -58,6 +58,10 @@ As having a JSON and defining mathematical notations on it is quite ineffcient, 
 <dependency> a JSON object with exactly the following fields:
     "task": a JSON string
     "intervals" a JSON array of type <interval>
+    "unmetCost" a JSON integer
+
+<location> a JSON object with exactly the following fields:
+    "id": a JSON integer
     "unmetCost" a JSON integer
 ```
 For clarity everything in this JSON has to conform to the JSON standard (a valid JSON file). Also when "exactly the following fields" is written - it means exactly the listed fields, with exactly the specified types.

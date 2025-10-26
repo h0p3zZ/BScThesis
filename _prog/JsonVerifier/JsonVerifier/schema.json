@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "An input JSON of a scheduling problem",
+  "type": "object",
+
+  "$defs": {
+    "intervalCost": {
+      "type": "object",
+      "properties": {
+        "interval": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "cost": { "type": "integer" }
+      },
+      "required": [ "interval", "cost" ]
+    }
+  },
+
+  "properties": {
+    "horizon": { "type": "integer" },
+    "tasks": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Za-z0-9_]+$": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "duration": { "type": "integer" },
+            "importance": { "type": "integer" },
+            "urgency": { "type": "integer" },
+            "timeSlots": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/intervalCost" }
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "task": { "type": "string" },
+                  "items": { "$ref": "#/$defs/intervalCost" }
+                },
+                "required": [ "task", "items" ]
+              }
+            },
+            "location": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "unmetCost": { "type": "integer" }
+              },
+              "required": [ "id", "unmetCost" ]
+            }
+          },
+          "required": [ "name", "duration", "importance", "urgency", "timeSlots" ]
+        }
+      }
+    }
+  },
+  "required": [ "horizon", "tasks" ]
+}

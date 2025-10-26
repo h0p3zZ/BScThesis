@@ -1,0 +1,46 @@
+{
+  "horizon": 420,
+  "tasks": {
+    "Unique": {
+      "name": "TasksA",
+      "duration": 69,
+      "importance": 3,
+      "urgency": "doesNotWork",
+      "timeSlots": [
+        {
+          "interval": [ 0, 100, -1 ],
+          "cost": 1
+        },
+        {
+          "interval": [ 100, 200 ],
+          "cost": 2
+        }
+      ],
+      "dependencies": [
+        {
+          "task": "AnyString"
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": 10
+      }
+    },
+    "anyString": {
+      "name": "TasksA",
+      "duration": 6.3,
+      "importance": 10,
+      "urgency": 50,
+      "timeSlots": [
+        {
+          "interval": [ 0, 5 ],
+          "cost": 0
+        },
+        {
+          "interval": [ 2, 6 ],
+          "cost": 4
+        }
+      ]
+    }
+  }
+}

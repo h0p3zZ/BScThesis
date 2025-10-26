@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonVerifier", "JsonVerifier\JsonVerifier.csproj", "{EEECD470-EC20-4FC1-9B60-294D8AA36603}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEECD470-EC20-4FC1-9B60-294D8AA36603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEECD470-EC20-4FC1-9B60-294D8AA36603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEECD470-EC20-4FC1-9B60-294D8AA36603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEECD470-EC20-4FC1-9B60-294D8AA36603}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9FA13BB6-06DC-49DB-8383-65CB51E6CD75}
+	EndGlobalSection
+EndGlobal
