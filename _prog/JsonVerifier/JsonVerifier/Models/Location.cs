@@ -3,5 +3,5 @@
 internal class Location
 {
     public int Id { get; set; }
-    public int UnmetCost { get; set; }
+    public double UnmetCost { get; set; }
 }

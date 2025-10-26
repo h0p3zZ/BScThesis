@@ -4,7 +4,7 @@
     "UUIDTaskTestAnyString": {
       "name": "TasksA",
       "duration": 69,
-      "importance": 3,
+      "importance": "Infinity",
       "urgency": 1,
       "timeSlots": [
         {

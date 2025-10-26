@@ -29,7 +29,15 @@
           "properties": {
             "name": { "type": "string" },
             "duration": { "type": "integer" },
-            "importance": { "type": "integer" },
+            "importance": {
+              "oneOf": [
+                { "type": "integer" },
+                {
+                  "type": "string",
+                  "enum": [ "Infinity" ]
+                }
+              ]
+            },
             "urgency": { "type": "integer" },
             "timeSlots": {
               "type": "array",
@@ -50,7 +58,15 @@
               "type": "object",
               "properties": {
                 "id": { "type": "integer" },
-                "unmetCost": { "type": "integer" }
+                "unmetCost": {
+                  "oneOf": [
+                    { "type": "integer" },
+                    {
+                      "type": "string",
+                      "enum": [ "Infinity" ]
+                    }
+                  ]
+                }
               },
               "required": [ "id", "unmetCost" ]
             }
