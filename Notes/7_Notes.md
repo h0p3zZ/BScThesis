@@ -65,3 +65,14 @@ For any two given solutions (assignments) $a_1$ and $a_2$, $a_1$ is better iff:
 
 We determine the best sollution by:
 * $\min(c(a)) | a \in A$
+
+
+### Meeting notes
+
+* Instead of the current definition for task emmediatly before (grouped) task at a location use:
+  * \sum_{t_1, t_2 \in T_s} loc_C(t_2) * (1 - \delta(loc_L(t_1), loc_L(t_2))) * \delta(a(t_1) + dur(t_1), a(t_2))
+  * This does not allow tasks to have a gap between them, think of a way to schedule optional placeholder tasks between them to have a notion of "nothing to do" such that one can easily use the above notation to find if the task was scheduled at the same location.
+
+#### TODO
+* Right solution verifier - tells you if the soluation is valid (for the problem) and additionally calculates the cost.
+* Set up a latex folder in the github repo such that Adrian can take a look at it (instead of overleaf).
