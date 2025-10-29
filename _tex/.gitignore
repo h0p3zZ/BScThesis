@@ -48,7 +48,7 @@ build/
 
 *.fdb_latexmk
 *.xml
-*.pdf
+main-thesis.pdf
 *.fls
 *.bcf
 *.pyg
