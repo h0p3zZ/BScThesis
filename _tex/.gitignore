@@ -29,7 +29,6 @@
 *.nlo
 *.nls
 *.out
-*.pdf
 *.pyg
 *.run.xml
 *.snm
@@ -46,9 +45,4 @@
 .mtc
 build/
 
-*.fdb_latexmk
-*.xml
 main-thesis.pdf
-*.fls
-*.bcf
-*.pyg
