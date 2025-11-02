@@ -151,7 +151,10 @@
 \usepackage{import}
 \usepackage{amsfonts}
 \usepackage{subfigure}
-%\usepackage{acronym}
+\usepackage{acronym}
+
+\usepackage{jsonlisting}
+\usepackage{math-macros}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,7 +179,7 @@
 %% 
 
 %% Command \title{title}: sets the title of your thesis
-\title{TODO: Space for your thesis title}
+\title{Intermediate Representation for Modeling Soft and Hard Time Constraints}
 
 %% Command \titleshort{short title}: sets an abbreviated version of the thesis title for page heads
 %\titleshort{Optional space for your abbreviated title}
@@ -258,9 +261,9 @@
 %\listoffigures
 
 %% Make sure to start the list of acronyms on a new odd page (odd is only relevant in twoside layout)
-%\cleardoubleoddpage
+\cleardoubleoddpage
 %% Include list of acronyms (optional and often not necessary)
-%\import{./}{acronyms}
+\import{./}{acronyms}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -274,7 +277,9 @@
 %% 
 
 \import{./}{01-introduction}
-\import{./}{02-example}
+\import{./}{02-data-format}
+\import{./}{03-semantics}
+\import{./}{04-solver}
 % ...
 \import{./}{09-conclusion}
 

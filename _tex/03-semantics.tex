@@ -1,0 +1,78 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+\chapter{Semantics}
+\label{sec:semantics}
+To make the definition in \autoref{sec:data-format} make sense we need to define mathematicl semantics. This will be done in three levels of abstraction:
+\begin{enumerate}
+    \item \nameref{sec:semantics:data-definition}, in which we define the data we need to define a problem distinctively.
+    \item \nameref{sec:semantics:search-space}, here we define the space of possible problems we have.
+    \item \nameref{sec:semantics:semantics}, for this section we actually mathematically define what a valid soluation for our problem defined in \autoref{sec:semantics:data-definition}. Additionally, we define a what cost is and how it is calculated in \nameref{sec:semantics:semantics:computing-cost}.
+\end{enumerate}
+
+For global usage we define:
+* $\mathbb{N}_u = \N_0 \cup \{ u \}$, where u means undefined.
+
+\section{Data Definitino}
+\label{sec:semantics:data-definition}
+\begin{itemize}
+    \item `tasks`: $T$ is a finite set
+    \item `horizon`: $H \in \N_0$
+    \item `duration` $\textit{dur}: T \longrightarrow \N_0$
+    \item `time slot function` $slot: T \times \N_u \longrightarrow \N_0 \cup \{ \infty \}$ \\
+          maps every task at a given time slot to a cost
+    \item `dependencies` $\textit{dep}: T \times T \longrightarrow (\Z \cup \{ u \}) \longrightarrow \N_0 \cup \{ \infty \}$
+    \item `locations`: $L$ is a finite set
+    \item `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$
+    \item $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$
+    \item \textcolor{red}{TODO} `travel` $\textit{trav}: T \times T \longrightarrow \N_0 \cup \{ \infty \}$
+\end{itemize}
+
+
+\section{Search Space}
+\label{sec:semantics:search-space}
+We define $a$ to be the function of any task to an assignment (either the time slot it is assigned to or just "u" for unassigned).
+
+\begin{itemize}
+    \item `assignments`: $a: T \longrightarrow \N_u$
+    \item A is the set of all possible functions $T \longrightarrow N_u$
+\end{itemize}
+
+\section{Semantics}
+\label{sec:semantics:semantics}
+
+Additionally, we define:
+\begin{itemize}
+    \item $T_s \subseteq T$ as the subset of scheduled Tasks ($a(t_s) \geq 0$)
+    \item `relDist`: $\N_u \times \N_u \longrightarrow \Z \cup \{ u \}$
+          \begin{itemize}
+              \item $\operatorname{relDist}(n_1, n_2) = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$
+              \item For readability we define use the infix notation: $n_1 - n_2 = \operatorname{relDist}(n_1, n_2)$
+          \end{itemize}
+\end{itemize}
+
+In this section we now show what a valid solution looks like:
+An assignment $a \in A$ is valid iff:
+\begin{itemize}
+    \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap:\\
+          $a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_1)$
+    \item For every task assigned task $t$ the assigned time slots must not exceed the horizon.\\
+          $a(t) + \textit{dur}(t) < H$
+    \item For every task we need the cost function defined in (\nameref{sec:semantics:semantics:computing-cost}) to be finite.\\
+          $c(a) \in \N_0$
+    \item \textcolor{red}{TODO} $\forall t_1, t_2 \in T_s | (a(t_1) < a(t_2) \land \forall t \in T_s: a(t) > a(t_1) \implies a(t) > a(t_2)): \textit{trav}(t_1, t_2) \in N_0$\\
+          If both tasks are scheduled, and $t_2$ is the next task after $t_1$ the travel function should return a number (not $\infty$).
+\end{itemize}
+
+\subsection{Computing Cost}
+\label{sec:semantics:semantics:computing-cost}
+To be able to compare solutions to the problem we need some form of metric. For this we introduce the following cost function $\operatorname{c} \colon A \to \N_0 \cup \{ \infty \}$.
+\begin{align*}
+    c(a) = & \sum_{t \in T} slot(t, a(t)) +                                                                                        \\
+           & \sum_{t_1, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1)) +                                                                \\
+           & \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2))
+\end{align*}
+
+
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -69,7 +69,7 @@ We determine the best sollution by:
 
 ### Meeting notes
 
-* Instead of the current definition for task emmediatly before (grouped) task at a location use:
+* Instead of the current definition for task immediatly before (grouped) task at a location use:
   * \sum_{t_1, t_2 \in T_s} loc_C(t_2) * (1 - \delta(loc_L(t_1), loc_L(t_2))) * \delta(a(t_1) + dur(t_1), a(t_2))
   * This does not allow tasks to have a gap between them, think of a way to schedule optional placeholder tasks between them to have a notion of "nothing to do" such that one can easily use the above notation to find if the task was scheduled at the same location.
 
