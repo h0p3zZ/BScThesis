@@ -2,7 +2,7 @@
 
 namespace JsonVerifier.Models;
 
-internal class IntervalCost
+public class IntervalCost
 {
     [Length(2,2)]
     public required List<int> Interval { get; set; }

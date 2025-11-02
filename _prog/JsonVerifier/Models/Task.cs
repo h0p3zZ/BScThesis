@@ -1,6 +1,6 @@
 ﻿namespace JsonVerifier.Models;
 
-internal class Task
+public class Task
 {
     public required string Name { get; set; }
     public int Duration { get; set; }
