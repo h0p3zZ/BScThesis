@@ -1,4 +1,5 @@
-﻿using JsonVerifier.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using JsonVerifier.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 
@@ -36,25 +37,27 @@ public static class JsonParser
         }
     }
 
-    public static bool TryParse(string filePath, out ScheduleProblem? schedule)
+    public static bool TryParse(
+        string filePath,
+        [NotNullWhen(true)] out ScheduleProblem? schedule
+    )
     {
+        schedule = null;
         if (
             !File.Exists(filePath)
             || !Path.GetExtension(filePath).Equals(".json", StringComparison.OrdinalIgnoreCase)
         )
         {
-            schedule = null;
             return false;
         }
 
         try
         {
             schedule = JsonConvert.DeserializeObject<ScheduleProblem>(File.ReadAllText(filePath));
-            return true;
+            return schedule != null;
         }
         catch (JsonException)
         {
-            schedule = null;
             return false;
         }
     }
