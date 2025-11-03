@@ -12,7 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="assignment.json">
+    <None Update="exceedingHorizonAssignment.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="validAssignment.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="overlappingAssignment.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="schedule.json">

@@ -42,5 +42,64 @@ if (assignment.Assignments.Any(x => !problem.Tasks.ContainsKey(x.Key)))
     return;
 }
 
-var importanceCost = assignment.Assignments.Sum((x) => (x.Value == null) ? problem.Tasks[x.Key].Importance : 0);
+double importanceCost = 0;
+double urgencyCost = 0;
+double dependencyCost = 0;
+double locationCost = 0;
+foreach (var i1 in assignment.Assignments)
+{
+    var task1 = problem.Tasks[i1.Key];
+
+    if (i1.Value is { } task1TimeSlot)
+    {
+        urgencyCost = task1.Urgency * task1TimeSlot;
+        // Check whether the task has exceeded the scheduling horizon
+        if (task1TimeSlot + task1.Duration >= problem.Horizon)
+        {
+            Console.WriteLine($"Task {i1.Key} exceeds the scheduling horizon.");
+            return;
+        }
+
+        foreach (var i2 in assignment.Assignments)
+        {
+            if (i2.Value is not { } task2TimeSlot) continue;
+            if (i1.Key == i2.Key) continue;
+
+            var task2 = problem.Tasks[i2.Key];
+            // Check whether tasks overlap with one another
+            if (
+                task1TimeSlot + task1.Duration > task2TimeSlot && task2TimeSlot + task2.Duration > task1TimeSlot
+            )
+            {
+                Console.WriteLine($"Tasks {i1.Key} and {i2.Key} overlap with one another.");
+                return;
+            }
+
+            // Check dependency cost
+            foreach (var dependency in task2.Dependencies ?? [])
+            {
+                if (dependency.Task == i1.Key)
+                {
+                    // TODO: handle multiple matching intervals
+                    var interval = dependency.Intervals.FirstOrDefault(x =>
+                        task2TimeSlot - task1TimeSlot + task1.Duration > x.Interval[0] &&
+                        task2TimeSlot - task1TimeSlot + task1.Duration < x.Interval[1]
+                    );
+                    if (interval != null)
+                        dependencyCost += interval.Cost;
+                    else 
+                        dependencyCost += dependency.UnmetCost;
+                }
+            }
+        }
+    }
+    else
+    {
+        importanceCost += task1.Importance;
+    }
+}
+
 Console.WriteLine($"Importance cost of unassigned tasks: {importanceCost}");
+Console.WriteLine($"Urgency cost of unassigned tasks: {urgencyCost}");
+Console.WriteLine($"Dependency cost of unassigned tasks: {dependencyCost}");
+Console.WriteLine($"Location cost of unassigned tasks: {locationCost}");
