@@ -5,7 +5,7 @@ Console.OutputEncoding = System.Text.Encoding.Unicode;
 
 if (args.Length != 2)
 {
-    Console.WriteLine("Please specify file path: program.exe <file-to-problem> <file-to-assignment>");
+    Console.WriteLine("Please specify file path: program.exe <problem-file-path> <assignment_file_path>");
     return;
 }
 
@@ -52,7 +52,7 @@ foreach (var i1 in assignment.Assignments)
 
     if (i1.Value is { } task1TimeSlot)
     {
-        urgencyCost = task1.Urgency * task1TimeSlot;
+        urgencyCost = (task1.Urgency + 1) * task1TimeSlot;
         // Check whether the task has exceeded the scheduling horizon
         if (task1TimeSlot + task1.Duration >= problem.Horizon)
         {
