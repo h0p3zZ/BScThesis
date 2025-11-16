@@ -45,4 +45,6 @@
 .mtc
 build/
 
-main-thesis.pdf
+main-thesis.*
+
+.vscode
