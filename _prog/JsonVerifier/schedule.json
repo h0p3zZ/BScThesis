@@ -453,7 +453,7 @@
 
     "task_032": {
       "name": "t032",
-      "duration": 8,
+      "duration": 195,
       "importance": 10,
       "urgency": 20,
       "timeSlots": [

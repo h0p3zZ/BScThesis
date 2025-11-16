@@ -29,9 +29,9 @@ if (assignment == null)
     return;
 }
 
-if (problem.Tasks.Any(x => !assignment.Assignments.ContainsKey(x.Key)))
+if (problem.Tasks.FirstOrDefault(x => !assignment.Assignments.ContainsKey(x.Key)).Key is string taskKey)
 {
-    Console.WriteLine("Some tasks do not have an assignment.");
+    Console.WriteLine($"Some tasks do not have an assignment. First one found: {taskKey}");
     return;
 }
 
@@ -81,13 +81,36 @@ foreach (var i1 in assignment.Assignments)
                 if (dependency.Task == i1.Key)
                 {
                     // TODO: handle multiple matching intervals
-                    var interval = dependency.Intervals.FirstOrDefault(x =>
+                    var intervals = dependency.Intervals.Where(x =>
                         task2TimeSlot - task1TimeSlot + task1.Duration > x.Interval[0] &&
                         task2TimeSlot - task1TimeSlot + task1.Duration < x.Interval[1]
                     );
-                    if (interval != null)
-                        dependencyCost += interval.Cost;
-                    else 
+                    if (intervals.Any())
+                    {
+                        double weightedSum = 0;
+                        double totalOverlap = 0;
+
+                        foreach (var interval in intervals)
+                        {
+                            var intervalStart = interval.Interval[0];
+                            var intervalEnd = interval.Interval[1];
+
+                            // actual overlap between the task window and the interval
+                            var overlapStart = Math.Max(task2TimeSlot, intervalStart);
+                            var overlapEnd = Math.Min(task2TimeSlot + task2.Duration, intervalEnd);
+                            var overlapLength = overlapEnd - overlapStart;
+
+                            if (overlapLength > 0)
+                            {
+                                weightedSum += overlapLength * interval.Cost;
+                                totalOverlap += overlapLength;
+                            }
+                        }
+
+                        var weightedCost = weightedSum / totalOverlap;
+                        dependencyCost += weightedCost;
+                    }
+                    else
                         dependencyCost += dependency.UnmetCost;
                 }
             }
@@ -100,6 +123,6 @@ foreach (var i1 in assignment.Assignments)
 }
 
 Console.WriteLine($"Importance cost of unassigned tasks: {importanceCost}");
-Console.WriteLine($"Urgency cost of unassigned tasks: {urgencyCost}");
-Console.WriteLine($"Dependency cost of unassigned tasks: {dependencyCost}");
-Console.WriteLine($"Location cost of unassigned tasks: {locationCost}");
+Console.WriteLine($"Urgency cost of all tasks: {urgencyCost}");
+Console.WriteLine($"Dependency cost of all tasks: {dependencyCost}");
+Console.WriteLine($"Location cost of all tasks: {locationCost}");

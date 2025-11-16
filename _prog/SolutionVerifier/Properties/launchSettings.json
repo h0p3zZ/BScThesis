@@ -2,7 +2,7 @@
   "profiles": {
     "SolutionVerifier": {
       "commandName": "Project",
-      "commandLineArgs": "./schedule.json ./overlappingAssignment.json"
+      "commandLineArgs": "./schedule.json ./validAssignment.json"
     }
   }
 }
