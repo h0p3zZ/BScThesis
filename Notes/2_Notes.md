@@ -193,8 +193,8 @@ The frontend can generate multiple tasks (as with reoccurrences) and split the t
   
 
 # Notes from meeting
-Remove timeWindow (don't give the solver a notion of days)
--> Replace by timeslots (frontend handles)
+Remove `timeWindow` (don't give the solver a notion of days)
+→ Replace by timeslots (frontend handles)
 
 prefered timeslots can be just the previous timeslots but with weights/benefits
 
