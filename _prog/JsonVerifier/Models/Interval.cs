@@ -4,7 +4,7 @@ namespace JsonVerifier.Models;
 
 public class IntervalCost
 {
-    [Length(2,2)]
+    [Length(2, 2)]
     public required List<int> Interval { get; set; }
     public int Cost { get; set; }
 }

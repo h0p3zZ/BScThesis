@@ -14,7 +14,8 @@ internal class AssignmentParser
 
     internal bool Prase([NotNullWhen(true)] out ScheduleAssignment? assignment)
     {
-        if (!File.Exists(_filePath)){
+        if (!File.Exists(_filePath))
+        {
             assignment = null;
             return false;
         }
