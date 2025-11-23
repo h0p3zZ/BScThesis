@@ -6,6 +6,7 @@
 \label{chapter:methodology-language-design}
 
 \section{TODO}
+\todo{Find proper section name}
 Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
 Speaking of \enquote{time slots} we additionally need to phrase the explicit meaning of the phrase. Such a slot is defined using a 0 based time slot "array" in form of intervals. It starts counting from the 0 (now) up to a given horizon and every task inside that needs to be scheduled has defined possible time slots (intervals), which are also static - relative to the given beginning of the tasks (time slot 0).
 
@@ -23,7 +24,7 @@ To make the content of the \acl{IR} less abstract we depict the following exampl
             "name": "Some Cleartext name",
             "duration": 5,
             "importance": 100,
-            \textcolor{red}{TODO}"urgency": 5,
+            \todo{"urgency": 5,}
             "timeSlots": [
                 { "interval": [5,12], "cost": 5},
                 { "interval": [20,22], "cost": 0},
@@ -48,7 +49,7 @@ To make the content of the \acl{IR} less abstract we depict the following exampl
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
 \subsection*{Horizon}
-This \textit{horizon} field is solely to define the length of time the solver can define tasks to - the amount of time slots. Wihtout defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
+This \textit{horizon} field is solely to define the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
 
 \subsection*{Tasks}
 For convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The id is also required to know and display what task is assigned at what time slot.

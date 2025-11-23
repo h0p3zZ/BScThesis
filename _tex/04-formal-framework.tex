@@ -26,7 +26,7 @@ For global usage we define:
     \item `locations`: $L$ is a finite set
     \item `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$
     \item $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$
-    \item \textcolor{red}{TODO} `travel` $\textit{trav}: T \times T \longrightarrow \N_0 \cup \{ \infty \}$
+    \item `travel` $\textit{trav}: T \times T \longrightarrow \N_0 \cup \{ \infty \}$\todo{properly define this}
 \end{itemize}
 
 
@@ -61,7 +61,7 @@ An assignment $a \in A$ is valid iff:
           $a(t) + \textit{dur}(t) < H$
     \item For every task we need the cost function defined in (\nameref{subsec:formal-framework:semantics:computing-cost}) to be finite.\\
           $c(a) \in \N_0$
-    \item \textcolor{red}{TODO} $\forall t_1, t_2 \in T_s | (a(t_1) < a(t_2) \land \forall t \in T_s: a(t) > a(t_1) \implies a(t) > a(t_2)): \textit{trav}(t_1, t_2) \in N_0$\\
+    \item $\forall t_1, t_2 \in T_s | (a(t_1) < a(t_2) \land \forall t \in T_s: a(t) > a(t_1) \implies a(t) > a(t_2)): \textit{trav}(t_1, t_2) \in N_0$ \todo{Properly define this}\\
           If both tasks are scheduled, and $t_2$ is the next task after $t_1$ the travel function should return a number (not $\infty$).
 \end{itemize}
 

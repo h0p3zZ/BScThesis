@@ -2,7 +2,7 @@
 %% 
 %% LaTeX Style for Various Reports and Theses at Johannes Kepler University Linz
 %% 
-%% Copyright (C) 2021-2023  Michael Roland
+%% Copyright (C) 2021-2025  Michael Roland
 %% 
 %% This Source Code Form is subject to the terms of the Mozilla Public
 %% License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +12,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 
-\ProvidesPackage{jkureport}[2023/12/14 v2.1 JKU Linz Thesis and Report Style]
+\ProvidesPackage{jkureport}[2025/01/16 v2.2+git JKU Linz Thesis and Report Style]
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,7 +65,14 @@
 \RequirePackage{booktabs}
 \RequirePackage{rotating}
 \RequirePackage{colortbl}
-\RequirePackage{ifxetex}
+\RequirePackage{iftex}
+% legacy packages prior to merge into iftex; still relevant?
+\@ifundefined{ifluatex}{%
+    \RequirePackage{ifluatex}
+}{}
+\@ifundefined{ifxetex}{%
+    \RequirePackage{ifxetex}
+}{}
 \RequirePackage{verbatim}
 \RequirePackage{tcolorbox}
 \tcbuselibrary{skins}
@@ -79,6 +86,8 @@
         \RequirePackage{listings}%
     }%
 }
+
+\RequirePackage{caption}
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,7 +141,7 @@
     fontpath=fonts,
 }
 
-% Option [no]fancyfonts: use custom TTF fonts with XeTeX (defaults to true)
+% Option [no]fancyfonts: use custom TTF fonts with XeTeX/LuaTeX (defaults to true)
 \newbool{jkureport@xetexfonts}
 \pgfkeys{%
     /jkureport/pkg/.cd,
@@ -171,7 +180,7 @@
     nocompactmono/.code={\boolfalse{jkureport@compactmono}},
 }
 
-% Option [no]mathastext: use standard document fonts (and default to sans-serif font) in math mode (defaults to false)
+% Option [no]mathastext: use standard document fonts in math mode (defaults to false)
 \newbool{jkureport@mathastext}
 \pgfkeys{%
     /jkureport/pkg/.cd,
@@ -237,6 +246,8 @@
     equalmargins/true/.code={\setlength{\jkureport@textwidthadd}{0mm}},
     equalmargins/false/.code={\setlength{\jkureport@textwidthadd}{-15mm}},
     equalmargins=false,
+    noequalmargins/.value forbidden,
+    noequalmargins/.code={\setlength{\jkuexercise@textwidthadd}{-15mm}},
 }
 
 % Option phdthesis: this is a PhD thesis
@@ -384,6 +395,35 @@
     tnf/.code={\renewcommand{\jkureport@faculty}{tnf}},
 }
 
+% Option legacymode: activate a legacy mode to account for previous formal requirements, styles, and/or features
+%    Supported legacy modes:
+%      - phd2021  Adapt cover sheet to formal requirements for unstructured doctoral programs before 2021W
+%                 (also accounts for change from "Beurteiler*in" to "Betreuer*in" in 2024W versions of the German thesis cover sheets)
+\newcommand{\jkureport@legacymodes}{}
+\newbool{jkureport@legacyMMXXIV@evaluator}
+\pgfkeys{%
+    /jkureport/pkg/.cd,
+    legacymode/.value required,
+    legacymode/.code={%
+        \notblank{#1}{%
+            \xdef\jkureport@legacymodes{\jkureport@legacymodes,#1}
+            \ifstrequal{#1}{phd2021}{%
+                \PackageWarning{jkureport}{Activating legacy mode `#1': Cover sheet for unstructured doctoral programs before 2021W.}%
+                \booltrue{jkureport@legacyMMXXIV@evaluator}%
+            }{%
+                \PackageError{jkureport}{Legacy mode `#1' not supported!}{}%
+            }%
+        }{%
+            \ifdefempty{\jkureport@legacymodes}{}{%
+                \PackageWarning{jkureport}{Disabling all legacy modes.}%
+            }%
+            \renewcommand{\jkureport@legacymodes}{}%
+            \boolfalse{jkureport@legacyMMXXIV@evaluator}%
+        }%
+    },
+    legacymode=,
+}
+
 
 \DeclareOption*{}
 \ProcessPgfOptions{/jkureport/pkg}
@@ -435,8 +475,19 @@
 \setlength{\jkureport@authoring@titlepage@offset}{60mm}
 
 % General page sizing
-\setlength{\pdfpagewidth}{\paperwidth}
-\setlength{\pdfpageheight}{\paperheight}
+
+\@ifundefined{pdfpagewidth}{}{%
+    \setlength{\pdfpagewidth}{\paperwidth}
+}
+\@ifundefined{pagewidth}{}{%
+    \setlength{\pagewidth}{\paperwidth}
+}
+\@ifundefined{pdfpageheight}{}{%
+    \setlength{\pdfpageheight}{\paperwidth}
+}
+\@ifundefined{pageheight}{}{%
+    \setlength{\pageheight}{\paperwidth}
+}
 \setlength{\hoffset}{0in}
 \setlength{\voffset}{0in}
 
@@ -463,6 +514,10 @@
 %\setlength{\parskip}{1.5ex plus0.5ex minus0.5ex}
 \addtolength{\parskip}{0.5\baselineskip plus0.2ex minus0.5ex}
 
+% Increase default line spacing as suggested by issue #23 to improve readability
+% (you can still use a different \linespread{...} later in your document).
+\linespread{1.1}
+
 \newlength{\jkureport@topmargin}
 \newlength{\jkureport@oddsidemargin}
 \newlength{\jkureport@evensidemargin}
@@ -476,30 +531,41 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 
-%% Fancy fonts with XeTeX
+%% Fancy fonts with LuaTeX/XeTeX
 %% 
-
-\ifxetex\else%
-    \ifbool{jkureport@xetexfonts}{%
-        \PackageWarning{jkureport}{True-type fonts are only supported on XeLaTeX. Please consider switching to XeLaTeX to get the full look and feel of this template. Note that you can silence this warning with the `nofancyfonts' option.}%
-    }{}%
-    \boolfalse{jkureport@xetexfonts}%
-\fi
 
 \ifbool{jkureport@xetexfonts}{}{%
     \RequirePackage{lmodern}
 }%
 \RequirePackage{inconsolata}
 \RequirePackage{helvet}
-\RequirePackage{euler}
+\ifluatex\else\ifxetex\else%
+    \RequirePackage{euler}
+\fi\fi
 \RequirePackage{fontawesome5}
-\ifxetex\else%
+\ifluatex\else\ifxetex\else%
     % fix potentially mis-packaged FA5 in TeX Live 2017, see https://tex.stackexchange.com/q/497792/290236
     \pdfmapfile{=fontawesome5.map}%
-\fi
+\fi\fi
+
+\ifluatex\else\ifxetex\else%
+    \ifbool{jkureport@xetexfonts}{%
+        \PackageWarning{jkureport}{True-type fonts are only supported on LuaLaTeX/XeLaTeX. Please consider switching to LuaLaTeX (or XeLaTex) to get the full look and feel of this template. Note that you can silence this warning with the `nofancyfonts' option.}%
+    }{}%
+    \boolfalse{jkureport@xetexfonts}%
+\fi\fi
 
 \ifbool{jkureport@xetexfonts}{%
-    \RequirePackage{fontspec}
+    \ifbool{jkureport@mathastext}{
+        \RequirePackage[usefilenames]{firamath-otf}%
+    }{%
+        \@ifpackageloaded{unicode-math}{%
+            \setmathfont{Euler-Math.otf}
+        }{%
+            \RequirePackage{euler-math}%
+        }%
+    }
+    %\RequirePackage{fontspec}
     % discover font path
     \expandafter\IfFileExists\expandafter{\jkureport@fontpath PublicSans-Regular.ttf}{%
         \IfFontExistsTF{\jkureport@fontpath PublicSans-Regular.ttf}{%
@@ -682,7 +748,19 @@
 %% 
 
 \ifbool{jkureport@mathastext}{%
-    \usepackage[italic,defaultmathsizes,eulergreek]{mathastext}
+    \ifxetex%
+        % As of version 1.4, mathastext no longer compiles with XeLaTeX unless we
+        % the (deprecated) everymath option or the nominus option. Bug has been
+        % acknowledged by mathastext author. Until then, we are safe to use everymath:
+        \PassOptionsToPackage{everymath}{mathastext}
+        % In the future, we may also want to consider to use nominus (and use the
+        % standard math font for it). In that case, we should do this for at least
+        % the three basic operators +/-/= to achieve consistent operator alignment.
+        % Actually, this looks very promising in combination with FiraMath and we
+        % might want to consider always doing that in future (not just for XeLaTeX):
+        %\PassOptionsToPackage{noplus,nominus,noequal}{mathastext}
+    \fi
+    \usepackage[italic,defaultmathsizes,eulergreek,nosmalldelims,unicodeminus]{mathastext}
 }{}
 
 %% 
@@ -1233,7 +1311,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 
-%% Headings
+%% Headings & Captions
 %% 
 
 \KOMAoption{listof}{totoc}
@@ -1241,6 +1319,7 @@
 \KOMAoption{index}{totoc}
 \KOMAoption{numbers}{noenddot}
 \KOMAoption{captions}{tableheading}
+\captionsetup{format=hang}
 \ifdef{\chapter}{%
     \KOMAoption{chapterprefix}{true}
     \renewcommand*{\chaptermarkformat}{\thechapter\autodot\enskip}%
@@ -1347,16 +1426,48 @@
 \defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@submissiondepartmentname}{Angefertigt am}
 
 \defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@supervisorname}{Thesis Supervisor}
-\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@supervisorname}{Beurteiler\ifbool{jkureport@gender@f}{in}{}}
+\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@supervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Beurteiler}% was used before 2024W
+        {Betreuer}% used since 2024W
+    \ifbool{jkureport@gender@f}{in}{}%
+}
 
-\defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@firstsupervisorname}{First Supervisor}
-\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@firstsupervisorname}{Erstbeurteiler\ifbool{jkureport@gender@f}{in}{}}
+\defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@firstsupervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Supervisor and First Evaluator}% used since 2024W for pre-2021W unstructured doctoral programs
+        {First Supervisor}%
+}
+\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@firstsupervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Erstbeurteiler}% was used before 2024W and used since 2024W for pre-2021W unstructured doctoral programs
+        {Erstbetreuer}% used since 2024W
+    \ifbool{jkureport@gender@f}{in}{}%
+}
 
-\defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@secondsupervisorname}{Second Supervisor}
-\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@secondsupervisorname}{Zweitbeurteiler\ifbool{jkureport@gender@f}{in}{}}
+\defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@secondsupervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Second Evaluator}% used since 2024W for pre-2021W unstructured doctoral programs
+        {Second Supervisor}%
+}
+\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@secondsupervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Zweitbeurteiler}% was used before 2024W and used since 2024W for pre-2021W unstructured doctoral programs
+        {Zweitbetreuer}% used since 2024W
+    \ifbool{jkureport@gender@f}{in}{}%
+}
 
-\defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@thirdsupervisorname}{Third Supervisor}
-\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@thirdsupervisorname}{Drittbeurteiler\ifbool{jkureport@gender@f}{in}{}}
+\defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@thirdsupervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Third Evaluator}% used since 2024W for pre-2021W unstructured doctoral programs
+        {Third Supervisor}%
+}
+\defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@thirdsupervisorname}{%
+    \ifbool{jkureport@legacyMMXXIV@evaluator}%
+        {Drittbeurteiler}% was used before 2024W and used since 2024W for pre-2021W unstructured doctoral programs
+        {Drittbetreuer}% used since 2024W
+    \ifbool{jkureport@gender@f}{in}{}%
+}
 
 \defcaptionname{english,USenglish,american,UKenglish,british,canadian,australian,newzealand}{\jkureport@assistantsupervisorname}{Assistant Thesis Supervisor}
 \defcaptionname{german,germanb,ngerman,ngermanb,austrian,naustrian,swissgerman,nswissgerman}{\jkureport@assistantsupervisorname}{Mitbetreuung}
@@ -1778,12 +1889,12 @@
             {\usekomafont{author}\csuse{jkureport@insertsupervisor@1}}\par%
             \hfill\par%
             \ifcsempty{jkureport@insertsupervisor@2}{}{%
-                \csuse{jkureport@insertsupervisor@gender@1}%
+                \csuse{jkureport@insertsupervisor@gender@2}%
                 \jkureport@secondsupervisorname\par%
                 {\usekomafont{author}\csuse{jkureport@insertsupervisor@2}}\par%
                 \hfill\par%
                 \ifcsempty{jkureport@insertsupervisor@3}{}{%
-                    \csuse{jkureport@insertsupervisor@gender@1}%
+                    \csuse{jkureport@insertsupervisor@gender@3}%
                     \jkureport@thirdsupervisorname\par%
                     {\usekomafont{author}\csuse{jkureport@insertsupervisor@3}}\par%
                     \hfill\par%
@@ -1857,10 +1968,15 @@
 \newcommand{\jkureport@insertsubmissiondate}{%
     \begingroup%
     \DTMsetstyle{iso}%
-    \edef\@tmp{\noexpand\DTMsavedate{submissiondate}{\@date}}\@tmp%
-    \DTMmonthname{\DTMfetchmonth{submissiondate}}~\DTMfetchyear{submissiondate}%
+    \edef\@tmp{\noexpand\DTMsavedate{jkureport@docdate}{\@date}}\@tmp%
+    \DTMmonthname{\DTMfetchmonth{jkureport@docdate}}~\DTMfetchyear{jkureport@docdate}%
     \endgroup%
 }
+\ExplSyntaxOn
+\NewDocumentCommand{\jkureport@ifisodate}{mmm}{
+    \regex_match:nnTF {\A\d{4}-?\d{2}-?\d{2}\Z} {#1} {#2} {#3}
+}
+\ExplSyntaxOff
 \newcommand{\jkureport@insertdate}{%
     \ifdefstring{\jkureport@doctype}{thesis}{%
         \ifdefstring{\jkureport@docsubtype}{seminar}{%
@@ -1869,7 +1985,14 @@
             \jkureport@insertsubmissiondate%
         }%
     }{%
-        \protect\@date%
+        \expandafter\jkureport@ifisodate\expandafter{\@date}{%
+            \begingroup%
+            \edef\@tmp{\noexpand\DTMsavedate{jkureport@docdate}{\@date}}\@tmp%
+            \DTMusedate{jkureport@docdate}%
+            \endgroup%
+        }{%
+            \protect\@date%
+        }%
     }%
 }
 \newcommand{\jkureport@insertplace}{Linz}%
@@ -2271,7 +2394,7 @@
 %% Verbatim and listings
 %% 
 
-%\def\verbatim@font{\fontsize{10pt}{11pt}\jkubeamer@verbfamily\hyphenchar\font\m@ne\@noligs}
+%\def\verbatim@font{\fontsize{10pt}{11pt}\jkureport@verbfamily\hyphenchar\font\m@ne\@noligs}
 \def\verbatim@font{\normalfont\jkureport@verbfamily\hyphenchar\font\m@ne\@noligs}
 
 % Command \textverb{...}: Display argument in verbatim font (unlike with \verb|...|, the argument is not treated as verbatim).
@@ -2405,15 +2528,15 @@
 % Environment alertblock: add a boxed warning message block with an optional title
 \newenvironment{alertblock}[1][]{%
     \setlength{\jkureport@outerparskip}{\parskip}
-	\begin{tcolorbox}[colback=jkuRed!20,opacityback=1.0,colframe=jkuRed,colbacktitle=jkuRed,title={#1}]%
+    \begin{tcolorbox}[colback=jkuRed!20,opacityback=1.0,colframe=jkuRed,colbacktitle=jkuRed,title={#1}]%
         \setlength{\parskip}{\jkureport@outerparskip}%
 }{%
-	\end{tcolorbox}%
+    \end{tcolorbox}%
 }
 
 \newenvironment{alertblock*}[1][]{%
     \setlength{\jkureport@outerparskip}{\parskip}
-	\begin{tcolorbox}[colback=jkuRed!20,opacityback=1.0,colframe=jkuRed,colbacktitle=jkuRed,title={#1},
+    \begin{tcolorbox}[colback=jkuRed!20,opacityback=1.0,colframe=jkuRed,colbacktitle=jkuRed,title={#1},
         detach title,
         if odd page or oneside={%
             sharp corners=northeast,
@@ -2439,21 +2562,21 @@
     ]%
         \setlength{\parskip}{\jkureport@outerparskip}%
 }{%
-	\end{tcolorbox}%
+    \end{tcolorbox}%
 }
 
 % Environment block: add a boxed message block with an optional title
 \newenvironment{block}[1][]{%
     \setlength{\jkureport@outerparskip}{\parskip}
-	\begin{tcolorbox}[colback=jkuDarkGray!20,opacityback=1.0,title={#1}]%
+    \begin{tcolorbox}[colback=jkuDarkGray!20,opacityback=1.0,title={#1}]%
         \setlength{\parskip}{\jkureport@outerparskip}%
 }{%
-	\end{tcolorbox}%
+    \end{tcolorbox}%
 }
 
 \newenvironment{block*}[1][]{%
     \setlength{\jkureport@outerparskip}{\parskip}
-	\begin{tcolorbox}[colback=jkuDarkGray!20,opacityback=1.0,title={#1},
+    \begin{tcolorbox}[colback=jkuDarkGray!20,opacityback=1.0,title={#1},
         detach title,
         if odd page or oneside={%
             sharp corners=northeast,
@@ -2479,21 +2602,21 @@
     ]%
         \setlength{\parskip}{\jkureport@outerparskip}%
 }{%
-	\end{tcolorbox}%
+    \end{tcolorbox}%
 }
 
 % Environment highlightblock: add a highlighted boxed message block with an optional title
 \newenvironment{highlightblock}[1][]{%
     \setlength{\jkureport@outerparskip}{\parskip}
-	\begin{tcolorbox}[colback=palette faculty highlight!20,opacityback=1.0,colframe=palette faculty highlight,colbacktitle=palette faculty highlight,title={#1}]%
+    \begin{tcolorbox}[colback=palette faculty highlight!20,opacityback=1.0,colframe=palette faculty highlight,colbacktitle=palette faculty highlight,title={#1}]%
         \setlength{\parskip}{\jkureport@outerparskip}%
 }{%
-	\end{tcolorbox}%
+    \end{tcolorbox}%
 }
 
 \newenvironment{highlightblock*}[1][]{%
     \setlength{\jkureport@outerparskip}{\parskip}
-	\begin{tcolorbox}[colback=palette faculty highlight!20,opacityback=1.0,colframe=palette faculty highlight,colbacktitle=palette faculty highlight,title={#1},
+    \begin{tcolorbox}[colback=palette faculty highlight!20,opacityback=1.0,colframe=palette faculty highlight,colbacktitle=palette faculty highlight,title={#1},
         detach title,
         if odd page or oneside={%
             sharp corners=northeast,
@@ -2519,7 +2642,7 @@
     ]%
         \setlength{\parskip}{\jkureport@outerparskip}%
 }{%
-	\end{tcolorbox}%
+    \end{tcolorbox}%
 }
 
 %% 
