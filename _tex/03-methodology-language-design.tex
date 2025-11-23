@@ -52,14 +52,14 @@ To make the content of the \acl{IR} less abstract we depict the following exampl
 This \textit{horizon} field is solely to define the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
 
 \subsection*{Tasks}
-For convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The id is also required to know and display what task is assigned at what time slot.
+For convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The ID is also required to know and display what task is assigned at what time slot.
 
 \subsubsection*{Duration}
 Duration defines the length of a task in form of number of time slots as an integer.
 
 \subsubsection*{Importance}
 \label{subsubsec:methodology-language-design:importance}
-We define \textit{importance} to be an integer (or infinity), which defines how important a task is. Importance defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an importance value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal importance score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferebly scheduled and what tasks can - if necessary - be left unscheduled.
+We define \textit{importance} to be an integer (or infinity), which defines how important a task is. Importance defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an importance value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal importance score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can - if necessary - be left unscheduled.
 
 \subsubsection{Time slots}
 \label{subsubsec:methodology-language-design:time-slots}
