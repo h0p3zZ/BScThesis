@@ -7,7 +7,9 @@ if (args.Length != 1)
     return;
 }
 
-var success = JsonParser.CheckSchema(args[0], out IList<string> messages);
+var jsonParser = new JsonParser(args[0]);
+
+var success = jsonParser.CheckSchema(out IList<string> messages);
 if (success)
 {
     Console.WriteLine("The JSON file is valid according to the schema.");

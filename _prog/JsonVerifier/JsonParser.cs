@@ -5,24 +5,28 @@ using Newtonsoft.Json.Schema;
 
 namespace JsonVerifier;
 
-public static class JsonParser
+public class JsonParser
 {
-    public static bool CheckSchema(string filePath, out IList<string> messages)
+    private readonly string _filePath;
+
+    public JsonParser(string filePath) => _filePath = filePath;
+
+    public bool CheckSchema(out IList<string> messages)
     {
         messages = [];
-        if (!File.Exists(filePath))
+        if (!File.Exists(_filePath))
         {
             messages.Add("File not found.");
             return false;
         }
-        if (!Path.GetExtension(filePath).Equals(".json", StringComparison.OrdinalIgnoreCase))
+        if (!Path.GetExtension(_filePath).Equals(".json", StringComparison.OrdinalIgnoreCase))
         {
             messages.Add("The specified file is not a JSON file.");
             return false;
         }
 
         var jSchema = JSchema.Parse(File.ReadAllText("./schema.json"));
-        using StreamReader fileReader = File.OpenText(filePath);
+        using StreamReader fileReader = File.OpenText(_filePath);
         using JsonTextReader jsonReader = new(fileReader);
         using JSchemaValidatingReader validatingReader = new(jsonReader);
         validatingReader.Schema = jSchema;
@@ -37,15 +41,12 @@ public static class JsonParser
         }
     }
 
-    public static bool TryParse(
-        string filePath,
-        [NotNullWhen(true)] out ScheduleProblem? schedule
-    )
+    public bool TryParse([NotNullWhen(true)] out ScheduleProblem? schedule)
     {
         schedule = null;
         if (
-            !File.Exists(filePath)
-            || !Path.GetExtension(filePath).Equals(".json", StringComparison.OrdinalIgnoreCase)
+            !File.Exists(_filePath)
+            || !Path.GetExtension(_filePath).Equals(".json", StringComparison.OrdinalIgnoreCase)
         )
         {
             return false;
@@ -53,7 +54,7 @@ public static class JsonParser
 
         try
         {
-            schedule = JsonConvert.DeserializeObject<ScheduleProblem>(File.ReadAllText(filePath));
+            schedule = JsonConvert.DeserializeObject<ScheduleProblem>(File.ReadAllText(_filePath));
             return schedule != null;
         }
         catch (JsonException)

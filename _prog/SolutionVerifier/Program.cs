@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using JsonVerifier;
 using JsonVerifier.Models;
+using SolutionVerifier;
 Console.OutputEncoding = System.Text.Encoding.Unicode;
 
 if (args.Length != 2)
@@ -9,7 +10,8 @@ if (args.Length != 2)
     return;
 }
 
-var success = JsonParser.TryParse(args[0], out ScheduleProblem? problem);
+var jsonParser = new JsonParser(args[0]);
+var success = jsonParser.TryParse(out ScheduleProblem? problem);
 if (!success || problem == null)
 {
     Console.WriteLine("The file could not be parsed as a valid Schedule JSON. Please verify the file using the JsonVerifier.");
@@ -22,17 +24,34 @@ if (!File.Exists(args[1]))
     return;
 }
 
-var assignment = JsonSerializer.Deserialize<ScheduleAssignment>(File.ReadAllText(args[1]));
-if (assignment == null)
+var assignmentParser = new AssignmentParser(args[1]);
+success = assignmentParser.Prase(out ScheduleAssignment? assignment);
+if (!success || assignment == null)
 {
     Console.WriteLine("The file does not contain a valid assignment");
     return;
 }
 
-if (problem.Tasks.FirstOrDefault(x => !assignment.Assignments.ContainsKey(x.Key)).Key is string taskKey)
+foreach (var assignemtn in assignment.Assignments)
 {
-    Console.WriteLine($"Some tasks do not have an assignment. First one found: {taskKey}");
-    return;
+    if (assignemtn.Value is not { } timeSlot) continue;
+    if (timeSlot < 0)
+    {
+        Console.WriteLine($"Task {assignemtn.Key} has a negative time slot.");
+        return;
+    }
+}
+
+foreach (var task in problem.Tasks)
+{
+    bool found = false;
+    if (!assignment.Assignments.ContainsKey(task.Key))
+    {
+        Console.WriteLine($"Task {task.Key} does not have an assignment.");
+        found = true;
+    }
+    if (found)
+        return;
 }
 
 
@@ -80,7 +99,6 @@ foreach (var i1 in assignment.Assignments)
             {
                 if (dependency.Task == i1.Key)
                 {
-                    // TODO: handle multiple matching intervals
                     var intervals = dependency.Intervals.Where(x =>
                         task2TimeSlot - task1TimeSlot + task1.Duration > x.Interval[0] &&
                         task2TimeSlot - task1TimeSlot + task1.Duration < x.Interval[1]

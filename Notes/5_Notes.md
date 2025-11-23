@@ -114,7 +114,7 @@ Add `duration` $d$
 Fix `dependencies` and  
 
 ### `Assignments`
-When using $\N_0 \cup - 1$ you have to handle that seperately in the assignment/duration semantics
+When using $\N_0 \cup - 1$ you have to handle that separately in the assignment/duration semantics
 
 ### `Dependencies`
 Instead of using $\in N_0 just write \geq 0$
