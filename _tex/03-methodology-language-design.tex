@@ -1,0 +1,83 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\cleardoubleoddpage%  Make sure to start each chapter on a new odd page
+
+\chapter{Methodology and Language Design}
+\label{chapter:methodology-language-design}
+
+\section{TODO}
+Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
+Speaking of \enquote{time slots} we additionally need to phrase the explicit meaning of the phrase. Such a slot is defined using a 0 based time slot "array" in form of intervals. It starts counting from the 0 (now) up to a given horizon and every task inside that needs to be scheduled has defined possible time slots (intervals), which are also static - relative to the given beginning of the tasks (time slot 0).
+
+\section{Data Format}
+\label{sec:methodology-language-design:data-format}
+In this chapter we want to give basic meaning to the underlying language, without going into implementation detail. We provide a minimal working example alongside detailed design choices for each field contained in our language.
+
+\subsection{\acl{IR} Example}
+To make the content of the \acl{IR} less abstract we depict the following example, it should give a structural understanding beforehand. In the next chapter (\ref{subsec:methodology-language-design:data-format:language-keywords}) we specify the exact reasons of choices we had to make during the design process. the example should serve as reference for later lookup.
+\begin{lstlisting}[language=json]
+{
+    "horizon": 100,
+    "tasks": {
+        "SomeTaskId": {
+            "name": "Some Cleartext name",
+            "duration": 5,
+            "importance": 100,
+            \textcolor{red}{TODO}"urgency": 5,
+            "timeSlots": [
+                { "interval": [5,12], "cost": 5},
+                { "interval": [20,22], "cost": 0},
+                { "interval": [20,28], "cost": 25},
+            ],
+            "dependencies": [
+                { 
+                    "task": "AnotherTaskId",
+                    "intervals": [
+                        { "interval": [10, 20], "cost": 5},
+                        { "interval": [20, 1110], "cost": 15}
+                    ],
+                    "unmetCost": 100
+                }
+            ],
+            "location": { "id": 1, "unmetCost": 150 }
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection{Language Keywords}
+\label{subsec:methodology-language-design:data-format:language-keywords}
+\subsection*{Horizon}
+This \textit{horizon} field is solely to define the length of time the solver can define tasks to - the amount of time slots. Wihtout defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
+
+\subsection*{Tasks}
+For convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The id is also required to know and display what task is assigned at what time slot.
+
+\subsubsection*{Duration}
+Duration defines the length of a task in form of number of time slots as an integer.
+
+\subsubsection*{Importance}
+\label{subsubsec:methodology-language-design:importance}
+We define \textit{importance} to be an integer (or infinity), which defines how important a task is. Importance defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an importance value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal importance score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferebly scheduled and what tasks can - if necessary - be left unscheduled.
+
+\subsubsection{Time slots}
+\label{subsubsec:methodology-language-design:time-slots}
+Describing when a given task can be scheduled is represented by the \textit{timeSlots} field. Without it, one could not define when to, when to best or when not to schedule a task. We came up with the following options on how to efficiently define the field:
+\begin{itemize}
+    \item array of bits,
+    \item array of interval
+    \item and array of interval-cost pairs.
+\end{itemize}
+Bit-arrays are very easy to handle and efficient to store - but as storage is not a concerning factor, and the representation scales linearly with the horizon it becomes harder to understand for humans, the bigger the horizon. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being easily human-readable. For expressiveness, we additionally added a cost for each interval and consequently stick with an array of interval-cost pairs.
+
+\subsection*{Dependencies}
+\label{subsubsec:methodology-language-design:dependencies}
+In the \textit{dependencies} we depict preceding tasks. It in turn again contains intervals in the same format as in \nameref{subsubsec:methodology-language-design:time-slots}. Additionally, similarly to the \nameref{subsubsec:methodology-language-design:importance} of a task, we define \textit{unmetCost} if a task does not conform to its dependencies. The necessity of the here described fields are already described in \nameref{subsubsec:methodology-language-design:time-slots} and \nameref{subsubsec:methodology-language-design:importance}.
+
+\subsubsection*{Location}
+Planning a timetable well improves throughput while simultaneously reducing travel time by grouping tasks in the same area together. Hence, we define \textit{location}, by a unique integer alongside with \textit{unmetCost}, for when the grouping is not managed properly. This is the most basic set of fields, one could use for this purpose. For the general functionality it is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
+
+
+
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
