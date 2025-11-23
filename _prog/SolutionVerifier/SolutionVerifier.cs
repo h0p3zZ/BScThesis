@@ -53,6 +53,16 @@ internal class SolutionVerifier
                     return scheduleCost;
                 }
 
+                // Add location cost if tasks are scheduled back-to-back and not at the same location
+                if (
+                    task1.Location != null && task2.Location != null
+                    && task1TimeSlot + task1.Duration == task2TimeSlot
+                    && task1.Location.Id != task2.Location.Id
+                )
+                {
+                    scheduleCost.LocationCost += task2.Location.UnmetCost;
+                }
+
                 // Check dependency cost
                 foreach (var dependency in task2.Dependencies ?? [])
                 {
@@ -63,33 +73,35 @@ internal class SolutionVerifier
                         task2TimeSlot - task1TimeSlot + task1.Duration > x.Interval[0] &&
                         task2TimeSlot - task1TimeSlot + task1.Duration < x.Interval[1]
                     );
-                    if (intervals.Any())
+
+                    if (!intervals.Any())
                     {
-                        double weightedSum = 0;
-                        double totalOverlap = 0;
-
-                        foreach (var interval in intervals)
-                        {
-                            var intervalStart = interval.Interval[0];
-                            var intervalEnd = interval.Interval[1];
-
-                            // actual overlap between the task window and the interval
-                            var overlapStart = Math.Max(task2TimeSlot, intervalStart);
-                            var overlapEnd = Math.Min(task2TimeSlot + task2.Duration, intervalEnd);
-                            var overlapLength = overlapEnd - overlapStart;
-
-                            if (overlapLength > 0)
-                            {
-                                weightedSum += overlapLength * interval.Cost;
-                                totalOverlap += overlapLength;
-                            }
-                        }
-
-                        var weightedCost = weightedSum / totalOverlap;
-                        scheduleCost.DependencyCost += weightedCost;
-                    }
-                    else
                         scheduleCost.DependencyCost += dependency.UnmetCost;
+                        continue;
+                    }
+
+                    double weightedSum = 0;
+                    double totalOverlap = 0;
+
+                    foreach (var interval in intervals)
+                    {
+                        var intervalStart = interval.Interval[0];
+                        var intervalEnd = interval.Interval[1];
+
+                        // Calculating overlap to determine weighted cost
+                        var overlapStart = Math.Max(task2TimeSlot, intervalStart);
+                        var overlapEnd = Math.Min(task2TimeSlot + task2.Duration, intervalEnd);
+                        var overlapLength = overlapEnd - overlapStart;
+
+                        if (overlapLength > 0)
+                        {
+                            weightedSum += overlapLength * interval.Cost;
+                            totalOverlap += overlapLength;
+                        }
+                    }
+
+                    var weightedCost = weightedSum / totalOverlap;
+                    scheduleCost.DependencyCost += weightedCost;
                 }
             }
         }
