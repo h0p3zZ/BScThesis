@@ -1,19 +1,18 @@
-﻿using JsonVerifier.Models;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace SolutionVerifier;
 
-public class AssignmentParser
+internal class AssignmentParser
 {
     private readonly string _filePath;
 
-    public AssignmentParser(string filePath)
+    internal AssignmentParser(string filePath)
     {
         _filePath = filePath;
     }
 
-    public bool Prase([NotNullWhen(true)] out ScheduleAssignment? assignment)
+    internal bool Prase([NotNullWhen(true)] out ScheduleAssignment? assignment)
     {
         if (!File.Exists(_filePath)){
             assignment = null;

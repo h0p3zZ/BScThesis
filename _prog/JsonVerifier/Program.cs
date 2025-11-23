@@ -7,6 +7,12 @@ if (args.Length != 1)
     return;
 }
 
+if (!File.Exists(args[0]))
+{
+    Console.WriteLine($"The JSON file ({args[0]}) does not exist.");
+    return;
+}
+
 var jsonParser = new JsonParser(args[0]);
 
 var success = jsonParser.CheckSchema(out IList<string> messages);
