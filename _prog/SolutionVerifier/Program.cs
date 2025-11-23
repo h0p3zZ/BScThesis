@@ -25,47 +25,46 @@ if (!File.Exists(args[1]))
 }
 
 var assignmentParser = new AssignmentParser(args[1]);
-success = assignmentParser.Prase(out ScheduleAssignment? assignment);
-if (!success || assignment == null)
+success = assignmentParser.Prase(out ScheduleAssignment? assignments);
+if (!success || assignments == null)
 {
     Console.WriteLine("The file does not contain a valid assignment");
     return;
 }
 
-foreach (var assignemtn in assignment.Assignments)
+bool foundProblem = false;
+foreach (var assignment in assignments)
 {
-    if (assignemtn.Value is not { } timeSlot) continue;
+    if (assignment.Value is not { } timeSlot) continue;
     if (timeSlot < 0)
     {
-        Console.WriteLine($"Task {assignemtn.Key} has a negative time slot.");
-        return;
+        Console.WriteLine($"Task {assignment.Key} has a negative time slot.");
+        foundProblem = true;
+    }
+    if (!problem.Tasks.ContainsKey(assignment.Key))
+    {
+        Console.WriteLine($"Non-existent task {assignment.Key} has an assignment.");
+        foundProblem = true;
     }
 }
 
 foreach (var task in problem.Tasks)
 {
-    bool found = false;
-    if (!assignment.Assignments.ContainsKey(task.Key))
+    if (!assignments.ContainsKey(task.Key))
     {
         Console.WriteLine($"Task {task.Key} does not have an assignment.");
-        found = true;
+        foundProblem = true;
     }
-    if (found)
-        return;
 }
 
-
-if (assignment.Assignments.Any(x => !problem.Tasks.ContainsKey(x.Key)))
-{
-    Console.WriteLine("Some non-existent tasks have an assignment.");
+if (foundProblem)
     return;
-}
 
 double importanceCost = 0;
 double urgencyCost = 0;
 double dependencyCost = 0;
 double locationCost = 0;
-foreach (var i1 in assignment.Assignments)
+foreach (var i1 in assignments)
 {
     var task1 = problem.Tasks[i1.Key];
 
@@ -79,7 +78,7 @@ foreach (var i1 in assignment.Assignments)
             return;
         }
 
-        foreach (var i2 in assignment.Assignments)
+        foreach (var i2 in assignments)
         {
             if (i2.Value is not { } task2TimeSlot) continue;
             if (i1.Key == i2.Key) continue;
