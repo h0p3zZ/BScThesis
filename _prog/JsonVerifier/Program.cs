@@ -1,6 +1,6 @@
 ﻿using JsonVerifier;
 
-
+#region ---------- Argument Check ----------
 if (args.Length != 1)
 {
     Console.WriteLine("Please specify file path: program.exe <file-to-json>");
@@ -12,6 +12,7 @@ if (!File.Exists(args[0]))
     Console.WriteLine($"The JSON file ({args[0]}) does not exist.");
     return;
 }
+#endregion Argument Check
 
 var jsonParser = new JsonParser(args[0]);
 

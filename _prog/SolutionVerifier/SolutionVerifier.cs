@@ -94,8 +94,8 @@ internal class SolutionVerifier
             {
                 scheduleCost.ImportanceCost += task1.Importance;
             }
-
-            return scheduleCost;
         }
+
+        return scheduleCost;
     }
 }
