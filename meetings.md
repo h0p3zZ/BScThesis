@@ -1,3 +1,44 @@
+# 17.11.2025
+
+I took a look into your thesis, here's some of my thoughts.
+
+## Structure
+
+While there's no predefined structure for a thesis, I recommend to start from the rough schema I lay out below, and then adapt it to each particular thesis as needed.
+
+1. Introduction. Here you present your thesis assuming the reader *doesn't know* what you did. This should roughly contain:
+    - What is the general problem your thesis works on. Not necessarily the problem you're solving, but the long-term problem your solution is a part of.
+    - What specifically is the sub-problem you worked on. This includes: why is this even a problem? Why is it a *relevant* problem? What is not so straightforward about it?
+    - What are your contributions i.e. what did you do to solve it. Here you summarize very briefly and without going into details what you did.
+    - What are your results. Explain what things you achieved with your solution.
+    - Outline the rest of your thesis.
+
+2. Preliminaries. Here you introduce any information the reader might need to understand what comes next that was *not your own contribution*.
+    So, here you can talk a bit about data formats like JSON, about solvers, etc.
+
+3. Methodology. Here you explain in much more detail what you did to solve the problem, but only what you need before going into details.
+    Here's where you'd talk about your choice of what is a task, what are the timeslots, what are dependencies etc.
+    Crucially, here's where you should talk about how your very limited IR language suffices to achieve great expressivity in different situations.
+    You also talk here about limitations.
+
+4. Implementation. Here you go into the tiny details. In your case, you'd probably call this "Formal framework".
+    This is the big part of your thesis, where you describe e.g. the mathematical modeling.
+
+5. Experimental evaluation. This part you can skip because your work is not experimental.
+
+6. Conclusion: Pretty much the same as the introduction, but this time around assuming the reader has already read the thesis and knows what you did.
+
+I think right now your thesis is not quite conforming to this.
+
+## Methodology
+
+From what I see, "Data format" would be Section 3: Methodology. As you probably have noticed by now, starting with definitions does not quite work well.
+Instead, I suggest you start by discussing what design decisions are involved. For example, you can start by saying that the intuitive definition of task is very wide
+and includes things like repetitions, task splitting etc. Then you say that instead you decided to interpret tasks as items that must be allocated predetermined contiguous amounts of time,
+and that other properties would be reduced to tasks.
+
+Similarly for time: you decided to discretize time into "slots" of an arbitrary length, and to bound the span of time being considered through the horizon etc.
+
 # 20.10.2025
 
 - There's no need to write everything symbolically, it suffices to be unambiguous.
