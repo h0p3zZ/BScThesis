@@ -29,10 +29,12 @@
       "dependencies": [
         {
           "task": "alpha_001",
-          "intervals": {
-            "interval": [ 0, 700 ],
-            "cost": 0
-          },
+          "intervals": [
+            {
+              "interval": [ 0, 700 ],
+              "cost": 0
+            }
+          ],
           "unmetCost": 5
         }
       ],
@@ -53,10 +55,12 @@
       "dependencies": [
         {
           "task": "alpha_002",
-          "intervals": {
-            "interval": [ 60, 700 ],
-            "cost": 2
-          },
+          "intervals": [
+            {
+              "interval": [ 60, 700 ],
+              "cost": 2
+            }
+          ],
           "unmetCost": 5
         }
       ]
@@ -74,18 +78,22 @@
       "dependencies": [
         {
           "task": "alpha_002",
-          "intervals": {
-            "interval": [ 0, 700 ],
-            "cost": 1
-          },
+          "intervals": [
+            {
+              "interval": [ 0, 700 ],
+              "cost": 1
+            }
+          ],
           "unmetCost": 5
         },
         {
           "task": "alpha_003",
-          "intervals": {
-            "interval": [ 150, 700 ],
-            "cost": 2
-          },
+          "intervals": [
+            {
+              "interval": [ 150, 700 ],
+              "cost": 2
+            }
+          ],
           "unmetCost": 5
         }
       ],
@@ -106,10 +114,12 @@
       "dependencies": [
         {
           "task": "alpha_004",
-          "intervals": {
-            "interval": [ 250, 700 ],
-            "cost": 3
-          },
+          "intervals": [
+            {
+              "interval": [ 250, 700 ],
+              "cost": 3
+            }
+          ],
           "unmetCost": 5
         }
       ]
@@ -127,10 +137,12 @@
       "dependencies": [
         {
           "task": "alpha_005",
-          "intervals": {
-            "interval": [ 350, 700 ],
-            "cost": 1
-          },
+          "intervals": [
+            {
+              "interval": [ 350, 700 ],
+              "cost": 1
+            }
+          ],
           "unmetCost": 5
         }
       ],
@@ -151,10 +163,12 @@
       "dependencies": [
         {
           "task": "alpha_006",
-          "intervals": {
-            "interval": [ 360, 700 ],
-            "cost": 0
-          },
+          "intervals": [
+            {
+              "interval": [ 360, 700 ],
+              "cost": 0
+            }
+          ],
           "unmetCost": 5
         }
       ]

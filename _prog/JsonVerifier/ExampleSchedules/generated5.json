@@ -15,10 +15,12 @@
       "dependencies": [
         {
           "task": "y",
-          "intervals": {
-            "interval": [ 0, 20 ],
-            "cost": 4
-          },
+          "intervals": [
+            {
+              "interval": [ 0, 20 ],
+              "cost": 4
+            }
+          ],
           "unmetCost": 10
         }
       ]

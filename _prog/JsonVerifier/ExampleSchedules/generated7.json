@@ -15,10 +15,12 @@
       "dependencies": [
         {
           "task": "bb",
-          "intervals": {
-            "interval": [ 0, 1 ],
-            "cost": 0
-          },
+          "intervals": [
+            {
+              "interval": [ 0, 1 ],
+              "cost": 0
+            }
+          ],
           "unmetCost": 0
         }
       ],

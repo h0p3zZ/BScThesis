@@ -11,7 +11,7 @@ public class JsonParser
 
     public JsonParser(string filePath) => _filePath = filePath;
 
-    public bool CheckSchema(out IList<string> messages)
+    public bool ValidateSchema(out IList<string> messages)
     {
         messages = [];
         if (!File.Exists(_filePath))
