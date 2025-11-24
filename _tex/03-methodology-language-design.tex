@@ -5,6 +5,11 @@
 \chapter{Methodology and Language Design}
 \label{chapter:methodology-language-design}
 
+% Introduce basic concepts
+% Dxplain time descretization, bounding
+
+% Describe tasks, non overlapping, dependencies, locations
+
 \section{TODO}
 \todo{Find proper section name}
 Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
@@ -15,7 +20,7 @@ Speaking of \enquote{time slots} we additionally need to phrase the explicit mea
 In this chapter we want to give basic meaning to the underlying language, without going into implementation detail. We provide a minimal working example alongside detailed design choices for each field contained in our language.
 
 \subsection{\acl{IR} Example}
-To make the content of the \acl{IR} less abstract we depict the following example, it should give a structural understanding beforehand. In the next chapter (\ref{subsec:methodology-language-design:data-format:language-keywords}) we specify the exact reasons of choices we had to make during the design process. the example should serve as reference for later lookup.
+To make the content of the \acl{IR} less abstract we depict the following example, it should give a structural understanding beforehand. In the next chapter (\ref{subsec:methodology-language-design:data-format:language-keywords}) we specify the exact reasons of choices we had to make during the design process. The example should serve as reference for later lookup.
 \begin{lstlisting}[language=json]
 {
     "horizon": 100,
@@ -45,9 +50,11 @@ To make the content of the \acl{IR} less abstract we depict the following exampl
     }
 }
 \end{lstlisting}
+\todo{Move JSON to implementation, just list the fields/constraints before explaining them.}
 
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
+\todo{Give the abstract notion (time) and discretize into the language - reasoning process}
 \subsection*{Horizon}
 This \textit{horizon} field is solely to define the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
 
