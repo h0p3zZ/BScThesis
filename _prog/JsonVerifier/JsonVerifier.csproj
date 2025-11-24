@@ -12,16 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="schedule.json">
+    <None Update="ExampleSchedules\schedule.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="invalidSchedule.json">
+    <None Update="ExampleSchedules\invalidSchedule.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="validSchedule.json">
+    <None Update="ExampleSchedules\validSchedule.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

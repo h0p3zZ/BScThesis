@@ -1,9 +1,9 @@
 {
-  "horizon": 420,
+  "horizon": 500,
   "tasks": {
     "UUIDTaskTestAnyString": {
       "name": "TasksA",
-      "duration": 69,
+      "duration": 42,
       "importance": "Infinity",
       "urgency": 1,
       "timeSlots": [
@@ -262,7 +262,7 @@
       "urgency": 1,
       "timeSlots": [
         {
-          "interval": [ 138, 420 ],
+          "interval": [ 138, 300 ],
           "cost": 1
         }
       ],
@@ -276,7 +276,7 @@
       "urgency": 2,
       "timeSlots": [
         {
-          "interval": [ 144, 420 ],
+          "interval": [ 144, 304 ],
           "cost": 1
         }
       ],
@@ -290,7 +290,7 @@
       "urgency": 4,
       "timeSlots": [
         {
-          "interval": [ 148, 420 ],
+          "interval": [ 148, 308 ],
           "cost": 2
         }
       ],
@@ -304,7 +304,7 @@
       "urgency": 10,
       "timeSlots": [
         {
-          "interval": [ 157, 420 ],
+          "interval": [ 157, 312 ],
           "cost": 3
         }
       ],
@@ -318,7 +318,7 @@
       "urgency": 2,
       "timeSlots": [
         {
-          "interval": [ 169, 420 ],
+          "interval": [ 169, 316 ],
           "cost": 1
         }
       ],
@@ -332,7 +332,7 @@
       "urgency": 5,
       "timeSlots": [
         {
-          "interval": [ 174, 420 ],
+          "interval": [ 174, 320 ],
           "cost": 2
         }
       ],
@@ -346,7 +346,7 @@
       "urgency": 3,
       "timeSlots": [
         {
-          "interval": [ 180, 420 ],
+          "interval": [ 180, 324 ],
           "cost": 1
         }
       ],
@@ -360,7 +360,7 @@
       "urgency": 1,
       "timeSlots": [
         {
-          "interval": [ 183, 420 ],
+          "interval": [ 183, 328 ],
           "cost": 2
         }
       ],
@@ -374,7 +374,7 @@
       "urgency": 1,
       "timeSlots": [
         {
-          "interval": [ 191, 420 ],
+          "interval": [ 191, 332 ],
           "cost": 0
         }
       ],
@@ -388,7 +388,7 @@
       "urgency": 6,
       "timeSlots": [
         {
-          "interval": [ 193, 420 ],
+          "interval": [ 193, 336 ],
           "cost": 2
         }
       ],
@@ -402,7 +402,7 @@
       "urgency": 2,
       "timeSlots": [
         {
-          "interval": [ 203, 420 ],
+          "interval": [ 203, 340 ],
           "cost": 1
         }
       ],
@@ -416,7 +416,7 @@
       "urgency": 3,
       "timeSlots": [
         {
-          "interval": [ 207, 420 ],
+          "interval": [ 207, 344 ],
           "cost": 1
         }
       ],
@@ -430,7 +430,7 @@
       "urgency": 2,
       "timeSlots": [
         {
-          "interval": [ 213, 420 ],
+          "interval": [ 213, 348 ],
           "cost": 1
         }
       ],
@@ -444,7 +444,7 @@
       "urgency": 4,
       "timeSlots": [
         {
-          "interval": [ 218, 420 ],
+          "interval": [ 218, 352 ],
           "cost": 2
         }
       ],
@@ -453,12 +453,12 @@
 
     "task_032": {
       "name": "t032",
-      "duration": 8,
+      "duration": 195,
       "importance": 10,
       "urgency": 20,
       "timeSlots": [
         {
-          "interval": [ 225, 420 ],
+          "interval": [ 225, 356 ],
           "cost": 5
         }
       ],

@@ -1,9 +1,9 @@
 {
-  "horizon": 420,
+  "horizon": 500,
   "tasks": {
     "UUIDTaskTestAnyString": {
       "name": "TasksA",
-      "duration": 69,
+      "duration": 42,
       "importance": "Infinity",
       "urgency": 1,
       "timeSlots": [

@@ -1,9 +1,9 @@
 {
-  "horizon": 420,
+  "horizon": 500,
   "tasks": {
     "Unique": {
       "name": "TasksA",
-      "duration": 69,
+      "duration": 42,
       "importance": 3,
       "urgency": "doesNotWork",
       "timeSlots": [
