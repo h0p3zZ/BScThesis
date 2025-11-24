@@ -49,9 +49,10 @@
                 "type": "object",
                 "properties": {
                   "task": { "type": "string" },
-                  "items": { "$ref": "#/$defs/intervalCost" }
+                  "intervals": { "$ref": "#/$defs/intervalCost" }
                 },
-                "required": [ "task", "items" ]
+                "unmetCost": { "type": "integer" },
+                "required": [ "task", "intervals", "unmetCost" ]
               }
             },
             "location": {

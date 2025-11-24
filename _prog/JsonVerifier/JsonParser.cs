@@ -33,7 +33,7 @@ public class JsonParser
         IList<string> errorMessages = [];
         validatingReader.ValidationEventHandler += (o, a) => errorMessages.Add(a.Message);
         while (validatingReader.Read()) { }
-        if (messages.Count == 0) return true;
+        if (errorMessages.Count == 0) return true;
         else
         {
             messages = errorMessages;

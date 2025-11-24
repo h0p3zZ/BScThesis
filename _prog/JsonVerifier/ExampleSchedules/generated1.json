@@ -1,0 +1,163 @@
+{
+  "horizon": 700,
+  "tasks": {
+    "alpha_001": {
+      "name": "DataIngestion",
+      "duration": 50,
+      "importance": "Infinity",
+      "urgency": 5,
+      "timeSlots": [
+        { "interval": [0, 120], "cost": 2 },
+        { "interval": [150, 300], "cost": 4 }
+      ],
+      "dependencies": [],
+      "location": {
+        "id": 1,
+        "unmetCost": 20
+      }
+    },
+
+    "alpha_002": {
+      "name": "Preprocessing",
+      "duration": 30,
+      "importance": 12,
+      "urgency": 10,
+      "timeSlots": [
+        { "interval": [40, 200], "cost": 1 },
+        { "interval": [210, 260], "cost": 3 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_001",
+          "intervals": {
+            "interval": [ 0, 700 ],
+            "cost": 0
+          },
+          "unmetCost": 5
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": 5
+      }
+    },
+
+    "alpha_003": {
+      "name": "FeatureEngineering",
+      "duration": 80,
+      "importance": 9,
+      "urgency": 8,
+      "timeSlots": [
+        { "interval": [100, 350], "cost": 1 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_002",
+          "intervals": {
+            "interval": [ 60, 700 ],
+            "cost": 2
+          },
+          "unmetCost": 5
+        }
+      ]
+    },
+
+    "alpha_004": {
+      "name": "ModelTraining",
+      "duration": 150,
+      "importance": 20,
+      "urgency": 12,
+      "timeSlots": [
+        { "interval": [200, 600], "cost": 5 },
+        { "interval": [300, 650], "cost": 3 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_002",
+          "intervals": {
+            "interval": [ 0, 700 ],
+            "cost": 1
+          },
+          "unmetCost": 5
+        },
+        {
+          "task": "alpha_003",
+          "intervals": {
+            "interval": [ 150, 700 ],
+            "cost": 2
+          },
+          "unmetCost": 5
+        }
+      ],
+      "location": {
+        "id": 2,
+        "unmetCost": "Infinity"
+      }
+    },
+
+    "alpha_005": {
+      "name": "ModelEvaluation",
+      "duration": 40,
+      "importance": 10,
+      "urgency": 6,
+      "timeSlots": [
+        { "interval": [300, 650], "cost": 0 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_004",
+          "intervals": {
+            "interval": [ 250, 700 ],
+            "cost": 3
+          },
+          "unmetCost": 5
+        }
+      ]
+    },
+
+    "alpha_006": {
+      "name": "Deployment",
+      "duration": 25,
+      "importance": 15,
+      "urgency": 15,
+      "timeSlots": [
+        { "interval": [400, 680], "cost": 2 },
+        { "interval": [450, 690], "cost": 0 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_005",
+          "intervals": {
+            "interval": [ 350, 700 ],
+            "cost": 1
+          },
+          "unmetCost": 5
+        }
+      ],
+      "location": {
+        "id": 3,
+        "unmetCost": 10
+      }
+    },
+
+    "alpha_007": {
+      "name": "PostDeploymentMonitoring",
+      "duration": 90,
+      "importance": 6,
+      "urgency": 4,
+      "timeSlots": [
+        { "interval": [450, 700], "cost": 2 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_006",
+          "intervals": {
+            "interval": [ 360, 700 ],
+            "cost": 0
+          },
+          "unmetCost": 5
+        }
+      ]
+    }
+  }
+}

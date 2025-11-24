@@ -1,0 +1,39 @@
+{
+  "horizon": 40,
+  "tasks": {
+    "x": {
+      "name": "x",
+      "duration": 3,
+      "importance": 7,
+      "urgency": 2,
+      "timeSlots": [
+        {
+          "interval": [ 0, 10 ],
+          "cost": 1
+        }
+      ],
+      "dependencies": [
+        {
+          "task": "y",
+          "intervals": {
+            "interval": [ 0, 20 ],
+            "cost": 4
+          },
+          "unmetCost": 10
+        }
+      ]
+    },
+    "y": {
+      "name": "y",
+      "duration": 5,
+      "importance": 1,
+      "urgency": 3,
+      "timeSlots": [
+        {
+          "interval": [ 5, 30 ],
+          "cost": 2
+        }
+      ]
+    }
+  }
+}

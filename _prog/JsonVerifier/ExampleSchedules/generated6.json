@@ -1,0 +1,29 @@
+{
+  "horizon": 1,
+  "tasks": {
+    "t1": {
+      "name": "t1",
+      "duration": 1,
+      "importance": 0,
+      "urgency": 0,
+      "timeSlots": [
+        {
+          "interval": [ 0, 0 ],
+          "cost": 0
+        }
+      ]
+    },
+    "t2": {
+      "name": "t2",
+      "duration": 1,
+      "importance": "Infinity",
+      "urgency": 0,
+      "timeSlots": [
+        {
+          "interval": [ 0, 1 ],
+          "cost": 0
+        }
+      ]
+    }
+  }
+}

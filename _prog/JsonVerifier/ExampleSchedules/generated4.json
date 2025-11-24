@@ -1,0 +1,37 @@
+{
+  "horizon": 50,
+  "tasks": {
+    "cleaning": {
+      "name": "cleaning",
+      "duration": 4,
+      "importance": 5,
+      "urgency": 3,
+      "timeSlots": [
+        {
+          "interval": [ 0, 25 ],
+          "cost": 3
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": 100
+      }
+    },
+    "inspection": {
+      "name": "inspection",
+      "duration": 2,
+      "importance": "Infinity",
+      "urgency": 5,
+      "timeSlots": [
+        {
+          "interval": [ 20, 30 ],
+          "cost": 1
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": "Infinity"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "horizon": 20,
+  "tasks": {
+    "taskA": {
+      "name": "TaskA",
+      "duration": 5,
+      "importance": 3,
+      "urgency": 1,
+      "timeSlots": [
+        {
+          "interval": [ 0, 10 ],
+          "cost": 1
+        }
+      ]
+    },
+    "taskB": {
+      "name": "TaskB",
+      "duration": 3,
+      "importance": 2,
+      "urgency": 4,
+      "timeSlots": [
+        {
+          "interval": [ 5, 15 ],
+          "cost": 2
+        }
+      ]
+    }
+  }
+}

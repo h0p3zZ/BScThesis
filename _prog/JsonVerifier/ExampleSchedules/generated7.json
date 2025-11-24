@@ -1,0 +1,47 @@
+{
+  "horizon": 2,
+  "tasks": {
+    "aa": {
+      "name": "aa",
+      "duration": 1,
+      "importance": "Infinity",
+      "urgency": 0,
+      "timeSlots": [
+        {
+          "interval": [ 0, 1 ],
+          "cost": 999
+        }
+      ],
+      "dependencies": [
+        {
+          "task": "bb",
+          "intervals": {
+            "interval": [ 0, 1 ],
+            "cost": 0
+          },
+          "unmetCost": 0
+        }
+      ],
+      "location": {
+        "id": 0,
+        "unmetCost": 0
+      }
+    },
+    "bb": {
+      "name": "bb",
+      "duration": 1,
+      "importance": 0,
+      "urgency": 0,
+      "timeSlots": [
+        {
+          "interval": [ 1, 1 ],
+          "cost": 1
+        }
+      ],
+      "location": {
+        "id": 0,
+        "unmetCost": "Infinity"
+      }
+    }
+  }
+}
