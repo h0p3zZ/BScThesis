@@ -2,7 +2,7 @@
   "profiles": {
     "SolutionVerifier": {
       "commandName": "Project",
-      "commandLineArgs": "./schedule.json ./ExampleSolutions/validAssignment.json"
+      "commandLineArgs": "./generated1.json ./ExampleSolutions/generated1.json"
     }
   }
 }

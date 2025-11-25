@@ -14,13 +14,26 @@ internal class AssignmentParser
 
     internal bool Prase([NotNullWhen(true)] out ScheduleAssignment? assignment)
     {
+        assignment = null;
         if (!File.Exists(_filePath))
         {
-            assignment = null;
             return false;
         }
 
-        assignment = JsonSerializer.Deserialize<ScheduleAssignment>(File.ReadAllText(_filePath));
+        var jsonString = File.ReadAllText(_filePath);
+
+        try
+        {
+            assignment = JsonSerializer.Deserialize<ScheduleAssignment>(jsonString);
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine("JSON parse error:");
+            Console.WriteLine($"Message: {ex.InnerException.Message}");
+            Console.WriteLine($"Path: {ex.Path}");
+            Console.WriteLine($"LineNumber: {ex.LineNumber}");
+            Console.WriteLine($"BytePositionInLine: {ex.BytePositionInLine}");
+        }
         return assignment != null;
     }
 }
