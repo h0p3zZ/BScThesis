@@ -12,8 +12,10 @@ public class SolutionVerifier
         _problem = problem;
     }
 
-    public ScheduleCost CalcCost(ScheduleAssignment assignments)
+    public ScheduleCost? CalcCost(ScheduleAssignment assignments, out List<string> messages)
     {
+        messages = [];
+
         var scheduleCost = new ScheduleCost();
 
         foreach (var assign1 in assignments)
@@ -22,16 +24,15 @@ public class SolutionVerifier
 
             if (assign1.Value is not { } task1TimeSlot) {
                 scheduleCost.ImportanceCost += task1.Importance;
+                if (task1.Importance == double.PositiveInfinity)
+                    messages.Add($"Task {assign1.Key} is not scheduled, incurring infinite importance cost.");
                 continue;
             }
 
             scheduleCost.UrgencyCost += (task1.Urgency + 1) * task1TimeSlot;
             // Check whether the task has exceeded the scheduling horizon
             if (task1TimeSlot + task1.Duration >= _problem.Horizon)
-            {
-                Console.WriteLine($"Task {assign1.Key} exceeds the scheduling horizon.");
-                return scheduleCost;
-            }
+                messages.Add($"Task {assign1.Key} exceeds the scheduling horizon.");
 
             foreach (var assign2 in assignments)
             {
@@ -40,13 +41,8 @@ public class SolutionVerifier
 
                 var task2 = _problem.Tasks[assign2.Key];
                 // Check whether tasks overlap with one another
-                if (
-                    task1TimeSlot + task1.Duration > task2TimeSlot && task2TimeSlot + task2.Duration > task1TimeSlot
-                )
-                {
-                    Console.WriteLine($"Tasks {assign1.Key} and {assign2.Key} overlap with one another.");
-                    return scheduleCost;
-                }
+                if (task1TimeSlot + task1.Duration > task2TimeSlot && task2TimeSlot + task2.Duration > task1TimeSlot)
+                    messages.Add($"Tasks {assign1.Key} and {assign2.Key} overlap with one another.");
 
                 // Add location cost if tasks are scheduled back-to-back and not at the same location
                 if (
@@ -56,6 +52,9 @@ public class SolutionVerifier
                 )
                 {
                     scheduleCost.LocationCost += task2.Location.UnmetCost;
+
+                    if (task2.Location.UnmetCost == double.PositiveInfinity)
+                        messages.Add($"Tasks {assign1.Key} and {assign2.Key} are scheduled back-to-back at different locations with mandatory same location (infinite cost).");
                 }
 
                 // Check dependency cost
@@ -72,6 +71,8 @@ public class SolutionVerifier
                     if (!intervals.Any())
                     {
                         scheduleCost.DependencyCost += dependency.UnmetCost;
+                        if (dependency.UnmetCost == double.PositiveInfinity)
+                            messages.Add($"Dependency between tasks {assign1.Key} and {assign2.Key} is not met within any specified interval even though it is mandatory (infinite cost).");
                         continue;
                     }
 
@@ -101,12 +102,7 @@ public class SolutionVerifier
             }
         }
 
-        // Check if any cost is infinite, mark the schedule as valid or invalid
-        // If this part is not reached, the schedule is automatically invalid
-        scheduleCost.Valid = 
-            scheduleCost.ImportanceCost != double.PositiveInfinity
-            && scheduleCost.LocationCost != double.PositiveInfinity
-            && scheduleCost.DependencyCost != double.PositiveInfinity;
-        return scheduleCost;
+        // If error messages exist, return null indicating invalid solution
+        return messages.Count == 0 ? scheduleCost : null;
     }
 }

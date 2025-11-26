@@ -70,9 +70,19 @@ if (foundProblem)
 #endregion Argument Check
 
 var verifier = new SolutionVerifier.SolutionVerifier(problem);
-var scheduleCost = verifier.CalcCost(_assignments);
+var scheduleCost = verifier.CalcCost(_assignments, out var messages);
 
-Console.WriteLine($"Assignment ({args[1]}) is {(scheduleCost.Valid ? string.Empty : "not ")}valid for schedule ({args[0]})");
+if (scheduleCost == null)
+{
+    Console.WriteLine($"The solution ({args[1]}) is invalid:");
+    foreach (var message in messages)
+    {
+        Console.WriteLine($"- {message}");
+    }
+    return;
+}
+
+Console.WriteLine($"The solution ({args[1]}) is valid.");
 Console.WriteLine($"Importance cost of unassigned tasks: {scheduleCost.ImportanceCost}");
 Console.WriteLine($"Urgency cost of all tasks: {scheduleCost.UrgencyCost}");
 Console.WriteLine($"Dependency cost of all tasks: {scheduleCost.DependencyCost}");
