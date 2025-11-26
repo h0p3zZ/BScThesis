@@ -1,468 +1,177 @@
 {
-  "horizon": 500,
+  "horizon": 700,
   "tasks": {
-    "UUIDTaskTestAnyString": {
-      "name": "TasksA",
-      "duration": 42,
+    "alpha_001": {
+      "name": "DataIngestion",
+      "duration": 50,
       "importance": "Infinity",
-      "urgency": 1,
+      "urgency": 5,
       "timeSlots": [
-        {
-          "interval": [ 0, 100 ],
-          "cost": 1
-        },
-        {
-          "interval": [ 100, 200 ],
-          "cost": 2
-        }
+        { "interval": [0, 120], "cost": 2 },
+        { "interval": [150, 300], "cost": 4 }
       ],
       "dependencies": [],
       "location": {
         "id": 1,
+        "unmetCost": 20
+      }
+    },
+
+    "alpha_002": {
+      "name": "Preprocessing",
+      "duration": 30,
+      "importance": 12,
+      "urgency": 10,
+      "timeSlots": [
+        { "interval": [40, 200], "cost": 1 },
+        { "interval": [210, 260], "cost": 3 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_001",
+          "intervals": [
+            {
+              "interval": [ 0, 700 ],
+              "cost": 0
+            }
+          ],
+          "unmetCost": 5
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": 5
+      }
+    },
+
+    "alpha_003": {
+      "name": "FeatureEngineering",
+      "duration": 80,
+      "importance": 9,
+      "urgency": 8,
+      "timeSlots": [
+        { "interval": [100, 350], "cost": 1 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_002",
+          "intervals": [
+            {
+              "interval": [ 60, 700 ],
+              "cost": 2
+            }
+          ],
+          "unmetCost": 5
+        }
+      ]
+    },
+
+    "alpha_004": {
+      "name": "ModelTraining",
+      "duration": 150,
+      "importance": 20,
+      "urgency": 12,
+      "timeSlots": [
+        { "interval": [200, 600], "cost": 5 },
+        { "interval": [300, 650], "cost": 3 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_002",
+          "intervals": [
+            {
+              "interval": [ 0, 700 ],
+              "cost": 1
+            }
+          ],
+          "unmetCost": 5
+        },
+        {
+          "task": "alpha_003",
+          "intervals": [
+            {
+              "interval": [ 150, 700 ],
+              "cost": 2
+            }
+          ],
+          "unmetCost": 5
+        }
+      ],
+      "location": {
+        "id": 2,
+        "unmetCost": "Infinity"
+      }
+    },
+
+    "alpha_005": {
+      "name": "ModelEvaluation",
+      "duration": 40,
+      "importance": 10,
+      "urgency": 6,
+      "timeSlots": [
+        { "interval": [300, 650], "cost": 0 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_004",
+          "intervals": [
+            {
+              "interval": [ 250, 700 ],
+              "cost": 3
+            }
+          ],
+          "unmetCost": 5
+        }
+      ]
+    },
+
+    "alpha_006": {
+      "name": "Deployment",
+      "duration": 25,
+      "importance": 15,
+      "urgency": 15,
+      "timeSlots": [
+        { "interval": [400, 680], "cost": 2 },
+        { "interval": [450, 690], "cost": 0 }
+      ],
+      "dependencies": [
+        {
+          "task": "alpha_005",
+          "intervals": [
+            {
+              "interval": [ 350, 700 ],
+              "cost": 1
+            }
+          ],
+          "unmetCost": 5
+        }
+      ],
+      "location": {
+        "id": 3,
         "unmetCost": 10
       }
     },
 
-    "AnyStringIsFineHere": {
-      "name": "TasksB",
-      "duration": 4,
-      "importance": 10,
-      "urgency": 50,
-      "timeSlots": [
-        {
-          "interval": [ 0, 5 ],
-          "cost": 0
-        },
-        {
-          "interval": [ 2, 6 ],
-          "cost": 4
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_002": {
-      "name": "t002",
-      "duration": 2,
-      "importance": 5,
-      "urgency": 5,
-      "timeSlots": [
-        {
-          "interval": [ 4, 50 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_003": {
-      "name": "t003",
-      "duration": 3,
-      "importance": 4,
-      "urgency": 4,
-      "timeSlots": [
-        {
-          "interval": [ 6, 60 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_005": {
-      "name": "t005",
-      "duration": 5,
-      "importance": 3,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 78, 120 ],
-          "cost": 2
-        },
-        {
-          "interval": [ 200, 300 ],
-          "cost": 4
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_006": {
-      "name": "t006",
-      "duration": 2,
-      "importance": 6,
-      "urgency": 3,
-      "timeSlots": [
-        {
-          "interval": [ 80, 150 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_007": {
-      "name": "t007",
-      "duration": 1,
-      "importance": 2,
-      "urgency": 1,
-      "timeSlots": [
-        {
-          "interval": [ 85, 200 ],
-          "cost": 0
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_008": {
-      "name": "t008",
-      "duration": 4,
-      "importance": 8,
-      "urgency": 6,
-      "timeSlots": [
-        {
-          "interval": [ 86, 120 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_009": {
-      "name": "t009",
-      "duration": 6,
-      "importance": 4,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 90, 200 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_010": {
-      "name": "t010",
-      "duration": 3,
-      "importance": 7,
-      "urgency": 3,
-      "timeSlots": [
-        {
-          "interval": [ 96, 240 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_011": {
-      "name": "t011",
-      "duration": 5,
-      "importance": 3,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 99, 130 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_012": {
-      "name": "t012",
-      "duration": 10,
-      "importance": 5,
-      "urgency": 5,
-      "timeSlots": [
-        {
-          "interval": [ 104, 220 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_013": {
-      "name": "t013",
-      "duration": 8,
-      "importance": 4,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 114, 260 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_014": {
-      "name": "t014",
-      "duration": 4,
-      "importance": 2,
-      "urgency": 1,
-      "timeSlots": [
-        {
-          "interval": [ 122, 300 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_015": {
-      "name": "t015",
-      "duration": 2,
-      "importance": 1,
-      "urgency": 1,
-      "timeSlots": [
-        {
-          "interval": [ 126, 350 ],
-          "cost": 0
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_016": {
-      "name": "t016",
-      "duration": 7,
-      "importance": 6,
-      "urgency": 8,
-      "timeSlots": [
-        {
-          "interval": [ 128, 360 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_017": {
-      "name": "t017",
-      "duration": 3,
-      "importance": 4,
-      "urgency": 3,
-      "timeSlots": [
-        {
-          "interval": [ 135, 400 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_018": {
-      "name": "t018",
-      "duration": 6,
-      "importance": 2,
-      "urgency": 1,
-      "timeSlots": [
-        {
-          "interval": [ 138, 300 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_019": {
-      "name": "t019",
-      "duration": 4,
-      "importance": 3,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 144, 304 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_020": {
-      "name": "t020",
-      "duration": 9,
+    "alpha_007": {
+      "name": "PostDeploymentMonitoring",
+      "duration": 90,
       "importance": 6,
       "urgency": 4,
       "timeSlots": [
-        {
-          "interval": [ 148, 308 ],
-          "cost": 2
-        }
+        { "interval": [450, 700], "cost": 2 }
       ],
-      "dependencies": []
-    },
-
-    "task_021": {
-      "name": "t021",
-      "duration": 12,
-      "importance": 9,
-      "urgency": 10,
-      "timeSlots": [
+      "dependencies": [
         {
-          "interval": [ 157, 312 ],
-          "cost": 3
+          "task": "alpha_006",
+          "intervals": [
+            {
+              "interval": [ 360, 700 ],
+              "cost": 0
+            }
+          ],
+          "unmetCost": 5
         }
-      ],
-      "dependencies": []
-    },
-
-    "task_022": {
-      "name": "t022",
-      "duration": 5,
-      "importance": 3,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 169, 316 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_023": {
-      "name": "t023",
-      "duration": 6,
-      "importance": 5,
-      "urgency": 5,
-      "timeSlots": [
-        {
-          "interval": [ 174, 320 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_024": {
-      "name": "t024",
-      "duration": 3,
-      "importance": 4,
-      "urgency": 3,
-      "timeSlots": [
-        {
-          "interval": [ 180, 324 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_025": {
-      "name": "t025",
-      "duration": 8,
-      "importance": 2,
-      "urgency": 1,
-      "timeSlots": [
-        {
-          "interval": [ 183, 328 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_026": {
-      "name": "t026",
-      "duration": 2,
-      "importance": 1,
-      "urgency": 1,
-      "timeSlots": [
-        {
-          "interval": [ 191, 332 ],
-          "cost": 0
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_027": {
-      "name": "t027",
-      "duration": 10,
-      "importance": 7,
-      "urgency": 6,
-      "timeSlots": [
-        {
-          "interval": [ 193, 336 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_028": {
-      "name": "t028",
-      "duration": 4,
-      "importance": 3,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 203, 340 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_029": {
-      "name": "t029",
-      "duration": 6,
-      "importance": 4,
-      "urgency": 3,
-      "timeSlots": [
-        {
-          "interval": [ 207, 344 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_030": {
-      "name": "t030",
-      "duration": 5,
-      "importance": 3,
-      "urgency": 2,
-      "timeSlots": [
-        {
-          "interval": [ 213, 348 ],
-          "cost": 1
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_031": {
-      "name": "t031",
-      "duration": 7,
-      "importance": 5,
-      "urgency": 4,
-      "timeSlots": [
-        {
-          "interval": [ 218, 352 ],
-          "cost": 2
-        }
-      ],
-      "dependencies": []
-    },
-
-    "task_032": {
-      "name": "t032",
-      "duration": 195,
-      "importance": 10,
-      "urgency": 20,
-      "timeSlots": [
-        {
-          "interval": [ 225, 356 ],
-          "cost": 5
-        }
-      ],
-      "dependencies": []
+      ]
     }
   }
 }

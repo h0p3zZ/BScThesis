@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ExampleSolutions\exceedingHorizonAssignment.json">
+    <None Update="ExampleSolutions\exceedingHorizon.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ExampleSolutions\invalidGenerated1.json">
@@ -30,13 +30,10 @@
     <None Update="ExampleSolutions\generated1.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ExampleSolutions\validAssignment.json">
+    <None Update="ExampleSolutions\valid.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ExampleSolutions\overlappingAssignment.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="generated1.json">
+    <None Update="ExampleSolutions\overlapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="schedule.json">

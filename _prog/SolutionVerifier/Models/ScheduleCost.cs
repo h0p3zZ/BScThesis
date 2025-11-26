@@ -1,9 +1,10 @@
 ﻿namespace SolutionVerifier.Models;
 
-internal class ScheduleCost
+public class ScheduleCost
 {
-    internal double ImportanceCost { get; set; } = 0f;
-    internal int UrgencyCost { get; set; } = 0;
-    internal double DependencyCost { get; set; } = 0f;
-    internal double LocationCost { get; set; } = 0f;
+    public bool Valid { get; set; } = false;
+    public double ImportanceCost { get; set; } = 0f;
+    public int UrgencyCost { get; set; } = 0;
+    public double DependencyCost { get; set; } = 0f;
+    public double LocationCost { get; set; } = 0f;
 }

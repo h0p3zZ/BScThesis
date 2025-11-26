@@ -3,25 +3,20 @@ using SolutionVerifier.Models;
 
 namespace SolutionVerifier;
 
-internal class SolutionVerifier
+public class SolutionVerifier
 {
     private readonly ScheduleProblem _problem;
-    private readonly ScheduleAssignment _assignments;
 
-    internal SolutionVerifier(
-        ScheduleProblem problem,
-        ScheduleAssignment assignments
-    )
+    public SolutionVerifier(ScheduleProblem problem)
     {
         _problem = problem;
-        _assignments = assignments;
     }
 
-    internal ScheduleCost CalcCost()
+    public ScheduleCost CalcCost(ScheduleAssignment assignments)
     {
         var scheduleCost = new ScheduleCost();
 
-        foreach (var assign1 in _assignments)
+        foreach (var assign1 in assignments)
         {
             var task1 = _problem.Tasks[assign1.Key];
 
@@ -38,7 +33,7 @@ internal class SolutionVerifier
                 return scheduleCost;
             }
 
-            foreach (var assign2 in _assignments)
+            foreach (var assign2 in assignments)
             {
                 if (assign2.Value is not { } task2TimeSlot) continue;
                 if (assign1.Key == assign2.Key) continue;
@@ -106,6 +101,12 @@ internal class SolutionVerifier
             }
         }
 
+        // Check if any cost is infinite, mark the schedule as valid or invalid
+        // If this part is not reached, the schedule is automatically invalid
+        scheduleCost.Valid = 
+            scheduleCost.ImportanceCost != double.PositiveInfinity
+            && scheduleCost.LocationCost != double.PositiveInfinity
+            && scheduleCost.DependencyCost != double.PositiveInfinity;
         return scheduleCost;
     }
 }
