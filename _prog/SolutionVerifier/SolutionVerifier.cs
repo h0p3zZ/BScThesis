@@ -37,7 +37,7 @@ public class SolutionVerifier
             var start = task1TimeSlot;
             var end = task1TimeSlot + task1.Duration;
             var intervals = task1.TimeSlots.Where(x =>
-                start <= x.Interval[1] &&
+                start < x.Interval[1] && // end is exclusive
                 end >= x.Interval[0]
             );
 

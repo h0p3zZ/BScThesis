@@ -81,7 +81,7 @@ public sealed class SolutionVerifierTests
                     {
                         new() { Interval = [0, 4], Cost = 1 },
                         new() { Interval = [4, 10], Cost = 2 },
-                        new() { Interval = [10, 20], Cost = 3 },
+                        new() { Interval = [11, 20], Cost = 3 },
                     },
                     Location = new Location { Id = 2, UnmetCost = double.PositiveInfinity },
                 }
@@ -123,11 +123,11 @@ public sealed class SolutionVerifierTests
     // new () { Interval = [10, 20], Cost = 3 },
 
     [TestMethod]
-    [DataRow(10, 13, 16, 3*3)]
+    [DataRow(10, 13, 16, 3 * 3)]
     [DataRow(0, 4, 10, 1 + 2 + 3)]
-    [DataRow(4, 7, 10, 2*2 + 3)]
+    [DataRow(4, 7, 10, 2 * 2 + 3)]
     [DataRow(null, 0, 10, 0 + 1 + 3)]
-    [DataRow(null, null, 3, (1 + 2*2)/3d)]
+    [DataRow(null, null, 3, (1 + 2 * 2) / 3d)]
     public void TestValidTimeSlots(int? assignmentT1, int? assignmentT2, int? assignmentT3, double timeSlotCost)
     {
         var assignments = new Dictionary<string, int?>
@@ -144,6 +144,25 @@ public sealed class SolutionVerifierTests
 
         Assert.IsNotNull(cost);
         Assert.AreEqual(timeSlotCost, cost.TimeSlotCost);
+    }
+
+    [TestMethod]
+    public void TestInvalidTimeSlots()
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", 0 },
+            { "Task2", 4 },
+            { "Task4", 10 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNull(cost);
+        Assert.IsTrue(messages.Any(x => x.Contains("partially scheduled")));
     }
 
 
