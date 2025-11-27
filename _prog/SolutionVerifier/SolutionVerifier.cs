@@ -1,5 +1,6 @@
 ﻿using JsonVerifier.Models;
 using SolutionVerifier.Models;
+using System.Threading.Tasks;
 
 namespace SolutionVerifier;
 
@@ -29,10 +30,28 @@ public class SolutionVerifier
                 continue;
             }
 
-            scheduleCost.UrgencyCost += (task1.Urgency + 1) * task1TimeSlot;
+            var start = task1TimeSlot;
+            var end = task1TimeSlot + task1.Duration;
+            var intervals = task1.TimeSlots.Where(x =>
+                start <= x.Interval[1] &&
+                end >= x.Interval[0]
+            );
+
+            // If the task is not fully covered by the provided intervals, log error message = mark invalid
+            if (!IsRangeCoveredByIntervals(start, end, intervals))
+            {
+                scheduleCost.ImportanceCost += task1.Importance;
+                messages.Add($"Task {assign1.Key} is only partially scheduled in appropriate intervals, there is some of the duration not in a provided interval.");
+                continue;
+            }
+
+            scheduleCost.TimeSlotCost += CalculateWeightedIntervalCost(start, end, intervals);
+
             // Check whether the task has exceeded the scheduling horizon
             if (task1TimeSlot + task1.Duration >= _problem.Horizon)
                 messages.Add($"Task {assign1.Key} exceeds the scheduling horizon.");
+
+            scheduleCost.UrgencyCost += (task1.Urgency + 1) * task1TimeSlot;
 
             foreach (var assign2 in assignments)
             {
@@ -63,14 +82,14 @@ public class SolutionVerifier
                     if (dependency.Task != assign1.Key)
                         continue;
 
-                    var start = task2TimeSlot - task1TimeSlot;
-                    var end = task2TimeSlot - task1TimeSlot + task2.Duration;
-                    var intervals = dependency.Intervals.Where(x =>
+                    start = task2TimeSlot - task1TimeSlot;
+                    end = task2TimeSlot - task1TimeSlot + task2.Duration;
+                    intervals = dependency.Intervals.Where(x =>
                         start <= x.Interval[1] &&
                         end >= x.Interval[0]
-                    ).OrderBy(x => x.Interval[0]);
+                    );
 
-                    if (!IsRangeCoveredByIntervals(start, end, dependency.Intervals))
+                    if (!IsRangeCoveredByIntervals(start, end, intervals))
                     {
                         scheduleCost.DependencyCost += dependency.UnmetCost;
                         if (dependency.UnmetCost == double.PositiveInfinity)
@@ -78,28 +97,7 @@ public class SolutionVerifier
                         continue;
                     }
 
-                    double weightedSum = 0;
-                    double totalOverlap = 0;
-
-                    foreach (var interval in intervals)
-                    {
-                        var intervalStart = interval.Interval[0];
-                        var intervalEnd = interval.Interval[1];
-
-                        // Calculating overlap to determine weighted cost
-                        var overlapStart = Math.Max(task2TimeSlot, intervalStart);
-                        var overlapEnd = Math.Min(task2TimeSlot + task2.Duration, intervalEnd);
-                        var overlapLength = overlapEnd - overlapStart;
-
-                        if (overlapLength > 0)
-                        {
-                            weightedSum += overlapLength * interval.Cost;
-                            totalOverlap += overlapLength;
-                        }
-                    }
-
-                    var weightedCost = weightedSum / totalOverlap;
-                    scheduleCost.DependencyCost += weightedCost;
+                    scheduleCost.DependencyCost += CalculateWeightedIntervalCost(start, end, intervals);
                 }
             }
         }
@@ -115,7 +113,7 @@ public class SolutionVerifier
     /// <param name="end">End of range excluded.</param>
     /// <param name="intervals">The intervals that should cover the initial range.</param>
     /// <returns>True if the <paramref name="intervals"/> cover the range between <paramref name="start"/> and <paramref name="end"/>.</returns>
-    private static bool IsRangeCoveredByIntervals (int start, int end, List<IntervalCost> intervals)
+    private static bool IsRangeCoveredByIntervals (int start, int end, IEnumerable<IntervalCost> intervals)
     {
         var values = Enumerable.Range(start, end - start).ToList();
 
@@ -125,5 +123,37 @@ public class SolutionVerifier
         }
 
         return values.Count == 0;
+    }
+
+    /// <summary>
+    /// Calculate the weighted average cost for the given range based on overlapping intervals.
+    /// </summary>
+    /// <param name="start">The start time slot of the range to check.</param>
+    /// <param name="end">The end time slot of the range to check.</param>
+    /// <param name="intervals">The intervals, that private the weighted cost over the range.</param>
+    /// <returns>The weighted cost.</returns>
+    private static double CalculateWeightedIntervalCost(int start, int end, IEnumerable<IntervalCost> intervals)
+    {
+        double weightedSum = 0;
+        double totalOverlap = 0;
+
+        foreach (var interval in intervals)
+        {
+            var intervalStart = interval.Interval[0];
+            var intervalEnd = interval.Interval[1];
+
+            // Calculating overlap to determine weighted cost
+            var overlapStart = Math.Max(start, intervalStart);
+            var overlapEnd = Math.Min(end, intervalEnd);
+            var overlapLength = overlapEnd - overlapStart;
+
+            if (overlapLength > 0)
+            {
+                weightedSum += overlapLength * interval.Cost;
+                totalOverlap += overlapLength;
+            }
+        }
+
+        return weightedSum / totalOverlap;
     }
 }

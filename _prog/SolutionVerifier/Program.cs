@@ -83,7 +83,8 @@ if (scheduleCost == null)
 }
 
 Console.WriteLine($"The solution ({args[1]}) is valid.");
+Console.WriteLine($"Time slot cost of assigned tasks: {scheduleCost.TimeSlotCost}");
 Console.WriteLine($"Importance cost of unassigned tasks: {scheduleCost.ImportanceCost}");
-Console.WriteLine($"Urgency cost of all tasks: {scheduleCost.UrgencyCost}");
-Console.WriteLine($"Dependency cost of all tasks: {scheduleCost.DependencyCost}");
-Console.WriteLine($"Location cost of all tasks: {scheduleCost.LocationCost}");
+Console.WriteLine($"Urgency cost of assigned tasks: {scheduleCost.UrgencyCost}");
+Console.WriteLine($"Dependency cost of assigned tasks: {scheduleCost.DependencyCost}");
+Console.WriteLine($"Location cost of assigned tasks: {scheduleCost.LocationCost}");
