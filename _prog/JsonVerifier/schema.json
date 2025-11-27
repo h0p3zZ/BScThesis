@@ -54,7 +54,15 @@
                     "items": { "$ref": "#/$defs/intervalCost" }
                   }
                 },
-                "unmetCost": { "type": "integer" },
+                "unmetCost": {
+                  "oneOf": [
+                    { "type": "integer" },
+                    {
+                      "type": "string",
+                      "enum": [ "Infinity" ]
+                    }
+                  ]
+                },
                 "required": [ "task", "intervals", "unmetCost" ]
               }
             },

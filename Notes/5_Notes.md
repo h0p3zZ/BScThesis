@@ -89,7 +89,7 @@ An assignment $a \in A$ is valid iff:
 * $\forall t \in T: a(t) \lt H$
 * $\forall t \in T: slot(t, a(t)) \in \N_0$
 * $\forall t_1, t_2 \in T: dep(t_1, t_2)(a(t_2)) \in \N_0$
-  * Thoughts: Where we can specify that e.g. $dep(t, t)(n) = 0 | t \in T, n \in \N$, meaning any task produces 0 cost when the dependency is checked on itself. Also, if the task is checked against a task where no direct depencency exists this is the most logical response.
+  * Thoughts: Where we can specify that e.g. $dep(t, t)(n) = 0 | t \in T, n \in \N$, meaning any task produces 0 cost when the dependency is checked on itself. Also, if the task is checked against a task where no direct dependency exists this is the most logical response.
 * $\forall t_1, t_2 \in T: loc(t_1, t_2) \in \N_0$
 
 #### Comparing by cost

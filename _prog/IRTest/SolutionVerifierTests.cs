@@ -38,6 +38,17 @@ public sealed class SolutionVerifierTests
                         new() { Interval = [0, 4], Cost = 1 },
                         new() { Interval = [4, 10], Cost = 2 },
                     },
+                    Dependencies = new List<Dependency>
+                    {
+                        new() {
+                            Task = "Task1",
+                            Intervals = new List<IntervalCost>
+                            {
+                                new() { Interval = [0, 10], Cost = 15 },
+                            },
+                            UnmetCost = 5,
+                        }
+                    },
                     Location = new Location { Id = 2, UnmetCost = 3},
                 }
             },
@@ -56,6 +67,21 @@ public sealed class SolutionVerifierTests
                     Location = new Location { Id = 2, UnmetCost = 5 },
                 }
             },
+            {
+                "Task4", new JsonVerifier.Models.Task
+                {
+                    Name = "Task 4",
+                    Duration = 3,
+                    Importance = 5,
+                    Urgency = 3,
+                    TimeSlots = new List<IntervalCost>
+                    {
+                        new() { Interval = [0, 4], Cost = 1 },
+                        new() { Interval = [4, 10], Cost = 2 },
+                    },
+                    Location = new Location { Id = 2, UnmetCost = double.PositiveInfinity },
+                }
+            },
         }
     };
 
@@ -64,8 +90,52 @@ public sealed class SolutionVerifierTests
     [TestInitialize]
     public void SetUp()
     {
-
         _verifier = new SolutionVerifier.SolutionVerifier(_schedule);
+    }
+
+    [TestMethod]
+    [DataRow(0, 5, 200)]
+    [DataRow(0, 5, 20)]
+    [DataRow(0, 5, 18)]
+    public void TestExceedHorizon(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", assignmentT1 },
+            { "Task3", assignmentT2 },
+            { "Task4", assignmentT3 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNull(cost);
+        Assert.IsTrue(messages.Any(x => x.Contains("horizon")));
+    }
+
+
+    [TestMethod]
+    [DataRow(0,0,0)]
+    [DataRow(0,2,4)]
+    [DataRow(0,3,5)]
+    public void TestOverlap(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", assignmentT1 },
+            { "Task3", assignmentT2 },
+            { "Task4", assignmentT3 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNull(cost);
+        Assert.IsTrue(messages.Any(x => x.Contains("overlap")));
     }
 
     [TestMethod]
@@ -76,7 +146,7 @@ public sealed class SolutionVerifierTests
     [DataRow(6, 3, 0, 1)] // task3-task2 location cost = 0, task2-task1 location cost = 1, total = 1
     [DataRow(6, 0, 3, 1)] // task2-task3 location cost = 0, task3-task1 location cost = 1, total = 1
     [DataRow(0, 6, 12, 0)] // no tasks are back to back, location cost = 0
-    public void TestLocationCostCorrectlyCalculated(int? assignmentT1, int? assignmentT2, int? assignmentT3, double expectedLocationCost)
+    public void TestValidLocationCost(int? assignmentT1, int? assignmentT2, int? assignmentT3, double expectedLocationCost)
     {
         var assignments = new Dictionary<string, int?>
         {
@@ -85,9 +155,95 @@ public sealed class SolutionVerifierTests
             { "Task3", assignmentT3 },
         };
 
-        var cost = _verifier.CalcCost(assignments);
+        var cost = _verifier.CalcCost(assignments, out var messages);
 
-        Assert.IsTrue(cost.Valid);
+        foreach ( var message in messages ) 
+            Console.WriteLine(message);
+
+        Assert.IsNotNull(cost);
         Assert.AreEqual(expectedLocationCost, cost.LocationCost);
+    }
+
+    [TestMethod]
+    [DataRow(0, 10, 3)] // Task1-Task4 have different locations Task4 location cost = infinite, therfore the solution is invalid
+    public void TestInvalidLocationCost(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", assignmentT1 },
+            { "Task3", assignmentT2 },
+            { "Task4", assignmentT3 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNull(cost);
+        Assert.IsTrue(messages.Any(x => x.Contains("mandatory same location")));
+    }
+
+    [TestMethod]
+    public void TestValidImportanceCost()
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", 0 },
+            { "Task2", null }, // Not scheduled, should incur importance cost
+            { "Task3", 3 },
+            { "Task4", 6 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNotNull(cost);
+        Assert.AreEqual(_schedule.Tasks["Task2"].Importance, cost.ImportanceCost);
+    }
+
+    [TestMethod]
+    [DataRow(null, null, null)] // All tasks not scheduled, Task3 importance is infinite, therefore the solution is invalid
+    [DataRow(0, 5, null)]
+    [DataRow(0, null, null)]
+    [DataRow(null, 0, null)]
+    public void TestInvalidImportanceCost(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", assignmentT1 },
+            { "Task2", assignmentT2 },
+            { "Task3", assignmentT3 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNull(cost);
+        Assert.IsTrue(messages.Any(x => x.Contains("infinite importance cost")));
+    }
+
+    [TestMethod]
+    [DataRow(0, 3, 10, 15)]
+    public void TestValidDependencyCost(int? assignmentT1, int? assignmentT2, int? assignmentT3, double dependencyCost)
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", assignmentT1 },
+            { "Task2", assignmentT2 },
+            { "Task3", assignmentT3 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNotNull(cost);
+        Assert.AreEqual(dependencyCost, cost.DependencyCost);
     }
 }

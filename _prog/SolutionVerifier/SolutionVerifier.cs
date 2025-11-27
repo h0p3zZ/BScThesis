@@ -63,12 +63,14 @@ public class SolutionVerifier
                     if (dependency.Task != assign1.Key)
                         continue;
 
+                    var start = task2TimeSlot - task1TimeSlot;
+                    var end = task2TimeSlot - task1TimeSlot + task2.Duration;
                     var intervals = dependency.Intervals.Where(x =>
-                        task2TimeSlot - task1TimeSlot + task1.Duration > x.Interval[0] &&
-                        task2TimeSlot - task1TimeSlot + task1.Duration < x.Interval[1]
-                    );
+                        start <= x.Interval[1] &&
+                        end >= x.Interval[0]
+                    ).OrderBy(x => x.Interval[0]);
 
-                    if (!intervals.Any())
+                    if (!IsRangeCoveredByIntervals(start, end, dependency.Intervals))
                     {
                         scheduleCost.DependencyCost += dependency.UnmetCost;
                         if (dependency.UnmetCost == double.PositiveInfinity)
@@ -104,5 +106,24 @@ public class SolutionVerifier
 
         // If error messages exist, return null indicating invalid solution
         return messages.Count == 0 ? scheduleCost : null;
+    }
+
+    /// <summary>
+    /// Checks whether the range [a, b) is fully covered by the given intervals.
+    /// </summary>
+    /// <param name="start">Start of range included.</param>
+    /// <param name="end">End of range excluded.</param>
+    /// <param name="intervals">The intervals that should cover the initial range.</param>
+    /// <returns>True if the <paramref name="intervals"/> cover the range between <paramref name="start"/> and <paramref name="end"/>.</returns>
+    private static bool IsRangeCoveredByIntervals (int start, int end, List<IntervalCost> intervals)
+    {
+        var values = Enumerable.Range(start, end - start).ToList();
+
+        foreach (var interval in intervals)
+        {
+            values.RemoveAll(v => v >= interval.Interval[0] && v <= interval.Interval[1]);
+        }
+
+        return values.Count == 0;
     }
 }
