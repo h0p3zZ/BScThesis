@@ -100,13 +100,13 @@ public sealed class SolutionVerifierTests
     [DataRow(0, 5, 200)]
     [DataRow(0, 5, 20)]
     [DataRow(0, 5, 18)]
-    public void TestExceedHorizon(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    public void TestExceedHorizon(int? assignmentT1, int? assignmentT3, int? assignmentT4)
     {
         var assignments = new Dictionary<string, int?>
         {
             { "Task1", assignmentT1 },
-            { "Task3", assignmentT2 },
-            { "Task4", assignmentT3 },
+            { "Task3", assignmentT3 },
+            { "Task4", assignmentT4 },
         };
 
         var cost = _verifier.CalcCost(assignments, out var messages);
@@ -118,18 +118,46 @@ public sealed class SolutionVerifierTests
         Assert.IsTrue(messages.Any(x => x.Contains("horizon")));
     }
 
+    // new () { Interval = [0, 4], Cost = 1 },
+    // new () { Interval = [4, 10], Cost = 2 },
+    // new () { Interval = [10, 20], Cost = 3 },
 
     [TestMethod]
-    [DataRow(0,0,0)]
-    [DataRow(0,2,4)]
-    [DataRow(0,3,5)]
-    public void TestOverlap(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    [DataRow(10, 13, 16, 3*3)]
+    [DataRow(0, 4, 10, 1 + 2 + 3)]
+    [DataRow(4, 7, 10, 2*2 + 3)]
+    [DataRow(null, 0, 10, 0 + 1 + 3)]
+    [DataRow(null, null, 3, (1 + 2*2)/3d)]
+    public void TestValidTimeSlots(int? assignmentT1, int? assignmentT2, int? assignmentT3, double timeSlotCost)
     {
         var assignments = new Dictionary<string, int?>
         {
             { "Task1", assignmentT1 },
-            { "Task3", assignmentT2 },
-            { "Task4", assignmentT3 },
+            { "Task2", assignmentT2 },
+            { "Task3", assignmentT3 },
+        };
+
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNotNull(cost);
+        Assert.AreEqual(timeSlotCost, cost.TimeSlotCost);
+    }
+
+
+    [TestMethod]
+    [DataRow(0, 0, 0)]
+    [DataRow(0, 2, 4)]
+    [DataRow(0, 3, 5)]
+    public void TestOverlap(int? assignmentT1, int? assignmentT3, int? assignmentT4)
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", assignmentT1 },
+            { "Task3", assignmentT3 },
+            { "Task4", assignmentT4 },
         };
 
         var cost = _verifier.CalcCost(assignments, out var messages);
@@ -160,7 +188,7 @@ public sealed class SolutionVerifierTests
 
         var cost = _verifier.CalcCost(assignments, out var messages);
 
-        foreach ( var message in messages ) 
+        foreach (var message in messages)
             Console.WriteLine(message);
 
         Assert.IsNotNull(cost);
@@ -169,13 +197,13 @@ public sealed class SolutionVerifierTests
 
     [TestMethod]
     [DataRow(0, 10, 3)] // Task1-Task4 have different locations Task4 location cost = infinite, therfore the solution is invalid
-    public void TestInvalidLocationCost(int? assignmentT1, int? assignmentT2, int? assignmentT3)
+    public void TestInvalidLocationCost(int? assignmentT1, int? assignmentT3, int? assignmentT4)
     {
         var assignments = new Dictionary<string, int?>
         {
             { "Task1", assignmentT1 },
-            { "Task3", assignmentT2 },
-            { "Task4", assignmentT3 },
+            { "Task3", assignmentT3 },
+            { "Task4", assignmentT4 },
         };
 
         var cost = _verifier.CalcCost(assignments, out var messages);
