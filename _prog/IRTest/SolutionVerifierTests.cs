@@ -86,6 +86,31 @@ public sealed class SolutionVerifierTests
                     Location = new Location { Id = 2, UnmetCost = double.PositiveInfinity },
                 }
             },
+            {
+                "Task5", new JsonVerifier.Models.Task
+                {
+                    Name = "Task 5",
+                    Duration = 3,
+                    Importance = 5,
+                    Urgency = 3,
+                    TimeSlots = new List<IntervalCost>
+                    {
+                        new() { Interval = [0, 20], Cost = 1 },
+                    },
+                    Dependencies = new List<Dependency>
+                    {
+                        new() {
+                            Task = "Task1",
+                            Intervals = new List<IntervalCost>
+                            {
+                                new() { Interval = [0, 10], Cost = 15 },
+                            },
+                            UnmetCost = double.PositiveInfinity,
+                        }
+                    },
+                    Location = new Location { Id = 3, UnmetCost = 2 },
+                }
+            }
         }
     };
 
@@ -295,5 +320,22 @@ public sealed class SolutionVerifierTests
 
         Assert.IsNotNull(cost);
         Assert.AreEqual(dependencyCost, cost.DependencyCost);
+    }
+
+    [TestMethod]
+    public void TestInvalidDependencyCost()
+    {
+        var assignments = new Dictionary<string, int?>
+        {
+            { "Task1", 0 },
+            { "Task5", 12 },
+        };
+        var cost = _verifier.CalcCost(assignments, out var messages);
+
+        foreach (var message in messages)
+            Console.WriteLine(message);
+
+        Assert.IsNull(cost);
+        Assert.IsTrue(messages.Any(x => x.Contains("mandatory dependency")));
     }
 }

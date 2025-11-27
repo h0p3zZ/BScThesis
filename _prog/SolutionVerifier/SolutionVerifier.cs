@@ -93,7 +93,7 @@ public class SolutionVerifier
                     {
                         scheduleCost.DependencyCost += dependency.UnmetCost;
                         if (dependency.UnmetCost == double.PositiveInfinity)
-                            messages.Add($"Dependency between tasks {assign1.Key} and {assign2.Key} is not met within any specified interval even though it is mandatory (infinite cost).");
+                            messages.Add($"Dependency between tasks {assign1.Key} and {assign2.Key} is not met mandatory dependency (infinite cost).");
                         continue;
                     }
 
