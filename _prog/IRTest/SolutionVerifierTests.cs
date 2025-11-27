@@ -22,6 +22,7 @@ public sealed class SolutionVerifierTests
                     {
                         new() { Interval = [0, 4], Cost = 1 },
                         new() { Interval = [4, 10], Cost = 2 },
+                        new() { Interval = [10, 20], Cost = 3 },
                     },
                     Location = new Location { Id = 1, UnmetCost = 1 },
                 }
@@ -37,6 +38,7 @@ public sealed class SolutionVerifierTests
                     {
                         new() { Interval = [0, 4], Cost = 1 },
                         new() { Interval = [4, 10], Cost = 2 },
+                        new() { Interval = [10, 20], Cost = 3 },
                     },
                     Dependencies = new List<Dependency>
                     {
@@ -63,6 +65,7 @@ public sealed class SolutionVerifierTests
                     {
                         new() { Interval = [0, 4], Cost = 1 },
                         new() { Interval = [4, 10], Cost = 2 },
+                        new() { Interval = [10, 20], Cost = 3 },
                     },
                     Location = new Location { Id = 2, UnmetCost = 5 },
                 }
@@ -78,6 +81,7 @@ public sealed class SolutionVerifierTests
                     {
                         new() { Interval = [0, 4], Cost = 1 },
                         new() { Interval = [4, 10], Cost = 2 },
+                        new() { Interval = [10, 20], Cost = 3 },
                     },
                     Location = new Location { Id = 2, UnmetCost = double.PositiveInfinity },
                 }
@@ -85,10 +89,9 @@ public sealed class SolutionVerifierTests
         }
     };
 
-    private SolutionVerifier.SolutionVerifier _verifier;
+    private readonly SolutionVerifier.SolutionVerifier _verifier;
 
-    [TestInitialize]
-    public void SetUp()
+    public SolutionVerifierTests()
     {
         _verifier = new SolutionVerifier.SolutionVerifier(_schedule);
     }

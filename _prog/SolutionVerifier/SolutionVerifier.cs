@@ -30,6 +30,10 @@ public class SolutionVerifier
                 continue;
             }
 
+            // Check whether the task has exceeded the scheduling horizon
+            if (task1TimeSlot + task1.Duration >= _problem.Horizon)
+                messages.Add($"Task {assign1.Key} exceeds the scheduling horizon.");
+
             var start = task1TimeSlot;
             var end = task1TimeSlot + task1.Duration;
             var intervals = task1.TimeSlots.Where(x =>
@@ -46,10 +50,6 @@ public class SolutionVerifier
             }
 
             scheduleCost.TimeSlotCost += CalculateWeightedIntervalCost(start, end, intervals);
-
-            // Check whether the task has exceeded the scheduling horizon
-            if (task1TimeSlot + task1.Duration >= _problem.Horizon)
-                messages.Add($"Task {assign1.Key} exceeds the scheduling horizon.");
 
             scheduleCost.UrgencyCost += (task1.Urgency + 1) * task1TimeSlot;
 
