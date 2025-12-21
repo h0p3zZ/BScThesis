@@ -10,12 +10,13 @@ Currently, most scheduling applications supply the options for defining tasks wi
     \item may have different time spans with different preferability and
     \item relations between tasks.
 \end{itemize}
-For this application, we needed a minimal list of constraints to narrow the vast verbal definitions of such a task to as few as possible. This will be our \Ac{IR}. We will give various reasons why such a representation is necessary - the simplest being, having constraints to give to a solver. \\
+This application should be able to take natural language inputs and create tasks to be created from it, before being scheduled using some for of constraint solving. To narrow the vast, possible verbal definitions of such a task to as few as possible, we introduce our \Ac{IR}. We will give various reasons why such a representation is necessary - the simplest being, having constraints to give to a solver. \\
 Defining the language, while ensuring the most efficient representation and having constraints to give to a solver efficiently.
 
 \section{Motivation}
 \label{sec:introduction:motivation}
-Scheduling is known to be a hard problem, especially constraint scheduling as for example in assigning restricted resources like rooms to given professors/courses at a university. \todo{Insert cite here}
+Scheduling is known to be a hard problem, especially constraint scheduling as for example in assigning restricted resources like rooms to given professors/courses at a university \cite{bib:2017-diveev}. With this approach we want to enable the definition of tasks in a minimal form, whilst maintaining expressivity to allow efficient solving in future work. \\
+We specifically do not define or implement a solver, but only provide the needed framework of bridging the gap between possible word-ambiguities, and solvable constraints.
 
 \section{Objectives and Approach}
 \label{sec:introduction:objectives}
