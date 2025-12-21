@@ -4,7 +4,39 @@
 \chapter{Formal Framework}
 \label{chapter:formal-framework}
 
-To make the definition in \autoref{sec:methodology-language-design:data-format} make sense we need to define mathematical semantics. This will be done in three levels of abstraction:
+\subsection{\acl{IR} Example}
+To make the content of the \acl{IR} less abstract we depict the following example, it should give a structural understanding beforehand. In the next chapter (\ref{subsec:methodology-language-design:data-format:language-keywords}) we specify the exact reasons of choices we had to make during the design process. The example should serve as reference for later lookup.
+\begin{lstlisting}[language=json]
+{
+    "horizon": 100,
+    "tasks": {
+        "SomeTaskId": {
+            "name": "Some Cleartext name",
+            "duration": 5,
+            "importance": 100,
+            "urgency": 5,
+            "timeSlots": [
+                { "interval": [5,12], "cost": 5},
+                { "interval": [20,22], "cost": 0},
+                { "interval": [20,28], "cost": 25},
+            ],
+            "dependencies": [
+                { 
+                    "task": "AnotherTaskId",
+                    "intervals": [
+                        { "interval": [10, 20], "cost": 5},
+                        { "interval": [20, 1110], "cost": 15}
+                    ],
+                    "unmetCost": 100
+                }
+            ],
+            "location": { "id": 1, "unmetCost": 150 }
+        }
+    }
+}
+\end{lstlisting}
+
+To make the above definition make sense we need to define mathematical semantics. This will be done in three levels of abstraction:
 \begin{enumerate}
     \item \nameref{sec:formal-framework:data-definition}, in which we define the data we need to define a problem distinctively.
     \item \nameref{sec:formal-framework:search-space}, here we define the space of possible problems we have.
@@ -16,44 +48,26 @@ For global usage we define:
 
 \section{Data Definition}
 \label{sec:formal-framework:data-definition}
+Such that we can solve an issue we need to clarify what is needed by the solvers so they can solve the problem at hand. Hence, we define the following functions both in natural language and mathematically:
 \begin{itemize}
     \item `tasks`: $T$ is a finite set
     \item `horizon`: $H \in \N_0$
     \item `duration` $\textit{dur}: T \longrightarrow \N_0$
-    \item `time slot function` $slot: T \times \N_u \longrightarrow \N_0 \cup \{ \infty \}$ \\
-          maps every task at a given time slot to a cost
-    \item `dependencies` $\textit{dep}: T \times T \longrightarrow (\Z \cup \{ u \}) \longrightarrow \N_0 \cup \{ \infty \}$
+    \item `time slot function` $slot: T \times \N_u \longrightarrow \N_0 \cup \{ \infty \}$, which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled) as well as the urgency given the assignment.
+    \item `dependencies` $\textit{dep}: T \times T \longrightarrow (\Z \cup \{ u \}) \longrightarrow \N_0 \cup \{ \infty \}$, which return the cost of a tasks dependencies, given another task - if applicable. This cost can also be infinite, if specified as such in the \textit{unmetCost}.
     \item `locations`: $L$ is a finite set
-    \item `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$
-    \item $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$
-    \item `travel` $\textit{trav}: T \times T \longrightarrow \N_0 \cup \{ \infty \}$\todo{Properly define this}
+    \item `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$, in which it is defined if a task has a set location and what the cost would be of driving to this specific location. Specifically: $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$.
 \end{itemize}
-
 
 \section{Search Space}
 \label{sec:formal-framework:search-space}
-We define $a$ to be the function of any task to an assignment (either the time slot it is assigned to or just "u" for unassigned).
-
-\begin{itemize}
-    \item `assignments`: $a: T \longrightarrow \N_u$
-    \item A is the set of all possible functions $T \longrightarrow N_u$
-\end{itemize}
+After defining what is needed to solve the problem, we now need to define what a solution generally looks like. For such a solution, we define $a$ to be the function of any task to an assignment (either the time slot it is assigned to or just "u" for unassigned). In particular, `assignments`: $a: T \longrightarrow \N_u$, where $A$ is the set of all possible functions $T \longrightarrow N_u$.
 
 \section{Semantics}
 \label{sec:formal-framework:semantics}
+We now finally have to put problem and solution together and define what a potential solution renders it a valid solution. For this wee need to define  $T_s \subseteq T$ as the subset of scheduled Tasks ($a(t_s) \in \N_0$, i.e. $a(t_s) \neq u$).
 
-Additionally, we define:
-\begin{itemize}
-    \item $T_s \subseteq T$ as the subset of scheduled Tasks ($a(t_s) \geq 0$)
-    \item `relDist`: $\N_u \times \N_u \longrightarrow \Z \cup \{ u \}$
-          \begin{itemize}
-              \item $\operatorname{relDist}(n_1, n_2) = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$
-              \item For readability we define use the infix notation: $n_1 - n_2 = \operatorname{relDist}(n_1, n_2)$
-          \end{itemize}
-\end{itemize}
-
-In this section we now show what a valid solution looks like:
-An assignment $a \in A$ is valid iff:
+Conceptually, an assignment $a \in A$ is valid iff:
 \begin{itemize}
     \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap:\\
           $a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_1)$
@@ -61,18 +75,16 @@ An assignment $a \in A$ is valid iff:
           $a(t) + \textit{dur}(t) < H$
     \item For every task we need the cost function defined in (\nameref{subsec:formal-framework:semantics:computing-cost}) to be finite.\\
           $c(a) \in \N_0$
-    \item $\forall t_1, t_2 \in T_s | (a(t_1) < a(t_2) \land \forall t \in T_s: a(t) > a(t_1) \implies a(t) > a(t_2)): \textit{trav}(t_1, t_2) \in N_0$ \todo{Properly define this}\\
-          If both tasks are scheduled, and $t_2$ is the next task after $t_1$ the travel function should return a number (not $\infty$).
 \end{itemize}
 
 \subsection{Computing Cost}
 \label{subsec:formal-framework:semantics:computing-cost}
 To be able to compare solutions to the problem we need some form of metric. For this we introduce the following cost function $\operatorname{c} \colon A \to \N_0 \cup \{ \infty \}$.
 \begin{align*}
-    c(a) = & \sum_{t \in T} slot(t, a(t)) +                                                                                        \\
-           & \sum_{t_1, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1)) +                                                                \\
-           & \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2))
+    c(a) & = \sum_{t \in T} slot(t, a(t))                                                                                          \\
+         & + \sum_{t_1, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1))                                                                  \\
+         & + \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2))
 \end{align*}
-The $\delta$ function above is defined as the Kronecker delta \cite{bib:2007-kozen}.
+The $\delta$ function above is defined as the Kronecker delta \cite{bib:2007-kozen}. It provides the functionality of comparing two values. If the values are the same, it returns 1 (true), otherwise it returns 0 (false).
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

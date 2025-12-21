@@ -10,56 +10,26 @@
 
 % Describe tasks, non overlapping, dependencies, locations
 
-\section{TODO}
-\todo{Find proper section name}
-Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
-Speaking of \enquote{time slots} we additionally need to phrase the explicit meaning of the phrase. Such a slot is defined using a 0 based time slot "array" in form of intervals. It starts counting from the 0 (now) up to a given horizon and every task inside that needs to be scheduled has defined possible time slots (intervals), which are also static - relative to the given beginning of the tasks (time slot 0).
+% \section{TODO}
+% \todo{Find proper section name}
+% Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
+% Speaking of \enquote{time slots} we additionally need to phrase the explicit meaning of the phrase. Such a slot is defined using a 0 based time slot "array" in form of intervals. It starts counting from the 0 (now) up to a given horizon and every task inside that needs to be scheduled has defined possible time slots (intervals), which are also static - relative to the given beginning of the tasks (time slot 0).
 
 \section{Data Format}
 \label{sec:methodology-language-design:data-format}
-In this chapter we want to give basic meaning to the underlying language, without going into implementation detail. We provide a minimal working example alongside detailed design choices for each field contained in our language.
-
-\subsection{\acl{IR} Example}
-To make the content of the \acl{IR} less abstract we depict the following example, it should give a structural understanding beforehand. In the next chapter (\ref{subsec:methodology-language-design:data-format:language-keywords}) we specify the exact reasons of choices we had to make during the design process. The example should serve as reference for later lookup.
-\begin{lstlisting}[language=json]
-{
-    "horizon": 100,
-    "tasks": {
-        "SomeTaskId": {
-            "name": "Some Cleartext name",
-            "duration": 5,
-            "importance": 100,
-            \todo{"urgency": 5,}
-            "timeSlots": [
-                { "interval": [5,12], "cost": 5},
-                { "interval": [20,22], "cost": 0},
-                { "interval": [20,28], "cost": 25},
-            ],
-            "dependencies": [
-                { 
-                    "task": "AnotherTaskId",
-                    "intervals": [
-                        { "interval": [10, 20], "cost": 5},
-                        { "interval": [20, 1110], "cost": 15}
-                    ],
-                    "unmetCost": 100
-                }
-            ],
-            "location": { "id": 1, "unmetCost": 150 }
-        }
-    }
-}
-\end{lstlisting}
-\todo{Move JSON to implementation, just list the fields/constraints before explaining them.}
+In this chapter we want to give basic meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
 
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
 \todo{Give the abstract notion (time) and discretize into the language - reasoning process}
+As we are dealing with the continuous notion of time, we cannot simply throw a solver onto this problem, as the complexity and solution space for such variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
+Furthermore, we have the following gears to tune, when using the language:
+
 \subsection*{Horizon}
-This \textit{horizon} field is solely to define the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
+First we needed to define the \textit{horizon} field is solely to specify the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
 
 \subsection*{Tasks}
-For convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The ID is also required to know and display what task is assigned at what time slot.
+We have already declared what a task is, for convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The ID is also required to know and display what task is assigned at what time slot.
 
 \subsubsection*{Duration}
 Duration defines the length of a task in form of number of time slots as an integer.
@@ -67,6 +37,10 @@ Duration defines the length of a task in form of number of time slots as an inte
 \subsubsection*{Importance}
 \label{subsubsec:methodology-language-design:importance}
 We define \textit{importance} to be an integer (or infinity), which defines how important a task is. Importance defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an importance value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal importance score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can - if necessary - be left unscheduled.
+
+\subsubsection*{Urgency}
+\label{subsubsec:methodology-language-design:urgency}
+As stated in \nameref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, as most of the tasks are plainly not known a lot of time beforehand. Concluding, we also need to ensure that our schedule handles as many of the tasks as soon as possible, to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of urgency into our language. It simulates this effect using cost, the higher the urgency the sooner a task should be scheduled, or else the cost will increase the later it is scheduled.
 
 \subsubsection{Time slots}
 \label{subsubsec:methodology-language-design:time-slots}
