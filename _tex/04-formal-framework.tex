@@ -48,6 +48,7 @@ For global usage we define:
 
 \section{Data Definition}
 \label{sec:formal-framework:data-definition}
+\todo{Show how the Data Definition corresponds to the JSON representation}
 Such that we can solve an issue we need to clarify what is needed by the solvers so they can solve the problem at hand. Hence, we define the following functions both in natural language and mathematically:
 \begin{itemize}
     \item `tasks`: $T$ is a finite set
@@ -55,12 +56,14 @@ Such that we can solve an issue we need to clarify what is needed by the solvers
     \item `duration` $\textit{dur}: T \longrightarrow \N_0$
     \item `time slot function` $slot: T \times \N_u \longrightarrow \N_0 \cup \{ \infty \}$, which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled) as well as the urgency given the assignment.
     \item `dependencies` $\textit{dep}: T \times T \longrightarrow (\Z \cup \{ u \}) \longrightarrow \N_0 \cup \{ \infty \}$, which return the cost of a tasks dependencies, given another task - if applicable. This cost can also be infinite, if specified as such in the \textit{unmetCost}.
+          \todo{Specify what happens when one of the tasks is undefined, remove unassigned up here and ensure tasks are assigned when computing cost - or find a use case where task A can be unscheduled, and you still need to add the unmetCost for task B, which is dependent on A, combine both ideas keep formalization, but in the computing cost you add in the second line, sum over tasks where $t_2$ is scheduled (if necessary) - Make sure to look at the code as well}
     \item `locations`: $L$ is a finite set
     \item `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$, in which it is defined if a task has a set location and what the cost would be of driving to this specific location. Specifically: $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$.
 \end{itemize}
 
 \section{Search Space}
 \label{sec:formal-framework:search-space}
+\todo{Add running example, give data definition, and search space, and finally give a small example to the semantics and cost}
 After defining what is needed to solve the problem, we now need to define what a solution generally looks like. For such a solution, we define $a$ to be the function of any task to an assignment (either the time slot it is assigned to or just "u" for unassigned). In particular, `assignments`: $a: T \longrightarrow \N_u$, where $A$ is the set of all possible functions $T \longrightarrow N_u$.
 
 \section{Semantics}
@@ -71,7 +74,7 @@ Conceptually, an assignment $a \in A$ is valid iff:
 \begin{itemize}
     \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap:\\
           $a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_1)$
-    \item For every task assigned task $t$ the assigned time slots must not exceed the horizon.\\
+    \item For every assigned task $t$ the assigned time slots must not exceed the horizon.\\
           $a(t) + \textit{dur}(t) < H$
     \item For every task we need the cost function defined in (\nameref{subsec:formal-framework:semantics:computing-cost}) to be finite.\\
           $c(a) \in \N_0$
@@ -85,6 +88,8 @@ To be able to compare solutions to the problem we need some form of metric. For 
          & + \sum_{t_1, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1))                                                                  \\
          & + \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2))
 \end{align*}
+\todo{What happens when you have one of them unassigned + the unmetCost should only be assigned if $t_1$ is assigned}
+\todo{Explain what the cost function does}
 The $\delta$ function above is defined as the Kronecker delta \cite{bib:2007-kozen}. It provides the functionality of comparing two values. If the values are the same, it returns 1 (true), otherwise it returns 0 (false).
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
