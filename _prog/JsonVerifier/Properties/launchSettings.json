@@ -2,7 +2,7 @@
   "profiles": {
     "JsonVerifier": {
       "commandName": "Project",
-      "commandLineArgs": "./ExampleSchedules/invalidSchedule.json"
+      "commandLineArgs": "./ExampleSchedules/generated1.json"
     }
   }
 }

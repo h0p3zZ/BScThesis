@@ -79,7 +79,7 @@ So, what I would expect to see is something along the lines of:
 <file>: a JSON object containing exactly the following fields:
     "horizon": a JSON integer
     "duration" a JSON integer
-    "importance": either a JSON integer or the string "inf"
+    "importance": either a JSON integer or the string "Infinity"
     "timeSlots": a list of <timeslot>
     ...
 

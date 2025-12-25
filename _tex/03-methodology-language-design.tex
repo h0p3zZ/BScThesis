@@ -10,8 +10,7 @@
 
 % Describe tasks, non overlapping, dependencies, locations
 
-% \section{TODO}
-% \todo{Find proper section name}
+% \section{No caption}
 % Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
 % Speaking of \enquote{time slots} we additionally need to phrase the explicit meaning of the phrase. Such a slot is defined using a 0 based time slot "array" in form of intervals. It starts counting from the 0 (now) up to a given horizon and every task inside that needs to be scheduled has defined possible time slots (intervals), which are also static - relative to the given beginning of the tasks (time slot 0).
 
@@ -21,7 +20,6 @@ In this chapter we want to give basic meaning to the underlying language, withou
 
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
-\todo{Give the abstract notion (time) and discretize into the language - reasoning process}
 As we are dealing with the continuous notion of time, we cannot simply throw a solver onto this problem, as the complexity and solution space for such variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
 Furthermore, we have the following gears to tune, when using the language:
 
@@ -59,7 +57,79 @@ In the \textit{dependencies} we depict preceding tasks. It in turn again contain
 \subsubsection*{Location}
 Planning a timetable well improves throughput while simultaneously reducing travel time by grouping tasks in the same area together. Hence, we define \textit{location}, by a unique integer alongside with \textit{unmetCost}, for when the grouping is not managed properly. This is the most basic set of fields, one could use for this purpose. For the general functionality it is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
 
-\todo{Say within this language, I can explain these high level constraints. Give examples. State situations that should be encodable - high level and handwavy e.g. If I want to do a BBQ the stuff has to be bought not too far before the BBQ. And in chapter 4 link back to this explanation, and encode them and show that these can be encoded using the language.}
+\subsection{Descriptive power - Example}
+For our personal scheduling application we want to be able to express as many high level specifications as possible. Therefore, we give the following examples to show the descriptive power of our language.
+
+\subsubsection{Example - BBQ}
+\label{subsubsec:methodology-language-design:example-bbq}
+Imagine you want to plan a BBQ with friends. For this you need to schedule several tasks, such as buying the groceries, setting up the location, the BBQ itself and cleaning up afterwards. Additionally, you want to have the groceries bought not too early before the BBQ, as otherwise the food might go bad. \\
+Using our language we can express these high level constraints as follows:
+\begin{lstlisting}[language=json]
+{
+    "horizon": 50,
+    "tasks": {
+        "BuyGroceries": {
+            "name": "Buy groceries for BBQ",
+            "duration": 3,
+            "importance": 100,
+            "urgency": 1,
+            "timeSlots": [
+                { "interval": [0,50], "cost": 0}
+            ],
+            "location": {
+                "id": 2,
+                "unmetCost": 50
+            }
+        },
+        "SetupLocation": {
+            "name": "Set up BBQ location",
+            "duration": 2,
+            "importance": 100,
+            "urgency": 1,
+            "timeSlots": [
+                { "interval": [0,50], "cost": 0}
+            ],
+            "location": {
+                "id": 1,
+                "unmetCost": 10
+            }
+        },
+        "BBQ": {
+            "name": "BBQ with friends",
+            "duration": 10,
+            "importance": "Infinity",
+            "urgency": 0,
+            "timeSlots": [
+                { "interval": [35,45], "cost": 0}
+            ],
+            "dependencies": [
+                { 
+                    "task": "SetupLocation",
+                    "intervals": [
+                        { "interval": [0,5], "cost": 0},
+                        { "interval": [6, 10], "cost": 15}
+                    ],
+                    "unmetCost": 500
+                },
+                { 
+                    "task": "BuyGroceries",
+                    "intervals": [
+                        { "interval": [0,5], "cost": 0},
+                        { "interval": [6,20], "cost": 100}
+                    ],
+                    "unmetCost": 500
+                }
+            ],
+            "location": {
+                "id": 1,
+                "unmetCost": 10
+            }
+        }
+    }
+}
+\end{lstlisting}
+Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval). The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost the earlier they are scheduled. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high unmet cost is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
+\todo{Link to the ``thesis\_problem.json'' and ``thesis\_assignment.json'' files in the repo as an example here.}
 
 \todo{It is very well known that cardinality constraints (+,-) in SAT does not work well. These things are hard to express in different formalisms. The backend can easily extract what it is supposed to say.}
 

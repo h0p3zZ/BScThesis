@@ -1,0 +1,83 @@
+{
+  "horizon": 50,
+  "tasks": {
+    "BuyGroceries": {
+      "name": "Buy groceries for BBQ",
+      "duration": 3,
+      "importance": 100,
+      "urgency": 1,
+      "timeSlots": [
+        {
+          "interval": [ 0, 50 ],
+          "cost": 0
+        }
+      ],
+      "location": {
+        "id": 2,
+        "unmetCost": 50
+      }
+    },
+    "SetupLocation": {
+      "name": "Set up BBQ location",
+      "duration": 2,
+      "importance": 100,
+      "urgency": 1,
+      "timeSlots": [
+        {
+          "interval": [ 0, 50 ],
+          "cost": 0
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": 10
+      }
+    },
+    "BBQ": {
+      "name": "BBQ with friends",
+      "duration": 10,
+      "importance": "Infinity",
+      "urgency": 0,
+      "timeSlots": [
+        {
+          "interval": [ 35, 45 ],
+          "cost": 0
+        }
+      ],
+      "dependencies": [
+        {
+          "task": "SetupLocation",
+          "intervals": [
+            {
+              "interval": [ 0, 5 ],
+              "cost": 0
+            },
+            {
+              "interval": [ 6, 10 ],
+              "cost": 15
+            }
+          ],
+          "unmetCost": 500
+        },
+        {
+          "task": "BuyGroceries",
+          "intervals": [
+            {
+              "interval": [ 0, 5 ],
+              "cost": 0
+            },
+            {
+              "interval": [ 6, 20 ],
+              "cost": 100
+            }
+          ],
+          "unmetCost": 500
+        }
+      ],
+      "location": {
+        "id": 1,
+        "unmetCost": 10
+      }
+    }
+  }
+}

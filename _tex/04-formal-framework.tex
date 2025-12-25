@@ -52,19 +52,45 @@ For global usage we define:
 Such that we can solve an issue we need to clarify what is needed by the solvers so they can solve the problem at hand. Hence, we define the following functions both in natural language and mathematically:
 \begin{itemize}
     \item `tasks`: $T$ is a finite set
+          \begin{itemize}
+              \item Which naturally translates to the dictionary of tasks contained in the JSON representation. Every $t \in T$ represents a unique task. ``SetupLocation'' would be such an example from \nameref{subsubsec:methodology-language-design:example-bbq}
+          \end{itemize}
     \item `horizon`: $H \in \N_0$
+          \begin{itemize}
+              \item Is a direct mapping to the `horizon` key in the JSON - 50 for the BBQ example.
+          \end{itemize}
     \item `duration` $\textit{dur}: T \longrightarrow \N_0$
+          \begin{itemize}
+              \item Is the duration of a task in time slots, directly mapping to the `duration` key in the JSON. In our example, we have $\textit{dur}(\text{SetupLocation}) = 2$.
+          \end{itemize}
     \item `time slot function` $slot: T \times \N_u \longrightarrow \N_0 \cup \{ \infty \}$, which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled) as well as the urgency given the assignment.
-    \item `dependencies` $\textit{dep}: T \times T \longrightarrow (\Z \cup \{ u \}) \longrightarrow \N_0 \cup \{ \infty \}$, which return the cost of a tasks dependencies, given another task - if applicable. This cost can also be infinite, if specified as such in the \textit{unmetCost}.
-          \todo{Specify what happens when one of the tasks is undefined, remove unassigned up here and ensure tasks are assigned when computing cost - or find a use case where task A can be unscheduled, and you still need to add the unmetCost for task B, which is dependent on A, combine both ideas keep formalization, but in the computing cost you add in the second line, sum over tasks where $t_2$ is scheduled (if necessary) - Make sure to look at the code as well}
-    \item `locations`: $L$ is a finite set
-    \item `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$, in which it is defined if a task has a set location and what the cost would be of driving to this specific location. Specifically: $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$.
+          \begin{itemize}
+              \item This function is a combination of multiple keys in the \Ac{IR}. First if it is not scheduled ($a(t) = u$) it returns the importance cost of the task. Otherwise, it checks all defined time slots for the task and if the given time slot $a(t)$ is within one of the defined intervals, it returns the cost of that interval plus an urgency cost calculated as $(a(t) + 1) \cdot \textit{urgency}$. If no interval is found it returns \textit{importance} as the cost. Looking at \nameref{subsubsec:methodology-language-design:example-bbq} and the example assignment in \nameref{sec:formal-framework:search-space}, we have for example $\operatorname{slot}(\text{BuyGroceries}, 29) = \text{intervalCost} + \text{urgencyCost} = 0 + (29 + 1) \cdot 1 = 30$.
+          \end{itemize}
+    \item `dependencies` $\textit{dep}: T \times T \longrightarrow (\Z \cup \{ u \}) \longrightarrow \N_0 \cup \{ \infty \}$, which return the cost of a tasks dependencies, given another task - if applicable. This cost can also be infinite, if specified as such in the \textit{unmetCost}. When the relative distance of assignment slots is $u$ (one of them is unassigned) the function returns the `unmetCost` in any case.
+          \begin{itemize}
+              \item This function maps every pair of tasks to another function, which in turn maps the relative distance of their assignments to a cost. If one of the tasks is unassigned, the function should return the `unmetCost` define in the JSON representation. Otherwise, it checks all defined intervals for the dependency and if the relative distance of assignments is within one of the defined intervals, it returns the cost of that interval. If no valid interval is found it again returns the `unmetCost`. In this case, when looking at the BBQ example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
+          \end{itemize}
+    \item `locations`: $L$ is a finite set. `locations` $\textit{loc}: T \longrightarrow L \times (\N_0 \cup \{ \infty \})$, in which it is defined if a task has a set location and what the cost would be of driving to this specific location. Specifically: $\textit{loc}(t) = (\textit{loc}_L(t), \textit{loc}_c(t))$.
+          \begin{itemize}
+              \item The set of locations is defined by all unique location IDs defined for all tasks. Additionally, the location function maps every task to a tuple of both the location ID and the cost of going there. If for a task there is no defined location, the function returns $(null, 0)$, which just means there is no location and therefore, no cost.
+          \end{itemize}
 \end{itemize}
 
 \section{Search Space}
 \label{sec:formal-framework:search-space}
 \todo{Add running example, give data definition, and search space, and finally give a small example to the semantics and cost}
 After defining what is needed to solve the problem, we now need to define what a solution generally looks like. For such a solution, we define $a$ to be the function of any task to an assignment (either the time slot it is assigned to or just "u" for unassigned). In particular, `assignments`: $a: T \longrightarrow \N_u$, where $A$ is the set of all possible functions $T \longrightarrow N_u$.
+
+Referring to \nameref{subsubsec:methodology-language-design:example-bbq} again, an example assignment could look like this:
+\begin{lstlisting}[language=json]
+{
+    "BuyGroceries": 29,
+    "SetupLocation": 32,
+    "BBQ": 35
+}
+\end{lstlisting}
+Where we have each task assigned to a specific time slot or ``u'' for unassigned. In this case, all tasks are assigned to a specific time slot. The above assignment function $a$ would therefore be defined as: $a(\text{BuyGroceries}) = 29$ for example.
 
 \section{Semantics}
 \label{sec:formal-framework:semantics}
@@ -73,23 +99,51 @@ We now finally have to put problem and solution together and define what a poten
 Conceptually, an assignment $a \in A$ is valid iff:
 \begin{itemize}
     \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap:\\
-          $a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_1)$
+          $a(t_1) + \textit{dur}(t_1) \leq a(t_2) \lor a(t_2) + \textit{dur}(t_2) \leq a(t_1)$ \\
+          Which works fine for the example assignments
+          \begin{align*}
+              a(\text{BuyGroceries}) + \textit{dur}(\text{BuyGroceries})   & = 29 + 3 = 32 \leq 32 = a(\text{SetupLocation}) & \text{True} \\
+              a(\text{BuyGroceries}) + \textit{dur}(\text{BuyGroceries})   & = 29 + 3 = 32 \leq 35 = a(\text{BBQ})           & \text{True} \\
+              a(\text{SetupLocation}) + \textit{dur}(\text{SetupLocation}) & = 32 + 2 = 34 \leq 35 = a(\text{BBQ})           & \text{True} \\
+          \end{align*}
     \item For every assigned task $t$ the assigned time slots must not exceed the horizon.\\
           $a(t) + \textit{dur}(t) < H$
-    \item For every task we need the cost function defined in (\nameref{subsec:formal-framework:semantics:computing-cost}) to be finite.\\
+          \begin{align*}
+              a(\text{BuyGroceries}) + \textit{dur}(\text{BuyGroceries})   & = 29 + 3 = 32 < 50 = h  & \text{True} \\
+              a(\text{SetupLocation}) + \textit{dur}(\text{SetupLocation}) & = 32 + 2 = 34 < 50 = h  & \text{True} \\
+              a(\text{BBQ}) + \textit{dur}(\text{BBQ})                     & = 35 + 10 = 45 < 50 = h & \text{True} \\
+          \end{align*}
+    \item For a given assignment $a$ we need the cost function - defined in \autoref{subsec:formal-framework:semantics:computing-cost} - to be finite.\\
           $c(a) \in \N_0$
 \end{itemize}
 
 \subsection{Computing Cost}
 \label{subsec:formal-framework:semantics:computing-cost}
 To be able to compare solutions to the problem we need some form of metric. For this we introduce the following cost function $\operatorname{c} \colon A \to \N_0 \cup \{ \infty \}$.
-\begin{align*}
-    c(a) & = \sum_{t \in T} slot(t, a(t))                                                                                          \\
-         & + \sum_{t_1, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1))                                                                  \\
-         & + \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2))
-\end{align*}
-\todo{What happens when you have one of them unassigned + the unmetCost should only be assigned if $t_1$ is assigned}
-\todo{Explain what the cost function does}
-The $\delta$ function above is defined as the Kronecker delta \cite{bib:2007-kozen}. It provides the functionality of comparing two values. If the values are the same, it returns 1 (true), otherwise it returns 0 (false).
+
+Finally, we need a Kronecker delta ($\delta$) function to help us with location cost calculation \cite{bib:2007-kozen}. It provides the functionality of comparing two values. If the values are the same, it returns 1 (true), otherwise it returns 0 (false). \\
+For simplicity, we also need a definition of a difference between two numbers in $\N_u$:\\
+$\operatorname{-}: \N_u \times \N_u \longrightarrow \Z \cup \{ u \}$ \\
+$n_1 - n_2 = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$
+\begin{align}
+    c(a) & = \sum_{t \in T} slot(t, a(t)) \label{eq:cost-function-1}                                                                                          \\
+         & + \sum_{t_1 \in T_s, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1))   \label{eq:cost-function-2}                                                        \\
+         & + \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2)) \label{eq:cost-function-3}
+\end{align}
+\todo{Why should we not append the cost in both cases $t_1$ unassigned or, $t_2$ unassigned?}
+We can split the cost function into three parts:
+\begin{itemize}
+    \item The first part (\autoref{eq:cost-function-1}) sums up the cost of every task at its assigned time slot. The urgency is automatically added, if the task is scheduled (e.g. $(a(t) + 1) \cdot \textit{urgency}$). On the other hand, if the task is not scheduled we simply append the importance cost. We already gave an example for this in \autoref{sec:formal-framework:data-definition} when explaining the `time slot function`.
+    \item The second part (\autoref{eq:cost-function-2}) sums up the dependency costs for every pair of tasks, where the first task is scheduled, and the second one might be scheduled but is not mandatory to be. The cost is calculated based on the relative distance of the assignments of both tasks. If one of the tasks - the second one, as the first one has to be assigned - is unassigned, the `unmetCost` is added to the total cost. We also gave an example for this in \autoref{sec:formal-framework:data-definition} when explaining the `dependencies` function.
+    \item The third part (\autoref{eq:cost-function-3}) sums up the location costs for every pair of scheduled tasks, where one task is scheduled immediately after the other. If both tasks share the same location no cost is added, otherwise the cost of driving to the location of the second task is added to the total cost. Finally, we give an example for the location by using ``SetupLocation'' and ``BBQ'' from \nameref{subsubsec:methodology-language-design:example-bbq}. Assuming both tasks have different locations defined, we calculate
+          \begin{align*}
+                & loc_C(\text{BBQ}) \cdot (1 - \delta(loc_L(\text{SetupLocation}), loc_L(\text{BBQ}))) \\
+                & \cdot \delta(a(\text{SetupLocation}) + dur(\text{SetupLocation}), a(\text{BBQ}))     \\
+              = & 10 \cdot (1 - \delta(1, 1)) \cdot \delta(32 + 2, 35)                                 \\
+              = & 10 \cdot (1 - 1) \cdot \delta(34, 35)                                                \\
+              = & 10 \cdot 0 \cdot 0 = 0
+          \end{align*}
+\end{itemize}
+Evaluating all of the above parts gives us the total cost of the given assignment ($a$), given the underlying definition of tasks (the problem)
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -82,8 +82,8 @@ public class SolutionVerifier
                     if (dependency.Task != assign1.Key)
                         continue;
 
-                    start = task2TimeSlot - task1TimeSlot;
-                    end = task2TimeSlot - task1TimeSlot + task2.Duration;
+                    start = task2TimeSlot - (task1TimeSlot + task1.Duration);
+                    end = task2TimeSlot - task1TimeSlot;
                     intervals = dependency.Intervals.Where(x =>
                         start <= x.Interval[1] &&
                         end >= x.Interval[0]

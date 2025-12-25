@@ -2,7 +2,7 @@
   "profiles": {
     "SolutionVerifier": {
       "commandName": "Project",
-      "commandLineArgs": "./schedule.json ./ExampleSolutions/exceedingHorizon.json"
+      "commandLineArgs": "./thesis_problem.json ./thesis_assignment.json"
     }
   }
 }
