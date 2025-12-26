@@ -127,7 +127,7 @@ $\operatorname{-}: \N_u \times \N_u \longrightarrow \Z \cup \{ u \}$ \\
 $n_1 - n_2 = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$
 \begin{align}
     c(a) & = \sum_{t \in T} slot(t, a(t)) \label{eq:cost-function-1}                                                                                          \\
-         & + \sum_{t_1 \in T_s, t_2 \in T} dep(t_1, t_2)(a(t_2) - a(t_1))   \label{eq:cost-function-2}                                                        \\
+         & + \sum_{t_1 \in T_s, t_2 \in T} dep(t_1, t_2)(a(t_2) - (a(t_1) + dur(t_1)))   \label{eq:cost-function-2}                                           \\
          & + \sum_{t_1, t_2 \in T_s} loc_C(t_2) \cdot (1 - \delta(loc_L(t_1), loc_L(t_2))) \cdot \delta(a(t_1) + dur(t_1), a(t_2)) \label{eq:cost-function-3}
 \end{align}
 \todo{Why should we not append the cost in both cases $t_1$ unassigned or, $t_2$ unassigned?}
