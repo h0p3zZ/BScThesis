@@ -5,42 +5,33 @@
 \chapter{Methodology and Language Design}
 \label{chapter:methodology-language-design}
 
-% Introduce basic concepts
-% Dxplain time descretization, bounding
-
-% Describe tasks, non overlapping, dependencies, locations
-
-% \section{No caption}
-% Across this chapter we will use several ambiguous words like \enquote{task}, \enquote{time slot}, \dots. The word task has a wide variety of meanings and infers several problems like: Task splitting, repetition, variable/fixed duration and variable/fixed time slots where such a task can be assigned to. Therefore, we need a clear understanding of the meaning of a \enquote{task} in this thesis. For the following chapters when we mention a task we are talking about a fixed duration, with a set of possible time slots at which this task can be assigned to.\\
-% Speaking of \enquote{time slots} we additionally need to phrase the explicit meaning of the phrase. Such a slot is defined using a 0 based time slot "array" in form of intervals. It starts counting from the 0 (now) up to a given horizon and every task inside that needs to be scheduled has defined possible time slots (intervals), which are also static - relative to the given beginning of the tasks (time slot 0).
-
 \section{Data Format}
 \label{sec:methodology-language-design:data-format}
 In this chapter we want to give basic meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
 
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
-As we are dealing with the continuous notion of time, we cannot simply throw a solver onto this problem, as the complexity and solution space for such variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
-Furthermore, we have the following gears to tune, when using the language:
+As we are dealing with the continuous notion of time, we cannot simply run a solver on this problem, as the complexity and solution space for such variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
+We finally landed on using the following constraints - also referred to as fields or keywords in this and following chapters - to define our language:
 
 \subsection*{Horizon}
-First we needed to define the \textit{horizon} field is solely to specify the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application.
+First we need to clarify that the \textit{horizon} field is solely to specify the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers \cite{bib:2023-parsert,bib:2025-ghosh}.
 
 \subsection*{Tasks}
-We have already declared what a task is, for convenience reasons - accessing the \textit{tasks} later on - and because a task needs to be uniquely identifiable for \nameref{subsubsec:methodology-language-design:dependencies}, tasks is a dictionary with a unique string key and the following fields as a task object. The ID is also required to know and display what task is assigned at what time slot.
+We have already defined what is meant by a task in \autoref{chapter:methodology-language-design}. For convenience - particularly to allow easy access later and to ensure unique identification for \nameref{subsubsec:methodology-language-design:dependencies} - tasks are stored in a dictionary. Each task is identified by a unique string key and represented as an object with the following fields. The ID is also required to later map the solution back to the high-level language.
 
 \subsubsection*{Duration}
-Duration defines the length of a task in form of number of time slots as an integer.
+The length of a task is defined in the \textit{duration} field in form of number of time slots as an integer.
 
 \subsubsection*{Importance}
 \label{subsubsec:methodology-language-design:importance}
-We define \textit{importance} to be an integer (or infinity), which defines how important a task is. Importance defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an importance value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal importance score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can - if necessary - be left unscheduled.
+We define \textit{importance} to be an integer (or infinity), which defines how important a task is. \textit{Importance} defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an \textit{importance} value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal \textit{importance} score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can - if necessary - be left unscheduled.
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
-As stated in \nameref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, as most of the tasks are plainly not known a lot of time beforehand. Concluding, we also need to ensure that our schedule handles as many of the tasks as soon as possible, to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of urgency into our language. It simulates this effect using cost, the higher the urgency the sooner a task should be scheduled, or else the cost will increase the later it is scheduled.
+As stated in \autoref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, as most of the tasks are plainly not known a lot of time beforehand. Concluding, we also need to ensure that our schedule handles as many of the tasks as soon as possible to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of \textit{urgency} into our language. It simulates this effect using cost, the higher the \textit{urgency} the sooner a task should be scheduled, or else the cost will increase the later it is scheduled.
 
-\subsubsection{Time slots}
+\subsubsection*{Time slots}
 \label{subsubsec:methodology-language-design:time-slots}
 Describing when a given task can be scheduled is represented by the \textit{timeSlots} field. Without it, one could not define when to, when to best or when not to schedule a task. We came up with the following options on how to efficiently define the field:
 \begin{itemize}
@@ -48,20 +39,18 @@ Describing when a given task can be scheduled is represented by the \textit{time
     \item array of interval
     \item and array of interval-cost pairs.
 \end{itemize}
-Bit-arrays are very easy to handle and efficient to store - but as storage is not a concerning factor, and the representation scales linearly with the horizon it becomes harder to understand for humans, the bigger the horizon. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being easily human-readable. For expressiveness, we additionally added a cost for each interval and consequently stick with an array of interval-cost pairs.
+Bit arrays are very easy to handle and efficient to store - but as storage is not a concerning factor, and the representation scales linearly with the \textit{horizon} it becomes harder to understand for humans, the bigger the \textit{horizon}. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being easily human-readable. For expressiveness, we additionally added a cost for each interval and consequently stick with an array of interval-cost pairs.
 
 \subsection*{Dependencies}
 \label{subsubsec:methodology-language-design:dependencies}
-In the \textit{dependencies} we depict preceding tasks. It in turn again contains intervals in the same format as in \nameref{subsubsec:methodology-language-design:time-slots}. Additionally, similarly to the \nameref{subsubsec:methodology-language-design:importance} of a task, we define \textit{unmetCost} if a task does not conform to its dependencies. The necessity of the here described fields are already described in \nameref{subsubsec:methodology-language-design:time-slots} and \nameref{subsubsec:methodology-language-design:importance}.
+In the \textit{dependencies} we depict preceding tasks. It in turn again contains intervals in the same format as in \textit{timeSlots}. Additionally, similarly to the \textit{importance} of a task, we define \textit{unmetCost} if a task does not conform to its \textit{dependencies}. The necessity of the here described fields are already described in \nameref{subsubsec:methodology-language-design:time-slots} and \nameref{subsubsec:methodology-language-design:importance}.
 
 \subsubsection*{Location}
 Planning a timetable well improves throughput while simultaneously reducing travel time by grouping tasks in the same area together. Hence, we define \textit{location}, by a unique integer alongside with \textit{unmetCost}, for when the grouping is not managed properly. This is the most basic set of fields, one could use for this purpose. For the general functionality it is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
 
-\subsection{Descriptive power - Example}
-For our personal scheduling application we want to be able to express as many high level specifications as possible. Therefore, we give the following examples to show the descriptive power of our language.
-
-\subsubsection{Example - BBQ}
-\label{subsubsec:methodology-language-design:example-bbq}
+\subsection{Example BBQ}
+\label{subsec:methodology-language-design:example-bbq}
+For our personal scheduling application we want to be able to express as many high level specifications as possible. Therefore, we give the following example to show the descriptive power of our language. \\
 Imagine you want to plan a BBQ with friends. For this you need to schedule several tasks, such as buying the groceries, setting up the location, the BBQ itself and cleaning up afterwards. Additionally, you want to have the groceries bought not too early before the BBQ, as otherwise the food might go bad. \\
 Using our language we can express these high level constraints as follows:
 \begin{lstlisting}[language=json]
@@ -128,7 +117,7 @@ Using our language we can express these high level constraints as follows:
     }
 }
 \end{lstlisting}
-Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval). The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost the earlier they are scheduled. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high unmet cost is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
+Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and it having infinity for \textit{importance}. The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost when scheduled before time slot 14. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high \textit{unmetCost} is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
 \todo{Link to the ``thesis\_problem.json'' and ``thesis\_assignment.json'' files in the repo as an example here.}
 
 \todo{It is very well known that cardinality constraints (+,-) in SAT does not work well. These things are hard to express in different formalisms. The backend can easily extract what it is supposed to say.}
