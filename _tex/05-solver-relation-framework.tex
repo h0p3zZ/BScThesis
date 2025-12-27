@@ -4,22 +4,39 @@
 
 \chapter{Solver Relation and Framework}
 \label{chapter:solver-relation-framework}
+SAT, SMT (as an extension of SAT) and ILP represent three major paradigms for constraint solving in computer science and optimization. Their differences in expressiveness, solver technology, and application domains justify their inclusion in a comprehensive study of automated reasoning approaches. Especially with SAT being one of the most popular paradigms for constraint solving~\cite{bib:2023-ulrich-oltean}, while SMT is a required extension to properly cover our language, and ILP being a good fit for our problem domain, we will focus on these three paradigms in the following sections.
 
 \section{Solver candidates}
-\subsection{Satisfiability Modulo Theories (SMT)}
-\Ac{SMT} \cite{bib:2018-clarke}
-\todo{implement}
+The three following chapters will introduce the most basic concept of the respective solver paradigms. The field of possible constraint solvers is vast and far from complete. We restrict ourselves to the three most prominent options, to ensure the focus of the thesis stays on the core concept of our \Ac{IR}.
+\subsection{Boolean Satisfiability Problem (SAT)}
+It is proven that \Ac{SAT} is NP-complete~\cite{bib:2008-marques}. It means that if a problem can be reduced to \ac{SAT} it can be solved by a \ac{SAT} solver with at worst-case exponential runtime complexity. Using this approach, we handle propositional logic formulas, which are representations of boolean variables possibly combined with logical operators like \textbf{AND} ($\land$), \textbf{OR} ($\lor$), and \textbf{NOT} ($\lnot$). Most solvers are specialized on formulas in \Ac{CNF}, which means there is a conjunction ($\land$) of clauses, which in turn is a disjunction ($\lor$) of literals (boolean variable or their negation). An example formula in \ac{CNF} would be: $a \land (b \lor \lnot c)$. While \ac{SAT} is also powerful enough to express linear relations in a \ac{CNF} it is not the most efficient way to do so~\cite{bib:2008-marques}. This is why we take a look at \ac{SMT} in the next section.
 
-\subsection{Boolean Satisfiability Problem (SAT)}2
-\Ac{SAT} \cite{bib:2008-marques}
-\todo{implement}
+\subsection{Satisfiability Modulo Theories (SMT)}
+\Ac{SMT} is one of the most promising extensions of \ac{SAT}~\cite{bib:2008-marques} hence, we also handle it in this chapter. In particular \ac{SMT} is the middle ground between first- or higher-order-logic and \ac{SAT}~\cite{bib:2018-clarke}. It tries to mend the gap between expressiveness and efficiency of automatically solving problems. By introducing the likes of equality, arithmetics and uninterpreted functions we get a more powerful language, which makes expressing problems easier~\cite{bib:2007-demoura}. On the other hand, this expressiveness comes with a trade-off in solver efficiency and hence, we need to introduce specialized theory solvers - \ac{SMT}. Similarly to \ac{SAT}, \ac{SMT} is the conjunction, or disjunction of formulas (or again their negations). An example formula in \ac{SMT} would be: $\Phi = x + y \leq 10 \land (z = x * 2 \lor \lnot (y < 5)) \land f(x) = 4$. Additionally, we define $M$ to be an assignment of the formula $\Phi$, and state that $M \models \Phi$ if $M$ satisfies $\Phi$. In \ac{SMT} we see the usage of arithmetics, which is not possible in \ac{SAT}. This makes \ac{SMT} a more expressive language, which is easier to use for humans. Similar to \ac{SAT}, \ac{SMT} can also express linear relations, but again it is not the most efficient way to do so~\cite{bib:2008-marques}. Arithmetics is what is needed to express the majority of constraints we defined in our language. As such, we will also take a look at \ac{ILP} in the next section, as it is specialized on solving linear relations.
 
 \subsection{Integer Linear Programming (ILP)}
-\Ac{ILP} \cite{bib:2018-kuendee}
-\todo{implement}
+\Ac{ILP} is designed to either minimize or maximize an objective function, while holding inequality and equality constraints or keeping integrality restrictions on variables~\cite{bib:1994-chaudhuri}. Similarly to \ac{SAT} we know that \ac{ILP} is NP-complete. This means that if a problem can be reduced to \ac{ILP} it can be solved by an \ac{ILP} solver with at worst-case exponential runtime complexity. An example of an \ac{ILP} problem would be: $z = \min{(c^Tx | Ax \leq b, x \in \Z^n)}$. Here, $c^Tx$ is the objective function to minimize and $z$ represents the corresponding minimum value. $Ax \leq b$ are the constraints, and $x \in \Z^n$ enforces integrality on the variables. As we can see, \ac{ILP} is specialized on linear relations, which makes it a good fit for our problem domain. Additionally, we have the issue of minimizing cost, which is another point in favor of \ac{ILP} solvers. In the next section we will take a look at how our constraints can be converted to \ac{ILP}-like constraints.
 
 \section{ILP Solver Encoding}
-\todo{implement}
+As most of our constraint focus on linear inequality relations ($a + b \leq c$) and minimizing cost ($\min{(c(a))}$) we isolated \Ac{ILP} to be our best fit for a deeper usage showcase. Additionally, we have the issue of minimizing cost, which is another point in favor of \ac{ILP} solvers. We therefore suggest the following constraints as examples:
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Constraint                          & \ac{ILP}-like Encoding                                                                                                                           \\
+        \hline
+        Task A before Task B                & $\operatorname{a}(A) + \operatorname{dur}(A) \leq \operatorname{a}(B)$                                                                           \\
+        \hline
+        Task A with interval [s, e]         & $s \leq \operatorname{a}(A) \land \operatorname{a}(A) + \operatorname{dur}(A) \leq e$                                                            \\
+        \hline
+        Task A must not overlap with Task B & $\operatorname{a}(A) + \operatorname{dur}(A) \leq \operatorname{a}(B) \lor \operatorname{a}(B) + \operatorname{dur}(B) \leq \operatorname{a}(A)$ \\
+        \hline
+        Minimize cost                       & $\min{(c(a))}$                                                                                                                                   \\
+        \hline
+    \end{tabular}
+    \caption{Constraint conversion table to \ac{ILP}-like constraints.}
+\end{table}\\
+In this case we inserted the function $\operatorname{a}$ instead of using variables to showcase that the output of such a solver would be an assignment of time slots (start times) to each task. It becomes clear that the constraints we defined in our language can be converted quite naturally to \ac{ILP} constraints or at least a form of inequalities. As for the last constraint of minimizing cost, we can instead of looking at the minimization of the whole assignment, also split this with the definition of the cost function on a specific task. Therefore, we can see that we do not need to define a complete assignment which is minimized, but we minimize the cost of each task itself.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

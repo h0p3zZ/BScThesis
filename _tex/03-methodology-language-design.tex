@@ -15,7 +15,7 @@ As we are dealing with the continuous notion of time, we cannot simply run a sol
 We finally landed on using the following constraints - also referred to as fields or keywords in this and following chapters - to define our language:
 
 \subsection*{Horizon}
-First we need to clarify that the \textit{horizon} field is solely to specify the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers \cite{bib:2023-parsert,bib:2025-ghosh}.
+First we need to clarify that the \textit{horizon} field is solely to specify the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
 
 \subsection*{Tasks}
 We have already defined what is meant by a task in \autoref{chapter:methodology-language-design}. For convenience - particularly to allow easy access later and to ensure unique identification for \nameref{subsubsec:methodology-language-design:dependencies} - tasks are stored in a dictionary. Each task is identified by a unique string key and represented as an object with the following fields. The ID is also required to later map the solution back to the high-level language.

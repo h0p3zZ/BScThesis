@@ -93,7 +93,7 @@ Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
 \label{subsec:formal-framework:semantics:computing-cost}
 To be able to compare solutions to the problem we need some form of metric. For this we introduce the following \code{cost function} $\operatorname{c} \colon A \to \N_{\infty}$.
 
-Finally, we need a Kronecker delta ($\delta$) function to help us with location cost calculation \cite{bib:2007-kozen}. It provides the functionality of comparing two values. If the values are the same, it returns 1 (true), otherwise it returns 0 (false). \\
+Finally, we need a Kronecker delta ($\delta$) function to help us with location cost calculation~\cite{bib:2007-kozen}. It provides the functionality of comparing two values. If the values are the same, it returns 1 (true), otherwise it returns 0 (false). \\
 For simplicity, we also need a definition of a difference between two numbers in $\N_u$:\\
 $\operatorname{-} \colon \N_u \times \N_u \longrightarrow \Z_u$ \\
 $n_1 - n_2 = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$
