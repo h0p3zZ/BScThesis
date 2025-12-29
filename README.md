@@ -22,3 +22,12 @@ It is split into to c# projects:
 ```sh
 ./_prog/SolutionVerifier> dotnet run <problem-file-path> <assignment_file_path>
 ```
+
+## Running tests
+```sh
+./_prog/JsonVerifier> dotnet test
+```
+
+```sh
+./_prog/SolutionVerifier> dotnet test
+```
