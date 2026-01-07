@@ -1,6 +1,6 @@
 ﻿using JsonVerifier;
 
-namespace VerfifierTests;
+namespace VerifierTests;
 
 [TestClass]
 public sealed class JsonVerifierTests

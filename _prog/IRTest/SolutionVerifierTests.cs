@@ -1,7 +1,7 @@
 ﻿using JsonVerifier.Models;
 using SolutionVerifier;
 
-namespace VerfifierTests;
+namespace VerifierTests;
 
 [TestClass]
 public sealed class SolutionVerifierTests
