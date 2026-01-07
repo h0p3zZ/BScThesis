@@ -118,11 +118,24 @@ Using our language we can express these high level constraints as follows:
 }
 \end{lstlisting}
 Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and it having infinity for \textit{importance}. The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost when scheduled before time slot 14. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high \textit{unmetCost} is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
-\todo{Link to the ``thesis\_problem.json'' and ``thesis\_assignment.json'' files in the repo as an example here.}
 
-\todo{It is very well known that cardinality constraints (+,-) in SAT does not work well. These things are hard to express in different formalisms. The backend can easily extract what it is supposed to say.}
-
-\todo{Link to schema file in repo, which can be used if the language is in fact valid}
+\subsubsection{Schema Verification}
+\label{subsub:methodology-language-design:example-bbq:schema-verification}
+To make the language explicit and verifiable, we defined a \ac{JSON} schema for it. This schema defines without ambiguity what fields are required, what types are valid for said fields in addition to other constraints such as minimum and maximum length of arrays. An excerpt of the schema file showing the definition of \textit{unmetCost} from \nameref{subsubsec:methodology-language-design:dependencies} is shown below:
+\begin{lstlisting}[language=json]
+...
+"unmetCost": {
+    "oneOf": [
+        { "type": "integer" },
+        {
+            "type": "string",
+            "enum": [ "Infinity" ]
+        }
+    ]
+},
+...
+\end{lstlisting}
+One can find the complete schema file in our repository\footnote{Schema file: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/JsonVerifier/schema.json}}. For testing one also needs a \ac{JSON} schema validation tool. We decided to use C\# with the \textit{Newtonsoft.Json.Schema} library\footnote{Newtonsoft.Json.Schema library: \url{https://www.newtonsoft.com/jsonschema}} for our C\# implementation to verify the input files. If one wants to test the specific example shown above it is also contained in the repository\footnote{Example files: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/SolutionVerifier/thesis_problem.json}}.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
