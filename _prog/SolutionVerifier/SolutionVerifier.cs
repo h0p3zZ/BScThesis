@@ -22,7 +22,8 @@ public class SolutionVerifier
         {
             var task1 = _problem.Tasks[assign1.Key];
 
-            if (assign1.Value is not { } task1TimeSlot) {
+            if (assign1.Value is not { } task1TimeSlot)
+            {
                 scheduleCost.ImportanceCost += task1.Importance;
                 if (task1.Importance == double.PositiveInfinity)
                     messages.Add($"Task {assign1.Key} is not scheduled, incurring infinite importance cost.");
@@ -112,7 +113,7 @@ public class SolutionVerifier
     /// <param name="end">End of range excluded.</param>
     /// <param name="intervals">The intervals that should cover the initial range.</param>
     /// <returns>True if the <paramref name="intervals"/> cover the range between <paramref name="start"/> and <paramref name="end"/>.</returns>
-    private static bool IsRangeCoveredByIntervals (int start, int end, IEnumerable<IntervalCost> intervals)
+    private static bool IsRangeCoveredByIntervals(int start, int end, IEnumerable<IntervalCost> intervals)
     {
         var values = Enumerable.Range(start, end - start).ToList();
 
