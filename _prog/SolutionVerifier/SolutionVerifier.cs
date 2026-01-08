@@ -1,6 +1,5 @@
 ﻿using JsonVerifier.Models;
 using SolutionVerifier.Models;
-using System.Threading.Tasks;
 
 namespace SolutionVerifier;
 

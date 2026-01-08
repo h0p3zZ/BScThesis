@@ -2,6 +2,6 @@
 
 public class Location
 {
-    public int Id { get; set; }
-    public double UnmetCost { get; set; }
+    public required int Id { get; set; }
+    public required double UnmetCost { get; set; } // Double used to allow for infinite importance
 }
