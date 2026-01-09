@@ -7,5 +7,5 @@ public class IntervalCost
     // Interval represented as [start, end] (end is excluded)
     [Length(2, 2)]
     public required List<int> Interval { get; set; }
-    public int Cost { get; set; }
+    public int Cost { get; set; } // Infinite cost not needed as we can just omit the interval if it should not be scheduled there
 }

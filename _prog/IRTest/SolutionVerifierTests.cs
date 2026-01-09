@@ -1,5 +1,4 @@
 ﻿using JsonVerifier.Models;
-using SolutionVerifier;
 
 namespace VerifierTests;
 
