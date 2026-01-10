@@ -12,20 +12,20 @@ In this chapter we want to give meaning to the underlying language, without goin
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
 As we are dealing with the continuous notion of time, we cannot simply run a solver on this problem, as the complexity and solution space for such a continuous variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
-We show the constraints - also referred to as fields or keywords in this and following chapters - we finally landed on in the remainder of this chapter.
+We show the constraints --- also referred to as fields or keywords in this and following chapters --- we finally landed on in the remainder of this chapter.
 
 \subsection*{Horizon}
-First we need to clarify that the \textit{horizon} field is solely to specify the length of time - the amount of time slots - the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
+First we need to clarify that the \textit{horizon} field is solely to specify the length of time --- the amount of time slots --- the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
 
 \subsection*{Tasks}
-We have already defined what is meant by a task in \autoref{chapter:methodology-language-design}. For convenience - particularly to allow easy access later and to ensure unique identification for \nameref{subsubsec:methodology-language-design:dependencies} - tasks are stored in a dictionary. Each task is identified by a unique string key and represented as an object with the following fields. The ID is also required to later map the solution back to the high-level language.
+We have already defined what is meant by a task in \autoref{chapter:methodology-language-design}. For convenience --- particularly to allow easy access later and to ensure unique identification for \nameref{subsubsec:methodology-language-design:dependencies} --- tasks are stored in a dictionary. Each task is identified by a unique string key and represented as an object with the following fields. The ID is also required to later map the solution back to the high-level language.
 
 \subsubsection*{Duration}
 The length of a task is defined in the \textit{duration} field in form of number of time slots as an integer.
 
 \subsubsection*{Importance}
 \label{subsubsec:methodology-language-design:importance}
-We define \textit{importance} to be an integer (or infinity), which defines how important a task is. \textit{Importance} defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an \textit{importance} value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal \textit{importance} score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can - if necessary - be left unscheduled.
+We define \textit{importance} to be an integer (or infinity), which defines how important a task is. \textit{Importance} defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an \textit{importance} value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal \textit{importance} score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can --- if necessary --- be left unscheduled.
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
@@ -39,7 +39,7 @@ Describing when a given task can be scheduled is represented by the \textit{time
     \item array of interval
     \item and array of interval-cost pairs.
 \end{itemize}
-Bit arrays are very easy to handle and efficient to store - but as storage is not a concerning factor, and the representation scales linearly with the \textit{horizon} it becomes harder to understand for humans, the bigger the \textit{horizon}. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being easily human-readable. For expressiveness, we additionally added a cost for each interval and consequently stick with an array of interval-cost pairs.
+Bit arrays are very easy to handle and efficient to store --- but as storage is not a concerning factor, and the representation scales linearly with the \textit{horizon} it becomes harder to understand for humans, the bigger the \textit{horizon}. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being easily human-readable. For expressiveness, we additionally added a cost for each interval and consequently stick with an array of interval-cost pairs.
 
 \subsection*{Dependencies}
 \label{subsubsec:methodology-language-design:dependencies}
