@@ -6,7 +6,7 @@
 
 \todo{Rewrite - improve structure}
 
-To make the definitions in \autoref{chapter:methodology-language-design} make sense, we need to define mathematical semantics. This will be done in three levels of abstraction:
+To make the definitions in \autoref{chapter:methodology-language-design} make sense, we need to define mathematical semantics. The mentioned semantics will be explicitly defined in three levels of abstraction:
 \begin{enumerate}
     \item \nameref{sec:formal-framework:data-definition}, in which we define the data we need to define a problem distinctively.
     \item \nameref{sec:formal-framework:search-space}, here we define the space of possible problems we have.
@@ -24,33 +24,31 @@ For global usage and simplicity we define:
 \label{sec:formal-framework:data-definition}
 Such that we can solve an issue we need to clarify what is needed by the solvers so they can solve the problem at hand. Hence, we define the following functions both in natural language and mathematically:
 \begin{itemize}
-    \item \code{tasks}: $T$ is a finite set
-          \begin{itemize}
-              \item Which naturally translates to the dictionary of tasks contained in the \ac{JSON} representation. Every $t \in T$ represents a unique task. ``SetupLocation'' would be such an example from \nameref{subsec:methodology-language-design:example-bbq}
-          \end{itemize}
+    \item \code{tasks}: $T$ is a finite set of tasks.
+
+          The set naturally translates to the dictionary of tasks contained in the
+          \ac{JSON} representation. Each $t \in T$ represents a unique task.
+          For example, ``SetupLocation'' corresponds to a task defined in
+          \nameref{subsec:methodology-language-design:example-bbq}.
     \item \code{horizon}: $H \in \N_0$
-          \begin{itemize}
-              \item Is a direct mapping to the \textit{horizon} key in the \ac{JSON}. In \nameref{subsec:methodology-language-design:example-bbq} the \textit{horizon} is set to 50.
-          \end{itemize}
+
+          This is a direct mapping to the \textit{horizon} key in the \ac{JSON}. In \nameref{subsec:methodology-language-design:example-bbq} the \textit{horizon} is set to 50.
     \item \code{duration} $\operatorname{dur} \colon T \longrightarrow \N_0$
-          \begin{itemize}
-              \item Is the duration of a task in time slots, directly mapping to the \textit{duration} key in the \ac{JSON}. In our example, we have $\operatorname{dur}(\text{SetupLocation}) = 2$.
-          \end{itemize}
+
+          Is the duration of a task in time slots, directly mapping to the \textit{duration} key in the \ac{JSON}. In our example, we have $\operatorname{dur}(\text{SetupLocation}) = 2$.
     \item \code{time slot function} $\operatorname{slot} \colon T \times \N_u \longrightarrow \N_{\infty}$, which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled) as well as the urgency given the corresponding assignment.
-          \begin{itemize}
-              \item This function is a combination of multiple keys in the \Ac{IR}. First if it is not scheduled ($a(t) = u$) it returns the importance cost of the task. Otherwise, it checks all defined time slots for the task and if the given time slot $a(t)$ is within one of the defined intervals, it returns the cost of that interval plus an \textit{urgency} cost calculated as $(a(t) + 1) \cdot \textit{urgency}$. If no interval is found it returns \textit{importance} as the cost. Looking at \nameref{subsec:methodology-language-design:example-bbq} and the example assignment in \nameref{sec:formal-framework:search-space}, we have for example $\operatorname{slot}(\text{BuyGroceries}, 29) = \textit{interval.cost} + \textit{urgency} = 0 + (29 + 1) \cdot 1 = 30$.
-          \end{itemize}
+
+          This function is a combination of multiple keys in the \Ac{IR}. First if it is not scheduled ($a(t) = u$) it returns the importance cost of the task. Otherwise, it checks all defined time slots for the task and if the given time slot $a(t)$ is within one of the defined intervals, it returns the cost of that interval plus an \textit{urgency} cost calculated as $(a(t) + 1) \cdot \textit{urgency}$. If no interval is found it returns \textit{importance} as the cost. Looking at \nameref{subsec:methodology-language-design:example-bbq} and the example assignment in \nameref{sec:formal-framework:search-space}, we have for example $\operatorname{slot}(\text{BuyGroceries}, 29) = \textit{interval.cost} + \textit{urgency} = 0 + (29 + 1) \cdot 1 = 30$.
     \item \code{dependencies function} $\operatorname{dep} \colon T \times T \longrightarrow \Z_u \longrightarrow \N_{\infty}$, which return the cost of a tasks dependencies, given another task - if applicable. This cost can also be infinite, if specified as such in the \textit{unmetCost}. When the relative distance of assignment slots is ``$u$'' (one of them is unassigned) the function returns the \textit{unmetCost} in any case.
-          \begin{itemize}
-              \item This function maps every pair of tasks to another function, which in turn maps the relative distance of their assignments to a cost. If one of the tasks is unassigned, the function should return the \textit{unmetCost} define in the \ac{JSON} representation. Otherwise, it checks all defined intervals for the dependency and if the relative distance of assignments is within one of the defined intervals, it returns the cost of that interval. If no valid interval is found it again returns the \textit{unmetCost}. In this case, when looking at the BBQ example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
-          \end{itemize}
+
+          This function maps every pair of tasks to another function, which in turn maps the relative distance of their assignments to a cost. If one of the tasks is unassigned, the function should return the \textit{unmetCost} define in the \ac{JSON} representation. Otherwise, it checks all defined intervals for the dependency and if the relative distance of assignments is within one of the defined intervals, it returns the cost of that interval. If no valid interval is found it again returns the \textit{unmetCost}. In this case, when looking at the BBQ example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
     \item \code{locations} $L$ is a finite set.
     \item \code{locations function} $\operatorname{loc} \colon T \longrightarrow L \times \N_{\infty }$, in which it is defined whether a task has a set location and what the cost would be of going to this specific location. For convenience, we also define $\operatorname{loc}(t) = (\operatorname{loc}_L(t), \operatorname{loc}_c(t))$.
-          \begin{itemize}
-              \item The set of locations is defined by all unique location IDs defined for all tasks. Additionally, the \code{location function} maps every task to a tuple of both the location ID and the cost of going there. If for a task there is no defined location, the function returns $(null, 0)$, which just means there is no \textit{location} and therefore, no cost.
-          \end{itemize}
+
+          The set of locations is defined by all unique location IDs defined for all tasks. Additionally, the \code{location function} maps every task to a tuple of both the location ID and the cost of going there. If for a task there is no defined location, the function returns $(null, 0)$, which just means there is no \textit{location} and therefore, no cost.
 \end{itemize}
 
+\clearpage
 \section{Search Space}
 \label{sec:formal-framework:search-space}
 After defining what is needed to solve the problem, we now need to define what a solution generally looks like. For such a solution, we define $a$ to be the function of any task to an assignment (either the time slot it is assigned to or just ``$u$'' for unassigned). In particular, \code{assignments} $\operatorname{a} \colon T \longrightarrow \N_u$ and $A$ is the set of all possible functions $T \longrightarrow N_u$.
@@ -67,7 +65,7 @@ Where we have each task assigned to a specific time slot or ``$u$'' for unassign
 
 \section{Semantics}
 \label{sec:formal-framework:semantics}
-We now finally have to put problem and solution together and define what a potential solution renders it a valid solution. For this wee need to define  $T_s \subseteq T$ as the subset of scheduled Tasks ($\operatorname{a}(t_s) \in \N_0$, i.e. $\operatorname{a}(t_s) \neq u$).
+We now finally have to put problem and solution together and define what a potential solution renders it a valid solution. For this we need to define  $T_s \subseteq T$ as the subset of scheduled Tasks ($\operatorname{a}(t_s) \in \N_0$, i.e. $\operatorname{a}(t_s) \neq u$).
 
 Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
 \begin{itemize}
@@ -119,7 +117,7 @@ We can split the cost function into three parts:
 \end{itemize}
 Evaluating all of the above parts gives us the total cost of the given assignment ($a$), given the underlying definition of tasks (the problem).
 
-Similarly to \autoref{subsub:methodology-language-design:example-bbq:schema-verification}, we have implemented the computation of cost and validity checking of a given assignment to a specific problem in C\#. The implementation can be found in our repository. Specifically, the cost computation can be found in the \textit{SolutionVerifier} project\footnote{\textit{SolutionVerifier} project: \url{https://github.com/h0p3zZ/BScThesis/tree/dev/_prog/SolutionVerifier}}. Finally, we also provide the assignment example from \autoref{sec:formal-framework:search-space} in the repository to test the cost computation\footnote{Assignment file: \url{https://github.com/h0p3zZ/BScThesis/tree/dev/_prog/SolutionVerifier/thesis_assignment.json}}.
+Similarly to \autoref{sub:methodology-language-design:example-bbq:schema-verification}, we have implemented the computation of cost and validity checking of a given assignment to a specific problem in C\#. The implementation can be found in our repository. Specifically, the cost computation can be found in the \textit{SolutionVerifier} project\footnote{\textit{SolutionVerifier} project: \url{https://github.com/h0p3zZ/BScThesis/tree/dev/_prog/SolutionVerifier}}. Finally, we also provide the assignment example from \autoref{sec:formal-framework:search-space} in the repository to test the cost computation\footnote{Assignment file: \url{https://github.com/h0p3zZ/BScThesis/tree/dev/_prog/SolutionVerifier/thesis_assignment.json}}.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

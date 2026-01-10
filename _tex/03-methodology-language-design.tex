@@ -5,19 +5,17 @@
 \chapter{Methodology and Language Design}
 \label{chapter:methodology-language-design}
 
-\todo{Rewrite - improve structure and general writing, add information on what fields exist and with what data types and meaning in a better structured way}.
-
 \section{Data Format}
 \label{sec:methodology-language-design:data-format}
-In this chapter we want to give basic meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
+In this chapter we want to give meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
 
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
-As we are dealing with the continuous notion of time, we cannot simply run a solver on this problem, as the complexity and solution space for such variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
-We finally landed on using the following constraints - also referred to as fields or keywords in this and following chapters - to define our language:
+As we are dealing with the continuous notion of time, we cannot simply run a solver on this problem, as the complexity and solution space for such a continuous variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
+We show the constraints - also referred to as fields or keywords in this and following chapters - we finally landed on in the remainder of this chapter.
 
 \subsection*{Horizon}
-First we need to clarify that the \textit{horizon} field is solely to specify the length of time the solver can define tasks to - the amount of time slots. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
+First we need to clarify that the \textit{horizon} field is solely to specify the length of time - the amount of time slots - the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
 
 \subsection*{Tasks}
 We have already defined what is meant by a task in \autoref{chapter:methodology-language-design}. For convenience - particularly to allow easy access later and to ensure unique identification for \nameref{subsubsec:methodology-language-design:dependencies} - tasks are stored in a dictionary. Each task is identified by a unique string key and represented as an object with the following fields. The ID is also required to later map the solution back to the high-level language.
@@ -47,8 +45,39 @@ Bit arrays are very easy to handle and efficient to store - but as storage is no
 \label{subsubsec:methodology-language-design:dependencies}
 In the \textit{dependencies} we depict preceding tasks. It in turn again contains intervals in the same format as in \textit{timeSlots}. Additionally, similarly to the \textit{importance} of a task, we define \textit{unmetCost} if a task does not conform to its \textit{dependencies}. The necessity of the here described fields are already described in \nameref{subsubsec:methodology-language-design:time-slots} and \nameref{subsubsec:methodology-language-design:importance}.
 
-\subsubsection*{Location}
+\subsection*{Location}
 Planning a timetable well improves throughput while simultaneously reducing travel time by grouping tasks in the same area together. Hence, we define \textit{location}, by a unique integer alongside with \textit{unmetCost}, for when the grouping is not managed properly. This is the most basic set of fields, one could use for this purpose. For the general functionality it is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
+
+\subsection*{Complete Language Definition}
+The above defined fields form the core of our language, giving the following strucuture of the \ac{JSON}:
+\begin{lstlisting}
+<file> a JSON object containing exactly the following fields:
+    "horizon" a JSON integer
+    "tasks" a JSON object of type dictionary with a JSON string as a key and a JSON object of type <task> as a value
+
+<task> a JSON object containing exactly the following fields:
+    "name": a JSON string
+    "duration": a JSON integer
+    "importance": a JSON integer or the JSON string "Infinity"
+    "urgency": a JSON integer
+    "timeSlots" a JSON array of type <interval>
+    "dependencies" a JSON array of type <dependency>
+    "location" a JSON object of type <location>
+
+<interval> a JSON object with exactly the following fields:
+    "interval": a JSON array of type JSON integer of exactly two numbers
+    "cost": a JSON integer
+
+<dependency> a JSON object with exactly the following fields:
+    "task": a JSON string
+    "intervals" a JSON array of type <interval>
+    "unmetCost" a JSON integer or the JSON string "Infinity"
+
+<location> a JSON object with exactly the following fields:
+    "id": a JSON integer
+    "unmetCost" a JSON integer
+\end{lstlisting}
+
 
 \subsection{Example BBQ}
 \label{subsec:methodology-language-design:example-bbq}
@@ -119,10 +148,10 @@ Using our language we can express these high level constraints as follows:
     }
 }
 \end{lstlisting}
-Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and it having infinity for \textit{importance}. The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost when scheduled before time slot 14. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high \textit{unmetCost} is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
+Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and \textit[importance] being infinity. The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost when scheduled before time slot 14. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high \textit{unmetCost} is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
 
-\subsubsection{Schema Verification}
-\label{subsub:methodology-language-design:example-bbq:schema-verification}
+\subsection{Schema Verification}
+\label{sub:methodology-language-design:example-bbq:schema-verification}
 To make the language explicit and verifiable, we defined a \ac{JSON} schema for it. This schema defines without ambiguity what fields are required, what types are valid for said fields in addition to other constraints such as minimum and maximum length of arrays. An excerpt of the schema file showing the definition of \textit{unmetCost} from \nameref{subsubsec:methodology-language-design:dependencies} is shown below:
 \begin{lstlisting}[language=json]
 ...
