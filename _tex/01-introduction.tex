@@ -4,35 +4,32 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Currently, most scheduling applications supply the options for defining tasks with known start time and length. Sometimes even allows for repetition. These restrictions might not be enough for a lot of people. Especially, when those people have problems with time management. Hence, we want to define a scheduling application, which also allows for soft time constraints. Meaning tasks
+Currently, most scheduling applications supply the options for defining tasks with known start times and lengths. Sometimes even allows for repetition. These restrictions might not be sufficient for a wide range of practitioners. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed \cite{bib:2015-rabinovici}. Hence, we want to define a scheduling application, which also allows for soft time constraints. Tasks with soft time constraints are tasks that
 \begin{itemize}
     \item have broad time spans in which it is acceptable to schedule them,
     \item may have different time spans with different levels of preferability,
     \item the possibility of not scheduling tasks at all,
-    \item relations between tasks and
-    \item the option to define locations to a task to reduce travel time.
+    \item relations between tasks,
+    \item and the option to define locations to which a task can be assigned.
 \end{itemize}
-This application should be able to take natural language inputs and create tasks from that descriptive inputs, before being scheduled using some form of constraint solving. To narrow the vast range of possible verbal definitions of such a task to as few as possible, we introduce our \Ac{IR}. We will give various reasons why such a representation is necessary. The simplest being, having constraints to give to a solver in a performant manner and defining the language, while ensuring the most efficient representation.
+This application should be able to take natural language inputs and create tasks from that descriptive inputs, before being scheduled using some form of constraint solving. To narrow down the vast range of possible verbal definitions of such a task we introduce an \Ac{IR}. Such a \ac{IR} will be used to represent tasks in a formalized manner. This formalization will then be used to define the constraints needed to solve the scheduling problem. These constraints can then be given to a solver to find a solution for said problem.
 
-\section{Motivation}
-\label{sec:introduction:motivation}
-Scheduling is known to be a hard problem, especially constraint scheduling as for example in assigning restricted resources like rooms to given professors/courses at a university~\cite{bib:2017-diveev}. With this approach we want to enable the definition of tasks in a minimal form, whilst maintaining expressivity to allow efficient solving in future work. \\
-We specifically do not define or implement a solver, but only provide the needed framework to bridge the gap between possible word-ambiguities, and solvable constraints.
+\todo{Link other sections which provide reasoning as to why it is necessary/needed}
+%Various reasons will be given as to why such a representation is necessary. The simplest being, having constraints to give to a solver in a performant manner and defining the language, while ensuring the most efficient representation.
 
-\section{Objectives and Approach}
-\label{sec:introduction:objectives}
-The objective consists of
+Scheduling is known to be a hard problem, especially constraint scheduling as for example in assigning restricted resources (e.g. rooms) to given professors or courses at a university~\cite{bib:2017-diveev}. The approach presented in this thesis enables the definition of tasks in a minimal form, whilst maintaining expressivity to allow for efficient solving in future work. \\
+We specifically do not define or implement a solver, as it is out of scope for this thesis. Instead, we only provide the needed framework to bridge the gap between possible word-ambiguities, and solvable constraints.
+
+Specifically, this work tries to answer the following research question:
 \begin{itemize}
-    \item finding a language, which provides ample expressivity while remaining relatively simple,
+    \item finding a language that provides sufficient expressivity while remaining as simple as feasible,
     \item giving a notion of solution for a given problem (input language),
-    \item defining how to compare given solutions and
-    \item showing the relation between the constraints of the language and constraints of solvers.
+    \item defining how to compare given solutions,
+    \item and showing the relation between the constraints of the language and constraints of solvers.
 \end{itemize}
-We evaluated several approaches to identify the most promising one. It is safe to say that this is not the only solution as there are ample possibilities on defining such constraints. We give various reasons as to why this final set of constraints are superior to previously considered options and differing implementation ideas.
+We evaluated several approaches to identify a suitable solution for the defined research questions. While alternative formulations of the constraints are possible, this work motivates the selected approach and outlines its advantages over other considered options.
 
-\section{Outline}
-\label{sec:introduction:outline}
-We first will give some definitions one needs to know to understand for the follow-up chapters in \autoref{chapter:preliminaries-related-work}. Followed by the language design, including decisions we needed to make and the exact definition of the language itself in \autoref{chapter:methodology-language-design}. After defining the language, we continue with defining the constraints mathematically to show what a valid solution needs in \autoref{chapter:formal-framework}. In \autoref{chapter:solver-relation-framework} we give examples as to what logical solvers could be used and give reasoning for our overall design choices, regarding converting it to solvable constrains, before finally giving a conclusion in \autoref{chapter:conclusion}.
+The remainder of the thesis is structured as follows: \autoref{chapter:preliminaries-related-work} introduces the necessary definitions required to understand the subsequent chapters. \autoref{chapter:methodology-language-design} presents the language design, including the key design choices and the formal definition of the language. In \autoref{chapter:formal-framework}, the constraints are defined mathematically to characterize what constitutes a valid solution. \autoref{chapter:solver-relation-framework} discusses suitable logical solvers and motivates the overall design decisions, particularly with respect to transforming the problem into a set of solvable constraints. Finally, \autoref{chapter:conclusion} summarizes the findings and presents the conclusions drawn from this work.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
