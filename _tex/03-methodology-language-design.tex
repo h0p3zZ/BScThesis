@@ -5,9 +5,12 @@
 \chapter{Methodology and Language Design}
 \label{chapter:methodology-language-design}
 
+In this chapter we want to give meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
+
 \section{Data Format}
 \label{sec:methodology-language-design:data-format}
-In this chapter we want to give meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
+
+Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday life. As personal scheduling is a lot more prone to change in comparison to business schedules, we need to ensure that running the solver is as fast as possible. To achieve this, we decided to put a cap on the latest possible time slot, which reduces the space of possible solutions. Most of the time appointments tend to be stacked up towards the near future and become less frequent the further we look into the future, as one might not know of their existence yet. Therefore, this method does not restrict the possible solutions as most of the tasks are bundled towards the near future anyway. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
 
 \subsection{Language Keywords}
 \label{subsec:methodology-language-design:data-format:language-keywords}
