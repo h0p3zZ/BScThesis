@@ -5,67 +5,64 @@
 \chapter{Methodology and Language Design}
 \label{chapter:methodology-language-design}
 
-In this chapter we want to give meaning to the underlying language, without going into implementation detail. We provide the required constraints alongside detailed design choices for each field contained in our language.
-
-\section{Data Format}
-\label{sec:methodology-language-design:data-format}
+The aim of this chapter is to describe the design of the proposed language without focusing on semantics. We provide the required constraints alongside detailed design choices for each field contained in our language.
 
 Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday life. As personal scheduling is a lot more prone to change in comparison to business schedules, we need to ensure that running the solver is as fast as possible. To achieve this, we decided to put a cap on the latest possible time slot, which reduces the space of possible solutions. Most of the time appointments tend to be stacked up towards the near future and become less frequent the further we look into the future, as one might not know of their existence yet. Therefore, this method does not restrict the possible solutions as most of the tasks are bundled towards the near future anyway. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
+\todo{Put this where it should be}
 
-\subsection{Language Keywords}
-\label{subsec:methodology-language-design:data-format:language-keywords}
-As we are dealing with the continuous notion of time, we cannot simply run a solver on this problem, as the complexity and solution space for such a continuous variable is just too vast, whilst having no upside in comparison to the discretized approach explained in this chapter. As previously mentioned in \autoref{subsec:preliminaries-related-work:time-theory:time-representation}, we will handle the notion of time using discretized time slots, to both make the language better solvable, and to reduce the variables to make the solver faster. \\
-We show the constraints --- also referred to as fields or keywords in this and following chapters --- we finally landed on in the remainder of this chapter.
+\section{Language Keywords}
+\label{sec:methodology-language-design:language-keywords}
+Since we are dealing with continuous time, we cannot simply run a solver on this problem. The complexity and solution space for such a continuous variable is just too vast, and there is no advantage to it compared to the discrete approach explained in this chapter~\cite{bib:2015-rintanen}. As mentioned in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, the notion of time is handled using discretized time slots to make the language better solvable, and to reduce the variables to improve the performance of the solver. \\
+Below, we present the constraints --- also referred to as fields, because we define language keywords (i.e. fields) --- we ultimately adopted for our language design in the remainder of this chapter.
 
 \subsection*{Horizon}
-First we need to clarify that the \textit{horizon} field is solely to specify the length of time --- the amount of time slots --- the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is not needed for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
+The \texttt{horizon} field is used to specify the length of time (i.e. the number of time slots) the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is unnecessary for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
 
 \subsection*{Tasks}
-We have already defined what is meant by a task in \autoref{chapter:methodology-language-design}. For convenience --- particularly to allow easy access later and to ensure unique identification for \nameref{subsubsec:methodology-language-design:dependencies} --- tasks are stored in a dictionary. Each task is identified by a unique string key and represented as an object with the following fields. The ID is also required to later map the solution back to the high-level language.
+The definition of task is provided in \Cref{chapter:methodology-language-design}. For convenience --- particularly to allow easy access later and to ensure unique identification for dependencies (cf. \Cref{subsubsec:methodology-language-design:dependencies}) --- \texttt{tasks} are stored in a dictionary. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
 
 \subsubsection*{Duration}
-The length of a task is defined in the \textit{duration} field in form of number of time slots as an integer.
+The \texttt{duration} field defines the length of a task. It is defined by the number of time slots a task takes.
 
 \subsubsection*{Importance}
 \label{subsubsec:methodology-language-design:importance}
-We define \textit{importance} to be an integer (or infinity), which defines how important a task is. \textit{Importance} defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an \textit{importance} value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal \textit{importance} score, close to 0. This enables the \ac{IR} to handle optional tasks and give an ordering of what tasks should be preferably scheduled and what tasks can --- if necessary --- be left unscheduled.
+\texttt{Importance} defines how important a task is as integer (or infinity). Furthermore, \texttt{importance} defines the cost of an unscheduled task. A task that must be scheduled without exception should be assigned an \texttt{importance} value of or approaching infinity. In contrast, a task whose inclusion is not critical can be given a minimal \texttt{importance} score close to zero. This enables the IR to handle optional tasks and determine which tasks should be scheduled first and which tasks can be left unscheduled if necessary.
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
-As stated in \autoref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, as most of the tasks are plainly not known a lot of time beforehand. Concluding, we also need to ensure that our schedule handles as many of the tasks as soon as possible to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of \textit{urgency} into our language. It simulates this effect using cost, the higher the \textit{urgency} the sooner a task should be scheduled, or else the cost will increase the later it is scheduled.
+As stated in \autoref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, because most of the tasks are not known beforehand. Hence, we also need to ensure that our schedule handles as many of the tasks as soon as possible to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule tasks as early as possible, while still being able to schedule them later if necessary.
 
-\subsubsection*{Time slots}
+\subsubsection*{Time Slots}
 \label{subsubsec:methodology-language-design:time-slots}
-Describing when a given task can be scheduled is represented by the \textit{timeSlots} field. Without it, one could not define when to, when to best or when not to schedule a task. We came up with the following options on how to efficiently define the field:
+Describing the time a given task can be scheduled is represented by the \mbox{\texttt{timeSlots}} field. Without this field, it would not be possible to specify when to schedule a task, when it is preferable to do so, or when it should be avoided. We therefore propose the following options for efficiently defining this field:
 \begin{itemize}
     \item array of bits,
-    \item array of interval
+    \item array of interval,
     \item and array of interval-cost pairs.
 \end{itemize}
-Bit arrays are very easy to handle and efficient to store --- but as storage is not a concerning factor, and the representation scales linearly with the \textit{horizon} it becomes harder to understand for humans, the bigger the \textit{horizon}. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being easily human-readable. For expressiveness, we additionally added a cost for each interval and consequently stick with an array of interval-cost pairs.
+Bit arrays are very easy to handle and efficient to store. However, since storage is not a concerning factor, and the representation scales linearly with the \texttt{horizon} it becomes harder for humans to understand as the \texttt{horizon} increases. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being human-readable. We use a half-open interval $[0,10)$, meaning 0 is included while 10 is excluded. For expressiveness, we additionally add a cost for each interval and stick with an array of interval-cost pairs.
 
 \subsection*{Dependencies}
 \label{subsubsec:methodology-language-design:dependencies}
-In the \textit{dependencies} we depict preceding tasks. It in turn again contains intervals in the same format as in \textit{timeSlots}. Additionally, similarly to the \textit{importance} of a task, we define \textit{unmetCost} if a task does not conform to its \textit{dependencies}. The necessity of the here described fields are already described in \nameref{subsubsec:methodology-language-design:time-slots} and \nameref{subsubsec:methodology-language-design:importance}.
+The field \texttt{dependencies} we depict preceding tasks. It also contains intervals in the same format as \texttt{timeSlots}. Additionally, similarly to the \texttt{importance} of a task, we define a field \texttt{unmetCost} if a task does not conform to its \texttt{dependencies}.
 
 \subsection*{Location}
-Planning a timetable well improves throughput while simultaneously reducing travel time by grouping tasks in the same area together. Hence, we define \textit{location}, by a unique integer alongside with \textit{unmetCost}, for when the grouping is not managed properly. This is the most basic set of fields, one could use for this purpose. For the general functionality it is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
+Planning a timetable well improves throughput while simultaneously reducing travel time by grouping tasks in the same area together. Therefore, we define \texttt{location}, by a unique integer alongside with \texttt{unmetCost} when the grouping is not managed properly. This represents the most basic set of fields that we identified as appropriate for this purpose. For the general functionality the location is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
 
-\subsection*{Complete Language Definition}
-The above defined fields form the core of our language, giving the following strucuture of the \ac{JSON}:
-\begin{lstlisting}
+\subsection{Language Specification}
+The above defined fields form the core of the proposed language, resulting in the following \ac{JSON} structure:
+\begin{lstlisting}[language=json]
 <file> a JSON object containing exactly the following fields:
     "horizon" a JSON integer
     "tasks" a JSON object of type dictionary with a JSON string as a key and a JSON object of type <task> as a value
 
 <task> a JSON object containing exactly the following fields:
-    "name": a JSON string
     "duration": a JSON integer
     "importance": a JSON integer or the JSON string "Infinity"
     "urgency": a JSON integer
-    "timeSlots" a JSON array of type <interval>
-    "dependencies" a JSON array of type <dependency>
-    "location" a JSON object of type <location>
+    "timeSlots": a JSON array of type <interval>
+    "dependencies": a JSON array of type <dependency>
+    "location": a JSON object of type <location>
 
 <interval> a JSON object with exactly the following fields:
     "interval": a JSON array of type JSON integer of exactly two numbers
@@ -73,31 +70,29 @@ The above defined fields form the core of our language, giving the following str
 
 <dependency> a JSON object with exactly the following fields:
     "task": a JSON string
-    "intervals" a JSON array of type <interval>
-    "unmetCost" a JSON integer or the JSON string "Infinity"
+    "intervals": a JSON array of type <interval>
+    "unmetCost": a JSON integer or the JSON string "Infinity"
 
 <location> a JSON object with exactly the following fields:
     "id": a JSON integer
-    "unmetCost" a JSON integer
+    "unmetCost": a JSON integer
 \end{lstlisting}
 
 
-\subsection{Example BBQ}
-\label{subsec:methodology-language-design:example-bbq}
-For our personal scheduling application we want to be able to express as many high level specifications as possible. Therefore, we give the following example to show the descriptive power of our language. \\
-Imagine you want to plan a BBQ with friends. For this you need to schedule several tasks, such as buying the groceries, setting up the location, preparing the BBQ itself, and cleaning up afterward. Additionally, you want to have the groceries bought not too early before the BBQ, as otherwise the food might go bad. \\
-Using our language we can express these high level constraints as follows:
+\section{Exemplary Scheduling Scenario}
+\label{sec:methodology-language-design:scheduling-example}
+For our personal scheduling application, we aim to support the specification of high-level constraints as comprehensively as possible. To illustrate the expressive power of our language, we present the following example. \\
+Consider the task of planning a \Ac{BBQ} with friends. This requires scheduling several interdependent tasks, such as purchasing groceries, setting up the location, preparing the barbecue itself, and cleaning up afterward. In addition, certain temporal constraints must be respected. For example, the groceries should not be purchased too early before the barbecue, as the food may otherwise spoil. Using our language, these high-level constraints can be expressed as follows\footnote{The \ac{BBQ} example can be found in our repository: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/SolutionVerifier/thesis_problem.json}}:
 \begin{lstlisting}[language=json]
 {
     "horizon": 50,
     "tasks": {
         "BuyGroceries": {
-            "name": "Buy groceries for BBQ",
             "duration": 3,
             "importance": 100,
             "urgency": 1,
             "timeSlots": [
-                { "interval": [0,50], "cost": 0}
+                { "interval": [0, 50], "cost": 0}
             ],
             "location": {
                 "id": 2,
@@ -105,12 +100,11 @@ Using our language we can express these high level constraints as follows:
             }
         },
         "SetupLocation": {
-            "name": "Set up BBQ location",
             "duration": 2,
             "importance": 100,
             "urgency": 1,
             "timeSlots": [
-                { "interval": [0,50], "cost": 0}
+                { "interval": [0, 50], "cost": 0}
             ],
             "location": {
                 "id": 1,
@@ -118,18 +112,17 @@ Using our language we can express these high level constraints as follows:
             }
         },
         "BBQ": {
-            "name": "BBQ with friends",
             "duration": 10,
             "importance": "Infinity",
             "urgency": 0,
             "timeSlots": [
-                { "interval": [35,45], "cost": 0}
+                { "interval": [35, 45], "cost": 0}
             ],
             "dependencies": [
                 { 
                     "task": "SetupLocation",
                     "intervals": [
-                        { "interval": [0,5], "cost": 0},
+                        { "interval": [0, 6], "cost": 0},
                         { "interval": [6, 10], "cost": 15}
                     ],
                     "unmetCost": 500
@@ -137,8 +130,8 @@ Using our language we can express these high level constraints as follows:
                 { 
                     "task": "BuyGroceries",
                     "intervals": [
-                        { "interval": [0,5], "cost": 0},
-                        { "interval": [6,20], "cost": 100}
+                        { "interval": [0, 6], "cost": 0},
+                        { "interval": [6, 20], "cost": 100}
                     ],
                     "unmetCost": 500
                 }
@@ -151,11 +144,11 @@ Using our language we can express these high level constraints as follows:
     }
 }
 \end{lstlisting}
-Here we can see that we defined all three tasks. Logically the ``main'' task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and \textit[importance] being infinity. The other two tasks can be scheduled any time between 0 and 19 before the BBQ, with increasing cost when scheduled before time slot 14. Additionally, both tasks have to be scheduled before the BBQ, otherwise a high \textit{unmetCost} is incurred. The tasks ``SetupLocation'' and ``BuyGroceries'' both are not mandatory to be scheduled, but have a high importance to be scheduled. As these tasks should be scheduled, but if not possible one can still ask someone else attending the BBQ to do it.
+In this example, three tasks are defined. Intuitively, the ``main'' task is the \ac{BBQ} itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and \texttt{importance} is infinity. The task ``SetupLocation'' has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals. Furthermore, the task is scheduled with cost zero when scheduled before time slot 6, otherwise a cost of 15 is incurred. Similarly, ``BuyGroceries'' has to be scheduled at time slot 0 to 19, with cost zero when scheduled before time slot 6, otherwise a cost of 100 is incurred. Both tasks have to be scheduled before the \ac{BBQ}, otherwise a high \texttt{unmetCost} (500) of the dependencies is incurred. Although the tasks "SetupLocation" and "BuyGroceries" are not mandatory, but they are important. If it is not possible to schedule these tasks, one can still ask someone else attending the barbecue to do it.
 
-\subsection{Schema Verification}
-\label{sub:methodology-language-design:example-bbq:schema-verification}
-To make the language explicit and verifiable, we defined a \ac{JSON} schema for it. This schema defines without ambiguity what fields are required, what types are valid for said fields in addition to other constraints such as minimum and maximum length of arrays. An excerpt of the schema file showing the definition of \textit{unmetCost} from \nameref{subsubsec:methodology-language-design:dependencies} is shown below:
+\section{Schema Verification}
+\label{sec:methodology-language-design:schema-verification}
+A \ac{JSON} schema is used to make the language explicit and verifiable. This schema defines without ambiguity what fields are required, what types are valid for these fields and other constraints such as minimum and maximum length of arrays. An excerpt of the schema file showing the definition of \texttt{unmetCost} from \texttt{\hyperref[subsubsec:methodology-language-design:dependencies]{dependencies}} is shown below\footnote{The complete schema file can be found in our repository: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/JsonVerifier/schema.json}}:
 \begin{lstlisting}[language=json]
 ...
 "unmetCost": {
@@ -169,7 +162,7 @@ To make the language explicit and verifiable, we defined a \ac{JSON} schema for 
 },
 ...
 \end{lstlisting}
-One can find the complete schema file in our repository\footnote{Schema file: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/JsonVerifier/schema.json}}. For testing one also needs a \ac{JSON} schema validation tool. We decided to use C\# with the \textit{Newtonsoft.Json.Schema} library\footnote{Newtonsoft.Json.Schema library: \url{https://www.newtonsoft.com/jsonschema}} for our C\# implementation to verify the input files. If one wants to test the specific example shown above it is also contained in the repository\footnote{Example files: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/SolutionVerifier/thesis_problem.json}}.
+In addition, a schema validation tool is needed for testing. We decided to use C\# with the \textit{Newtonsoft.Json.Schema} library\footnote{Newtonsoft.Json.Schema library: \url{https://www.newtonsoft.com/jsonschema}} for our implementation to verify the input files.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
