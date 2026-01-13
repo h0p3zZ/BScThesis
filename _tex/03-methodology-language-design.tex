@@ -7,16 +7,13 @@
 
 The aim of this chapter is to describe the design of the proposed language without focusing on semantics. We provide the required constraints alongside detailed design choices for each field contained in our language.
 
-Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday life. As personal scheduling is a lot more prone to change in comparison to business schedules, we need to ensure that running the solver is as fast as possible. To achieve this, we decided to put a cap on the latest possible time slot, which reduces the space of possible solutions. Most of the time appointments tend to be stacked up towards the near future and become less frequent the further we look into the future, as one might not know of their existence yet. Therefore, this method does not restrict the possible solutions as most of the tasks are bundled towards the near future anyway. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
-\todo{Put this where it should be}
-
 \section{Language Keywords}
 \label{sec:methodology-language-design:language-keywords}
 Since we are dealing with continuous time, we cannot simply run a solver on this problem. The complexity and solution space for such a continuous variable is just too vast, and there is no advantage to it compared to the discrete approach explained in this chapter~\cite{bib:2015-rintanen}. As mentioned in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, the notion of time is handled using discretized time slots to make the language better solvable, and to reduce the variables to improve the performance of the solver. \\
 Below, we present the constraints --- also referred to as fields, because we define language keywords (i.e. fields) --- we ultimately adopted for our language design in the remainder of this chapter.
 
 \subsection*{Horizon}
-The \texttt{horizon} field is used to specify the length of time (i.e. the number of time slots) the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is unnecessary for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}.
+The \texttt{horizon} field is used to specify the length of time (i.e. the number of time slots) the solver can define tasks to. Without defining such a stopper, one would have to take infinite time into account which is unnecessary for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}. This is reasonable, as most of the time appointments tend to be stacked up towards the near future and become less frequent the further one looks into the future, as their existence is not known yet. Therefore, this method does not noticeably restrict the possible solutions as most of the tasks are bundled towards the near future. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
 
 \subsection*{Tasks}
 The definition of task is provided in \Cref{chapter:methodology-language-design}. For convenience --- particularly to allow easy access later and to ensure unique identification for dependencies (cf. \Cref{subsubsec:methodology-language-design:dependencies}) --- \texttt{tasks} are stored in a dictionary. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
@@ -30,7 +27,7 @@ The \texttt{duration} field defines the length of a task. It is defined by the n
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
-As stated in \autoref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, because most of the tasks are not known beforehand. Hence, we also need to ensure that our schedule handles as many of the tasks as soon as possible to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule tasks as early as possible, while still being able to schedule them later if necessary.
+As stated in \Cref{sec:preliminaries-related-work:time-theory}, tasks tend to bulk in the near future and the schedule becomes more or less empty the further into the future we look. This is natural, because most of the tasks are not known beforehand. Hence, we also need to ensure that our schedule handles as many of the tasks as soon as possible to help with the fact that at a later time, one needs space for the tasks one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule tasks as early as possible, while still being able to schedule them later if necessary.
 
 \subsubsection*{Time Slots}
 \label{subsubsec:methodology-language-design:time-slots}
@@ -145,6 +142,8 @@ Consider the task of planning a \Ac{BBQ} with friends. This requires scheduling 
 }
 \end{lstlisting}
 In this example, three tasks are defined. Intuitively, the ``main'' task is the \ac{BBQ} itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and \texttt{importance} is infinity. The task ``SetupLocation'' has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals. Furthermore, the task is scheduled with cost zero when scheduled before time slot 6, otherwise a cost of 15 is incurred. Similarly, ``BuyGroceries'' has to be scheduled at time slot 0 to 19, with cost zero when scheduled before time slot 6, otherwise a cost of 100 is incurred. Both tasks have to be scheduled before the \ac{BBQ}, otherwise a high \texttt{unmetCost} (500) of the dependencies is incurred. Although the tasks "SetupLocation" and "BuyGroceries" are not mandatory, but they are important. If it is not possible to schedule these tasks, one can still ask someone else attending the barbecue to do it.
+
+\clearpage
 
 \section{Schema Verification}
 \label{sec:methodology-language-design:schema-verification}

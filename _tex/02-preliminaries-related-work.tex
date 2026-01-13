@@ -4,11 +4,11 @@
 \chapter{Preliminaries and Related Work}
 \label{chapter:preliminaries-related-work}
 
-In this chapter we will explain basic concepts such as \nameref{sec:preliminaries-related-work:time-theory} in order to understand what scheduling is. Besides, we will describe what \nameref{subsec:preliminaries-related-work:time-theory:time-representation} and \nameref{subsec:preliminaries-related-work:time-theory:time-representation:hard-vs-soft} are, in order to be able to understand what the thesis is about. Additionally, fundamental terminology is defined to ensure consistent understanding throughout the thesis. Further, the rationale behind the selected approaches is explained, along with a discussion of the limitations of existing solutions in the context of this thesis.
+In this chapter we will explain basic concepts such as time theory (cf. \Cref{sec:preliminaries-related-work:time-theory}) in order to understand what scheduling is. Besides, we will describe what time representation (cf. \Cref{subsec:preliminaries-related-work:time-theory:time-representation}) is, and compare hard and soft time constraints \Cref{subsec:preliminaries-related-work:time-theory:time-representation:hard-vs-soft}, in order to be able to understand what the thesis is about. Additionally, fundamental terminology is defined to ensure consistent understanding throughout the thesis. Further, the rationale behind the selected approaches is explained, along with a discussion of the limitations of existing solutions in the context of this thesis.
 
 \section{Scheduling Theory}
 \label{sec:preliminaries-related-work:time-theory}
-Scheduling refers to the task of assigning a finite set of time-constrained events to limited resources under a set of restrictions~\cite{bib:2018-baker}. In the context of this thesis, it denotes the assignment of tasks --- characterized by fixed durations, relative temporal dependencies, and location constraints --- to specific days and time slots, which constitute the limited resources. Further, a valid schedule most adhere to the previously mentioned constraints --- split into \nameref{subsec:preliminaries-related-work:time-theory:time-representation:hard-vs-soft} --- while optimizing the \nameref{subsec:preliminaries-related-work:time-theory:assignment-cost}.
+Scheduling refers to the task of assigning a finite set of time-constrained events to limited resources under a set of restrictions~\cite{bib:2018-baker}. In the context of this thesis, it denotes the assignment of tasks --- characterized by fixed durations, relative temporal dependencies, and location constraints --- to specific days and time slots, which constitute the limited resources. Further, a valid schedule most adhere to the previously mentioned constraints, while optimizing the cost of an assignment (i.e. mapping of tasks to time slots) for a given problem (cf. \Cref{subsec:preliminaries-related-work:time-theory:assignment-cost}).
 
 \subsection{Time Representation}
 \label{subsec:preliminaries-related-work:time-theory:time-representation}
@@ -17,18 +17,18 @@ Instead, a time slot approach will be used. One time slot is a discretized unit 
 Let A be an arbitrary Task. A should be scheduled on December the 31\textsuperscript{st} at 6 PM and takes one hour. If we compile this exactly on December $31^{\text{st}}$ at 6 PM and one time slot is discretized to 15 minutes, we can conclude that this task should be scheduled at time slot 4, 5, 6, and 7, as shown in \Cref{tab:preliminaries-related-work:time-theory:time-representation:time-slots}.
 
 \begin{table}[!ht]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-        \hline
-        index & 0     & 1     & 2     & 3     & 4     & 5     & 6     & 7     & \dots \\
-        \hline
-        start & 17:00 & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & \dots \\
-        \hline
-        end   & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & 19:00 & \dots \\
-        \hline
-    \end{tabular}
-    \caption{Ranges of time slots}
-    \label{tab:preliminaries-related-work:time-theory:time-representation:time-slots}
+      \centering
+      \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+            \hline
+            index & 0     & 1     & 2     & 3     & 4     & 5     & 6     & 7     & \dots \\
+            \hline
+            start & 17:00 & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & \dots \\
+            \hline
+            end   & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & 19:00 & \dots \\
+            \hline
+      \end{tabular}
+      \caption{Ranges of time slots}
+      \label{tab:preliminaries-related-work:time-theory:time-representation:time-slots}
 \end{table}
 When using this approach, we handle only the time of interest (i.e. the future), while ensuring the concept of time is discretized and abstracted away as early as possible in the conversion process of natural language to constraints. \\
 For simplicity, the issue of summer and winter time is omitted, and we suggest using the actual time the task is assigned to, without taking into account the time change when we switch from summer to winter time or vice versa.
@@ -41,10 +41,10 @@ A scheduling assignment is defined as a mapping of tasks to specific time slots.
 Constraints specify the conditions and limitations that must be satisfied when scheduling tasks~\cite{bib:2017-diveev}. They define what schedules are feasible by restricting the order, timing, and allocation of tasks and resources. Typical constraints arise from resource capacities, task dependencies, deadlines, and mutual exclusivity requirements, ensuring that tasks do not conflict and that system limitations are respected. By formalizing these restrictions, constraints reduce the solution space to schedules that are both valid and practically implementable. \\
 As we are tackling a personal scheduler, we need to cover the most common requirements one might need to define in such everyday scenarios. Therefore, we identified the following basic requirements:
 \begin{itemize}
-    \item Duration defines how long a task will take
-    \item Assignments defines at which point in time the task may be scheduled
-    \item Dependencies: depict that one task has to be scheduled after another
-    \item Locations: emphasize efficiency, as unnecessary traveling can be avoided
+      \item Duration defines how long a task will take
+      \item Assignments defines at which point in time the task may be scheduled
+      \item Dependencies: depict that one task has to be scheduled after another
+      \item Locations: emphasize efficiency, as unnecessary traveling can be avoided
 \end{itemize}
 The above constraints were identified as the most important and therefore are covered in the \Ac{IR}. These constraints are explained in detail in \Cref{chapter:methodology-language-design}.
 
@@ -54,9 +54,12 @@ Hard time constraints, are defined as both hard as in timely restricted, at a sp
 In contrast, when talking about soft time constraints, we tackle both tasks, which can be scheduled in a broader range of time, with possibly differing durations (not part of this thesis). Additionally, soft time constraints address tasks that are desirable but not mandatory to schedule, such as “I would like to read a book every Friday, if possible”. Solutions that include such tasks should be preferred over those in which the tasks are not scheduled. Hence, we introduce the notion of cost as explained in \Cref{subsec:preliminaries-related-work:time-theory:assignment-cost} to quantify the desirability of scheduling such tasks.
 
 \section{Scheduling Language}
-As one needs a way to define and store tasks, we need a language to represent said tasks. For ease of use we decided against defining our own language from scratch. Instead, we use \Ac{JSON} to represent our basic language. The decision is justified by the widespread use and human readability of \Ac{JSON}~\cite{bib:2020-bourhis}. If one wanted to instead use \Ac{XML}, it can be converted to \ac{JSON} and back~\cite{bib:2017-LaFontaine}.
+As one needs a way to define and store tasks, we need a language to represent said tasks. For ease of use we decided against defining our own language from scratch. Instead, we use \Ac{JSON} to represent our basic language. The decision is justified by the widespread use and human readability of \Ac{JSON}~\cite{bib:2020-bourhis}. If one wanted to instead use \Ac{XML}, it can be converted to \ac{JSON} and back~\cite{bib:2017-LaFontaine}. \\
+Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday life. Since personal scheduling is a lot more prone to change in comparison to business schedules, flexibility is important.
+
 
 \section{Existing Scheduling Languages and Standards}
+\label{sec:preliminaries-related-work:existing-scheduling-languages-and-standards}
 After introducing the basic ideas underlying the \ac{IR}, it is necessary to clarify which formats and standards already exist and why our language still addresses issues that remain unsolved by current approaches. One of the most widely used standards for scheduling is the \textit{iCalendar} format, defined in \textit{RFC 5545}~\cite{bib:rfc5545}. It specifies a set of rules for representing text-based, potentially recurring events and tasks, and is widely adopted in both professional and personal scheduling applications. Owing to its extensive rule set, iCalendar is considerably more expressive than the language (or set of constraints) proposed in this thesis. This expressiveness, however, comes at a cost: the format cannot be easily translated into a representation that can be directly processed by a solver.
 
 Another relevant format is defined by the \Ac{ITC}~\cite{bib:itc2019format}, whose primary purpose is to specify timetabling problems involving the assignment of courses to dedicated rooms at specific times. Similar to our approach, it relies on discretized time slots. Nevertheless, this format is overly complex for our use case. In particular, the \ac{ITC} format is designed to handle multiple constrained resources simultaneously (e.g., rooms and instructors), whereas our problem involves only a single resource—the individual allocating the tasks. Consequently, our model requires fewer dimensions than the \ac{ITC} format.
