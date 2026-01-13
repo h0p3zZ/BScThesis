@@ -1,0 +1,4 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QDescribing when a given task can be scheduled is represented by the timeSlots field.\\E$"}
+{"rule":"PRP_VBG","sentence":"^\\QLogically the “main” task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and it having infinity for importance.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QThe tasks “SetupLocation” and “BuyGroceries” both are not mandatory to be scheduled, but have a high importance to be scheduled.\\E$"}
+{"rule":"A_MD_VB","sentence":"^\\QA should be scheduled on December the 31st at 6 PM and takes one hour.\\E$"}
