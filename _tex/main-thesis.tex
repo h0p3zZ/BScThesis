@@ -162,6 +162,11 @@
 \usepackage{subfigure}
 \usepackage{acronym}
 \usepackage{cleveref}
+\usepackage{ragged2e}
+
+\makeatletter
+\pretocmd{\@footnotetext}{\RaggedRight}{}{}
+\makeatother
 
 \usepackage{jsonlisting}
 \usepackage{math-macros}
