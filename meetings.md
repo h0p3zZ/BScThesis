@@ -1,3 +1,176 @@
+# 20.01.2026
+
+I'm collecting here some general issues with the current writeup. Particular issues are addressed in the notes inside the thesis. The first two are major issues, but I think they won't take a lot of time to fix (it's mostly moving things around and writing a few additional paragraphs). The third is also a major issue and requires a bit of writing. The rest are rather minor issues, but they happen in several places or it was just easier to write them here.
+
+### Preliminaries
+
+I think the current structure in the thesis is a bit mixed up. Broadly, you should have 5 chapters (although you might split some of these into several; they don't need to have the titles I'm writing here):
+
+1. Introduction: what problem you're solving, and why (without assuming the reader knows the context)
+2. Preliminaries: what you need to know to understand the contribution
+3. Methodology: how you're going to solve the problem
+4. Implementation: the actual solution you're providing
+5. Conclusions: essentially the same as the introduction, but now assuming the reader has read the thesis
+
+As a general rule, "Preliminaries" should contain whatever you didn't do yourself (it's fine to include forward pointers to how this or that is used in your solution though). This is important for "setting the stage" and, more importantly, to separate what is your contribution from what is the state of the art. Bear in mind that failing to clearly separate this (and a preliminaries chapter is the easiest way to achieve that) counts as plagiarism, even if involuntary; but no worries, I know that was not your intention.
+
+* The content currently in Chapter 5 should go into "Preliminaries" (the parts about how the solvers work) and into "Implementation" (the parts about how the scheduling constraints correspond to solver constraints). I think it would be good to briefly mention metaheuristic optimization approaches (e.g. genetic algorithms, local search, GRASP (as in "greedy randomized adaptive search procedure"; note that the first CDCL SAT solver was, unfortunately, also named GRASP)).
+
+* The content currently in Chapter 2.1 that is specific to the solution you provide should go into "Methodology".
+
+* Chapter 2 should contain a discussion of the issues with time representation and modeling. Specifically, you currently imply that in order to model time it is *necessary* to discretize it. This is not quite true: if all your constraints are continuously defined, then it is sometimes *more* efficient to model time as a real-valued variable (counterintuitively, linear programming over the reals is *easier* than linear programming over the integers; we can discuss this if you're interested). There is no need to dive into that in your thesis, and discretizing time is a popular enough choice that you don't need to justify that. But you should not imply that this is the only way to do it.
+
+* Chapter 2 should contain a discussion of constrained optimization (i.e. the problem of finding solutions within a feasibility space defined by constraints that optimize a given objective function); there you can also explain how hard and soft constraints are a specific case of constrained optimization where the objective function value depends on what constraints are violated.
+
+In summary, Preliminaries in your case should contain:
+* Time representations and models.
+* Constrained optimization as a general approach, and soft vs hard constraints as a particular case.
+* Scheduling problems as a case of constrained optimization.
+* Solving methods for constrained optimization.
+* Existing scheduling languages, and their shortcomings for the problem you're solving.
+* Data interchange formats, e.g. JSON, XML
+
+### Methodology
+
+The methodology chapter should address three main questions (and probably it's a good idea to separate these into four sections):
+1. What are the concepts that define your intermediate representation, i.e. horizon, tasks etc?
+2. What kinds of computation you're deferring to the frontend? (e.g. converting dates with timezones to slots)
+3. How are these concepts represented in your language (i.e. the JSON representation of those concepts)?
+4. How can these concepts be combined to express new useful concepts (see section below).
+
+Currently, the methodology chapter combines these four concerns. I think the reader will have a much easier time if you separate these, since then the layers of abstraction become clearer (e.g. one could design the same fundamental concepts for the IR and have a completely different language). So, for example, you could say "a task is defined by the following features: (an itemized list of duration, time slots etc follows)" in (1), and then in (3) you describe how this is represented in your JSON format.
+
+The language spec is currently a code fragment. I suggest you change this into a normal paragraph. You can use `$\langle\mathrm{\textit{SyntaxItem}}\rangle$` to typeset syntax items, and the `\begin{itemize}...\end{itemize}` environment to list fields for objects.
+
+### Expressivity of the defined constraints
+
+There's one design discussion that ran throughout our discussions but does not appear in your thesis, namely that the constraints you have defined are *way more expressive* than they look. For example, your framework can express tasks with variable duration (say, I want to go to the gym for at least 45 min but preferably up to 1h) by splitting the task into several subtasks and imposing dependency and importance constraints (say, t1 is 45 min long, and t2 is 15min long but conditional on t1, with a cost of 0 at distance 0, an infinite cost if at any other distance, and a cost of 30 if unscheduled).
+
+Another thing you might want to discuss here are "quirks" of your semantics or things you can't encode in this formalism (e.g. costs of "moving to a different location" are only paid if the first task is allocated immediately before the second). You don't need to provide a fix, but you should acknowledge the limitations of your approach.
+
+I think your thesis is incomplete without some amount of discussion about these details.
+I know you want to be done soon; it's alright if you don't want to go into full detail (your thesis is otherwise excellent, and the other comments I've written are actually quite minor, even if annoying to fix). But I think it is important to include the discussion.
+
+### Minor issues
+
+## Scheduling as a problem
+
+At several points in your thesis you refer to scheduling problems in general and there's some implication that the problem you're solving neatly fits there. This is not quite the case (otherwise we would just pick any of the many many solvers that exist for this problem). Unless otherwise specified, the archetypical scheduling problem is the job-shop scheduling problem (https://en.wikipedia.org/wiki/Job-shop_scheduling). I think it would be good if you qualify what you're doing as "personal scheduling". It also won't hurt if you discuss JSP in the preliminaries and explain how it is similar or different to your problem.
+
+## Italization of defined concepts
+
+When writing technical documentation, we often use some terms with a very specific, formally defined meaning that have a broader, everyday meaning (e.g., "task"). To indicate that we're going to be using a word with a technical meaning (usually introduced later in the text), it is customary to use the `\emph` command to italicize the word (you might have seen this in papers or in textbooks). Generally you do this at the point of definition, but sometimes you also do it in the introduction or in the introductory paragraphs of a chapter to indicate to the reader that you plan to define this. It's not really a hard rule, more a matter of making the reader's life a bit easier :)
+
+## Presenting the larger context
+
+Your thesis is solving a small piece of a much larger project. This is not entirely obvious from the introduction. I think a good strategy here is to follow this general schema:
+1. Define the large-scale problem the project tries to solve.
+2. Explain the rough parts on which the project is divided, and how they connect to each other. A diagram here would help a lot. (This is currently missing; it will be very helpful to explain this here because "yeah no that's handled by the frontend" is a big part of your thesis later on.)
+3. Explain exactly what part in that project you're going to be working on.
+4. Explain what the issues to solve there are (this is basically your second itemized list).
+5. Explain, briefly and without getting into many details, what your solution is (this is currently missing).
+6. An outline of the thesis structure.
+
+You mostly already have these parts (I'd say only 2 and 5 are missing), but they're not clearly separated, so a first-time reader who knows nothing about your thesis would finish reading the introduction and still not know how what you did relates to the larger project. I don't think it is necessary to separate these parts with sections. Rather, you can guide the reader with the text e.g.:
+
+Current scheduling applications have this and that problem. This would be desirable because of blah.
+
+This thesis provides a component for a project that solves this problem. The broad goal of the project
+is to build a system that takes X as input and returns Y. To do this, the system does this and this and this with the input, and this results in a schedule. This approach presents challenges in (blah) and (blah).
+
+In this thesis, we focus on this part of the aforementioned pipeline. This is a critical part because this and that reason. To design this, we need to overcome the following challenges: (blah).
+This leads us to the following research questions: (blah).
+
+This thesis proposes a solution to these challenges consisting of (briefly describe the language).
+Associated formal semantics are defined for this language, based on (briefly describe the semantics).
+This IR is expressive enough to capture (briefly describe the things you can do by combining the features of your language).
+
+The remainder of this thesis is structured as follows: (blah)
+
+## Examples
+
+It is sometimes useful to use the `example` LaTeX environment to typeset examples. Just like sections, you can assign labels to refer to them later in the text. In particular you can "chain" examples by first writing "Example 1: here is a scheduling problem in natural language: (blah)", then "Example 2: Recall the problem in Example 1. The intermediate representation language can describe this problem as follows: (blah)".
+
+## Don't claim what you don't know
+
+At some points I've noticed claims that, although plausible, you haven't actually run experiments, or found justifying literature, to know if they're true or not. For example, in Section 2.1.2 you claim "Ideally, a solution with a cost of zero represents the best achievable outcome; however, such solutions are rarely attainable in practice".
+This claim is false in at least some not so rare contexts e.g. you give a very long horizon, or you don't have a lot of tasks to allocate (wouldn't it be nice...). What is true is that, even when those zero-cost solutions exist, it might be hard for a solver to find them.
+
+The good news is that avoiding these kinds of problems is very easy: just don't claim it. Most of the time it is not needed (e.g. in the example above you could just say "if a solution with cost zero exists, which is not guaranteed, then it is optimal"). As a general rule, these statements tend to be about "the real world" as opposed to "pure math", although it's not a perfect rule (e.g. "gravity makes things go down" is a practically correct statement; "P is not NP" refers to mathematics but we have no clue if it's true or not).
+
+## On the reasons for time slot representation
+
+You mention that the representation for time slots was chosen because it is more human-readable. This is a incorrect because, first, it is not (good luck figuring out what time of the week slot 3532 is), and second, because the whole point of the IR is that it does not need to be understood by humans.
+
+The reasons are more subtle and have to do with the format being designed to be solver-agnostic. Choosing a bit array is inconvenient because, if we use e.g. ILP for encoding, the natural encoding is an array of intervals. On the other hand, if we use MaxSAT, then converting intervals to a big disjunction is quite easy. Since you're moving the solver discussion in the preliminaries,
+now you can explain this at this point in the thesis.
+
+## Overlapping interval costs
+
+Perhaps it is worth clarifying already in Section 3 what happens if you have two overlapping intervals.
+According to Section 4.1 the cost of a slot `s` in that case is defined by picking one of the intervals that contain `s` and taking the cost of that interval. This is a problem because this operation is non-deterministic (which interval is picked?).
+
+There are several ways to fix this. One is to combine the costs of different overlapping intervals in some way; generally, you'd expect that:
+1. the combination cost is greater than the cost of each independent interval,
+2. the combination cost for zero overlapping intervals is 0, and
+3. the combination cost for one overlapping intervals is exactly the cost of that interval.
+Two combinations that fit this bill are:
+A) the maximum of the interval costs, assuming max of the empty set is 0, and
+B) the sum of the interval costs, assuming the sum of zero terms is 0, and assuming that infinity plus anything is infinity; both of these assumptions are commonplace in the literature.
+I would say (B) is the best approximation for the intuition of what "cost of a given interval" tries to express. Technically you could also choose to say that the combined cost is the interval cost of the first occurring applicable interval. I think that's ugly but not terrible. Alternatively, if you just want to be done with the thesis, you can just say that overlapping intervals are forbidden - I'm not going to give a worse grade for that, since technically this is something the frontend could handle.
+
+Remember to change the examples and validator accordingly!
+Note also that the same problem appears with dependencies (but also read my comments below about explaining dependencies).
+
+## Is location a mandatory field?
+
+I think the text is contradictory on whether `location` is mandatory or not in the file format.
+There are several ways to handle this. One is to say that it is mandatory but the frontend is supposed
+to create a fresh, unique location if one is not provided. Another way is to make it mandatory but allowed to be `null`. Another way is to say it is optional (then please change the "exactly the following fields" part where applicable).
+
+Note that in Section 4.1 the `loc` mapping is defined to be a total function, so items with `null` location would technically be clustered together. Using that definition, items with `null` location should then be excluded from the sum in equation (4.3). In my opinion, the easiest, minimum-change solution is the first one above (unique fresh location created on-demand by the frontend).
+
+## Barbeque example
+
+I think this is a great place to use the `example` LaTeX environment I mentioned above. For example, you could already at the start of Chapter 3 say that you will use this as a running example, and introduce the problem in natural language (possibly replacing specific dates and times by numbers, so "between slot 13 and slot 46" rather than "between 13:00 and 16:00 on December 32nd").
+Then in Section 3.2 you can use it as an example and explain how each part translates to your format.
+
+## Explaining dependencies
+
+I think one detail where the text is not quite clear is the notion of "dependency", especially by the time we arrive at Section 4.1.
+I suggest you introduce this notion in abstraction stages in Section 3.
+First you can explain that there are two different situations you want to model:
+1. A task B is optional but only makes sense to schedule it if another task A has also been scheduled.
+2. A task B must be scheduled after task A has been executed.
+Then you can point out to the reader that these two situations are covered by a more general abstract notion, which you call "dependency". This is a cost (potentially zero or infinite) that is only paid whenever task A is scheduled, and that depends on whether B is scheduled, and on the temporal distance between A and B if scheduled.
+Then the explanation in Section 4.1 should be pretty straightforward.
+
+## On comparing solving paradigms
+
+Towards the end of Section 5 you present some comparison of different solvers,
+and an encoding into ILP.
+
+Please note that designing a good encoding of your problem into ILP is a whole MSc thesis on its own. If you insist on including the encoding, please clarify that this is a naive encoding (not an insult, this is how such a "straightforward" encoding is usually called) only intended as an example.
+
+However, I think you should consider leaving the encoding and the solver comparison out. For one, the encoding you give is not quite an encoding: the disjointness constraint uses disjunction, and ILP only considers conjunctions of linear inequalities. Although disjunction can be encoded using extra variables, explaining that would take a while and wouldn't add much to your thesis. For another, figuring out what solving paradigm is best suited for a problem is a *huge* problem, and one that's very much open, so I don't think it is reasonable to dispatch it by how easy it is to encode the problem.
+
+It is actually quite nice that you took the interest to try to see how you'd go about encoding the problem into ILP, but that's a can of worms - if you are curious, we can take a look into that once you're done with the thesis.
+
+Regarding section 5.1.5, I think in this case it is fine to just claim that your problem can be encoded into MaxSAT, MaxSMT or ILP, and say that finding efficient encodings and determining which solving procedure would work best is out of the scope of your thesis.
+It is fine to just say "that's someone else's job" :)
+
+## Symbols and typography
+
+Feel free to skip the following if you don't feel like fixing them.
+
+* You currently use the symbol `T_s` to denote the tasks actually scheduled by a solution `a`.
+I think the symbol should reflect that `T_s` depends on `a` (it is not that important that `T` is in the symbol, since `a` is only defined for some specific set of tasks). I would suggest `a_s` or `T_a` as alternatives.
+* Similarly, it is customary to use `\operatorname` for "predefined" functions, so it makes more sense to not use `\operatorname` for `a`.
+* If you write the command `\urlstyle{tt}` right before `\begin{document}`, your URLs will be typeset in a monospaced font.
+* Many people use it with the same meaning you use ("see also"), but technically "cf. X" means "compare with X". So, it rather means something like "note the difference with X" (this is quite frequent in philosophy and law). But as I said, no one seems to care :)
+* Is the `\clearpage` at the end of Section 4 really needed?
+* Boolean is written in uppercase, since it refers to a person (namely, George Boole).
+
 # 17.11.2025
 
 I took a look into your thesis, here's some of my thoughts.

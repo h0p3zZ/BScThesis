@@ -12,7 +12,10 @@ Scheduling refers to the task of assigning a finite set of time-constrained even
 
 \subsection{Time Representation}
 \label{subsec:preliminaries-related-work:time-theory:time-representation}
-Representing time in a computer is challenging, because one has to handle dates, times, time zones, and the seasonal clock change, while still being efficient. To handle instances of this kind, it is mandatory to have enough expressivity to specifically define every possible point in time or time span. This is in conflict with the motivation (cf. \Cref{chapter:introduction}). We want to ensure utmost expressivity, while also ensuring a minimal language and compatibility with constraint solving. Hence, instead of making the language hardly solvable with a lot of constraints, we decided to omit this representation of time from the language. \\
+Representing time in a computer is challenging, because one has to handle dates, times, time zones, and the seasonal clock change, while still being efficient. To handle instances of this kind, it is mandatory\todo{it cannot be ``mandatory'' if you solve the problem without doing that!}
+to have enough expressivity to specifically define every possible point in time or time span. This is in conflict with the motivation (cf. \Cref{chapter:introduction})\todo{how?}.
+We want to ensure utmost expressivity\todo{I wouldn't say ``utmost''; there are some things your language doesn't handle, like travelling to a different timezone},
+while also ensuring a minimal language and compatibility with constraint solving. Hence, instead of making the language hardly solvable with a lot of constraints, we decided to omit this representation of time from the language. \\
 Instead, a time slot approach will be used. One time slot is a discretized unit of time, for example 15 minutes or 10 seconds. Relative to the beginning of solving --- starting with zero. So, instead of compiling dates ourselves we rely on receiving time slots relative from the point in time of conversion. To clarify we construct the following example in order to make the example of a time slot clearer: \\
 Let A be an arbitrary Task. A should be scheduled on December the 31\textsuperscript{st} at 6 PM and takes one hour. If we compile this exactly on December $31^{\text{st}}$ at 6 PM and one time slot is discretized to 15 minutes, we can conclude that this task should be scheduled at time slot 4, 5, 6, and 7, as shown in \Cref{tab:preliminaries-related-work:time-theory:time-representation:time-slots}.
 
@@ -32,6 +35,7 @@ Let A be an arbitrary Task. A should be scheduled on December the 31\textsupersc
 \end{table}
 When using this approach, we handle only the time of interest (i.e. the future), while ensuring the concept of time is discretized and abstracted away as early as possible in the conversion process of natural language to constraints. \\
 For simplicity, the issue of summer and winter time is omitted, and we suggest using the actual time the task is assigned to, without taking into account the time change when we switch from summer to winter time or vice versa.
+\todo{Clearer: ``we assume the front-end converts timeslots in different timezones to a uniform timezone''}
 
 \subsection{Scheduling Assignment and Cost}
 \label{subsec:preliminaries-related-work:time-theory:assignment-cost}
@@ -55,14 +59,17 @@ In contrast, when talking about soft time constraints, we tackle both tasks, whi
 
 \section{Scheduling Language}
 As one needs a way to define and store tasks, we need a language to represent said tasks. For ease of use we decided against defining our own language from scratch. Instead, we use \Ac{JSON} to represent our basic language. The decision is justified by the widespread use and human readability of \Ac{JSON}~\cite{bib:2020-bourhis}. If one wanted to instead use \Ac{XML}, it can be converted to \ac{JSON} and back~\cite{bib:2017-LaFontaine}. \\
-Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday life. Since personal scheduling is a lot more prone to change in comparison to business schedules, flexibility is important.
+Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday
+life\todo{I would say your IR is quite domain-specific (as compared to, say MiniZinc).}.
+Since personal scheduling is a lot more prone to change in comparison to business schedules, flexibility is important.\todo{This sentence is great, but probably you should say this already in the introduction!}
 
 
 \section{Existing Scheduling Languages and Standards}
 \label{sec:preliminaries-related-work:existing-scheduling-languages-and-standards}
 After introducing the basic ideas underlying the \ac{IR}, it is necessary to clarify which formats and standards already exist and why our language still addresses issues that remain unsolved by current approaches. One of the most widely used standards for scheduling is the \textit{iCalendar} format, defined in \textit{RFC 5545}~\cite{bib:rfc5545}. It specifies a set of rules for representing text-based, potentially recurring events and tasks, and is widely adopted in both professional and personal scheduling applications. Owing to its extensive rule set, iCalendar is considerably more expressive than the language (or set of constraints) proposed in this thesis. This expressiveness, however, comes at a cost: the format cannot be easily translated into a representation that can be directly processed by a solver.
+\todo{Also, AFAIK RFC 5545 has only very limited support for dynamically allocated tasks.}
 
-Another relevant format is defined by the \Ac{ITC}~\cite{bib:itc2019format}, whose primary purpose is to specify timetabling problems involving the assignment of courses to dedicated rooms at specific times. Similar to our approach, it relies on discretized time slots. Nevertheless, this format is overly complex for our use case. In particular, the \ac{ITC} format is designed to handle multiple constrained resources simultaneously (e.g., rooms and instructors), whereas our problem involves only a single resource—the individual allocating the tasks. Consequently, our model requires fewer dimensions than the \ac{ITC} format.
+Another relevant format is defined by the \Ac{ITC}~\cite{bib:itc2019format}, whose primary purpose is to specify timetabling problems involving the assignment of courses to dedicated rooms at specific times. Similar to our approach, it relies on discretized time slots. Nevertheless, this format is overly complex for our use case. In particular, the \ac{ITC} format is designed to handle multiple constrained resources simultaneously (e.g., rooms and instructors), whereas our problem involves only a single resource—the individual allocating the tasks. Consequently, our model requires fewer dimensions\todo{degrees of freedom} than the \ac{ITC} format.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -4,12 +4,21 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Currently, most scheduling applications supply the options for defining tasks with known start times and lengths. Sometimes even allows for repetition. These restrictions might not be sufficient for a wide range of practitioners. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Hence, we want to define a scheduling application, which also allows for soft time constraints. Tasks with soft time constraints are tasks that
+Currently, most scheduling applications\todo{which ones? give examples}
+supply the options for defining tasks with known start times and lengths.
+Sometimes even allows for repetition\todo{strange grammar}.
+These restrictions might not be sufficient for a wide range of
+practitioners\todo{why? you can state here already the main issue: sometimes the user doesn't want to commit to a time slot upfront}.
+This is especially true for people with time management issues.
+These individuals struggle to effectively sequence and schedule their tasks,
+leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}.
+Hence, we want to define a scheduling application, which also allows for soft time constraints.
+Tasks with soft time constraints are tasks that\todo{try to make sure that the lines below make grammatical sense as a single sentence}
 \begin{itemize}
     \item have broad time spans in which it is acceptable to schedule them,
-    \item may have different time spans with different levels of preferability,
-    \item the possibility of not scheduling tasks at all,
-    \item relations between tasks,
+    \item may have different time spans with different levels of preferability\todo{merge with the item above},
+    \item the possibility of not scheduling tasks at all\todo{``may be optional''},
+    \item relations between tasks\todo{what do you mean here?},
     \item and the option to define locations to which a task can be assigned.
 \end{itemize}
 This application should be able to take natural language inputs and create tasks from that descriptive inputs, before being scheduled using some form of constraint solving. To narrow down the vast range of possible verbal definitions of such a task we introduce an \Ac{IR}, which is the language proposed in this thesis. Such a \ac{IR} will be used to represent tasks in a formalized manner. This formalization will then be used to define the constraints needed to solve the scheduling problem. These constraints can then be given to a solver to find a solution for said problem. \\

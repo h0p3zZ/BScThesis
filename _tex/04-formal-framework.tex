@@ -13,7 +13,7 @@ For the definitions introduced in \Cref{chapter:methodology-language-design} to 
 
 For global use and notational simplicity, we introduce the following definitions:
 \begin{itemize}
-    \item $\N_u = \N_0 \cup \{ u \}$, denotes and undefined or unscheduled value.
+    \item $\N_u = \N_0 \cup \{ u \}$, denotes and undefined or unscheduled value.\todo{better: `` where $u$ denotes an undefined ...''}
     \item $\Z_u = \Z \cup \{ u \}$, denotes and undefined or unscheduled value.
     \item $\N_{\infty} = \N_0 \cup \{ \infty \}$, where $\infty$ denotes infinite cost.
 \end{itemize}
@@ -35,17 +35,32 @@ It is necessary to specify the information required by the solver to enable the 
           Is the duration of a task in time slots, directly mapping to the \texttt{duration} key in the \ac{JSON}. In our example, we have $\operatorname{dur}(\text{SetupLocation}) = 2$.
 
     \item \code{time slot function}: $\operatorname{slot} \colon T \times \N_u \longrightarrow \N_{\infty}$\\
-          which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled), and the urgency given the corresponding assignment. The function is a combination of multiple fields in the \Ac{IR}. If a task is not scheduled ($a(t) = u$) it returns the importance cost of the task. Otherwise, it checks all defined time slots for the task and if the given time slot $a(t)$ is within one of the defined intervals, it returns the cost of that interval plus an \texttt{urgency} cost calculated as $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$. If no interval is found it returns \texttt{importance} as the cost. Considering the example specified in \Cref{sec:methodology-language-design:scheduling-example}, we construct $\operatorname{slot}(\text{BuyGroceries}, 29) = \textit{interval.cost} + \textit{urgency} = 0 + (29 + 1) \cdot 1 = 30$ as an example, which provides a cost of $30$ for this exact input. The example assignment used in the example is the same as in \Cref{sec:formal-framework:search-space}.
+          which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled), and the urgency given the corresponding assignment. The function is a combination of multiple fields in the \Ac{IR}. If a task is not scheduled ($a(t) = u$) it returns the importance cost of the
+          task\todo{Technically at this point we do not yet have solutions. So, better: ``$\operatorname{slot}(T, u)$ is the importance cost, i.e.\ the cost of leaving $T$ unscheduled.''}.
+          Otherwise, it checks all defined time slots for the task and if the given time slot $a(t)$ is within one of the defined intervals,
+          it returns the cost of that interval plus an \texttt{urgency} cost calculated as
+          $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$.\todo{Ok, I think this is problematic, since \emph{which} interval is picked is not defined (so the function becomes non-deterministic, which creates all sorts of problems).}
+          If no interval is found it returns \texttt{importance} as the cost. Considering the example specified in \Cref{sec:methodology-language-design:scheduling-example}, we construct $\operatorname{slot}(\text{BuyGroceries}, 29) = \textit{interval.cost} + \textit{urgency} = 0 + (29 + 1) \cdot 1 = 30$ as an example, which provides a cost of $30$ for this exact input. The example assignment used in the example is the same as in \Cref{sec:formal-framework:search-space}.
 
     \item \code{dependency function}: $\operatorname{dep} \colon T \times T \longrightarrow \Z_u \longrightarrow \N_{\infty}$
-          It returns the cost of a task's dependencies, given another task --- if applicable. This cost can also be infinite, if specified as such in the \texttt{unmetCost}. When the relative distance of assignment slots is ``$u$'' (i.e. one of them is unassigned), the function returns the \texttt{unmetCost} in any case. This function maps every pair of tasks to another function, which in turn maps the relative distance of their assignments to a cost. If one of the tasks is unassigned, the function should return the \texttt{unmetCost} defined in the \ac{JSON} representation. Otherwise, it checks all defined intervals for the dependency and if the relative distance of the assignments is within one of the defined intervals, it returns the cost of that interval. If no valid interval is found it again returns the \texttt{unmetCost}. In this case, when looking at the \ac{BBQ} example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
+          It returns the cost of a task's dependencies, given another task --- if
+          applicable\todo{The cost of dependencies, and when they are applicable, is not clear at this point.}.
+          This cost can also be infinite, if specified as such in the \texttt{unmetCost}. When the relative distance of assignment slots is ``$u$'' (i.e. one of them is unassigned), the function returns the \texttt{unmetCost} in any case. This function maps every pair of tasks to another function, which in turn maps the relative distance of their assignments to a cost. If one of the tasks is unassigned, the function should return the \texttt{unmetCost} defined in the \ac{JSON} representation. Otherwise, it checks all defined intervals for the dependency and if the relative distance of the assignments is within one of the defined intervals, it returns the cost of that interval. If no valid interval is found it again returns the \texttt{unmetCost}. In this case, when looking at the \ac{BBQ} example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
 
     \item \code{locations}: $L$ is a finite set. \\
           The set contains all unique location IDs defined for all tasks. In the example in \Cref{sec:methodology-language-design:scheduling-example}, we have $L = \{ 1, 2 \}$, assuming ``SetupLocation'' has location ID 1 and ``BBQ'' has location ID 2.
 
     \item \code{location function}: $\operatorname{loc} \colon T \longrightarrow L \times \N_{\infty }$
-          The function specifies whether a task has a set location and what the cost would be of going to this specific location. For convenience, we define $\operatorname{loc}(t) = (\operatorname{loc}_L(t), \operatorname{loc}_c(t))$. The set of locations is defined by all unique location IDs for all tasks. Additionally, the \code{location function} maps every task to a tuple of both the location ID and the cost of going there. If a task has no defined location, the function returns $(null, 0)$, meaning there is no \textit{location} and therefore no cost.
+          The function specifies whether a task has a set location and what the cost would be of going to this specific Location
+          \todo{add a clarification that this cost is paid if the previous task's location is not the same}.
+          For convenience, we define $\operatorname{loc}(t) = (\operatorname{loc}_L(t), \operatorname{loc}_c(t))$. The set of locations is defined by all unique location IDs for all tasks. Additionally, the \code{location function} maps every task to a tuple of both the location ID and the cost of going there. If a task has no defined location, the function returns $(null, 0)$, meaning there is no \textit{location} and therefore no cost.
 \end{itemize}
+
+\todo[inline]{Something that's mising here is some commentary or acknowledgement that the data definition
+is strictly more expressive than the IR language. That is, there are some data definitions that cannot be
+captured by the IR language (e.g. backwards-in-time dependencies by having e.g. $\operatorname{dep}(t_1, t_2)(-3) > 0$).
+Note, however, that this is alright! As long as every IR language spec has
+a well-defined corresponding data definition, the semantics are well-defined.}
 
 \section{Search Space}
 \label{sec:formal-framework:search-space}
@@ -63,9 +78,17 @@ In this representation, each task is associated with a specific time slot, or u 
 
 \section{Semantics}
 \label{sec:formal-framework:semantics}
+
+\todo[inline]{The correct definition is $T_s = \{ t \in T \text{ such that } a(t) \neq u \}$.}
+
 We can now bring together the problem definition and the notion of a solution by specifying the conditions under which a candidate solution is considered valid. To this end, we define $T_s \subseteq T$ as the subset of scheduled Tasks ($\operatorname{a}(t_s) \in \N_0$, i.e. $\operatorname{a}(t_s) \neq u$).
 
 Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
+
+\todo[inline]{This is just a suggestion, it's alright if you ignore it: I think the reading flow would
+become a bit easier if you collect all the "example" fragments in two big example environments
+(one at the end of Section 4.3 and one at the end of Section 4.4).}
+
 \begin{itemize}
     \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap. \\
           $\operatorname{a}(t_1) + \operatorname{dur}(t_1) \leq \operatorname{a}(t_2) \lor \operatorname{a}(t_2) + \operatorname{dur}(t_2) \leq \operatorname{a}(t_1)$
@@ -88,19 +111,39 @@ Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
           $\operatorname{c}(a) \in \N_0$
 \end{itemize}
 
+\todo[inline]{Normally I'd be alright with the third constraint just being ``the cost is finite''.
+However in this case the cost function is particularly hard to read
+(it is quite long, and there are non-obvious details like $T$ vs $T_s$ and the Kronecker delta).
+I suggest you write here the corresponding conditions so that each component of the cost function is finite,
+so that the reader can understand what you're trying to express with your constraints.
+That would be:\\
+1.\quad$\operatorname{slot}(t, a(t))$ is finite for every scheduled task\\
+2.\quad$\operatorname{dep}(t_1, t_2)(\dots)$ is finite for each scheduled task $t_1$ and task $t_2$\\
+3.\quad$\operatorname{loc}_C(t_2) \cdot \dots$ is finite for ...\\[2ex]
+It might help if you define both the distance operation and the "immediately after" operation
+(containing the Kronecker delta) at the start of Section 4.3.}
+
 \subsection{Computing Cost}
 \label{subsec:formal-framework:semantics:computing-cost}
 To enable the comparison of different solutions, we introduce a quantitive evaluation criterion in the form of a cost metric. Specifically, we define a cost function \code{cost function} $\operatorname{c} \colon A \to \N_{\infty}$.
 
-Additionally, we employ the Kronecker delta function $\delta$ to support the computation of location-related costs~\cite{bib:2007-kozen}. This function compares two values and returns $1$, if they are the equal, and $0$ otherwise. \\
+Additionally, we employ the Kronecker delta function $\delta$ to support the computation of location-related
+costs~\cite{bib:2007-kozen}\todo{I don't think you need a citation for the Kronecker delta (and Kronecker certainly didn't invent it in 2007 anyway)}.
+This function compares two values and returns $1$, if they are the equal, and $0$ otherwise. \\
 For notational simplicity, we also define a notion of difference between two values in $\N_u$:\\
-$\operatorname{-} \colon \N_u \times \N_u \longrightarrow \Z_u$ \\
+${}-{} \colon \N_u \times \N_u \longrightarrow \Z_u$ \\
 $n_1 - n_2 = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$
 \begin{align}
     \operatorname{c}(a) & = \sum_{t \in T} \operatorname{slot}(t, \operatorname{a}(t)) \label{eq:cost-function-1}                                                                                                                                                      \\
                         & + \sum_{t_1 \in T_s, t_2 \in T} \operatorname{dep}(t_1, t_2)(\operatorname{a}(t_2) - (\operatorname{a}(t_1) + \operatorname{dur}(t_1)))   \label{eq:cost-function-2}                                                                         \\
                         & + \sum_{t_1, t_2 \in T_s} \operatorname{loc}_C(t_2) \cdot (1 - \delta(\operatorname{loc}_L(t_1), \operatorname{loc}_L(t_2))) \cdot \delta(\operatorname{a}(t_1) + \operatorname{dur}(t_1), \operatorname{a}(t_2)) \label{eq:cost-function-3}
 \end{align}
+\todo[inline]{As I mentioned earlier, it might be best to move both the difference operator and the
+part containing the Kronecker delta to the start of Section 4.3. For the latter, I suggest you define
+a function called e.g. ``movement condition''
+that takes two locations and two integers defined by $\mu(l_1, l_2; n_1, n_2) = (1 - \delta(l_1, l_2))\cdot\delta(n_1, n_2)$,
+and then you describe what it does (it returns 1 for different locations and equal slots, or otherwise 0).
+Then you can define equation 4.3 in terms of $\mu$, which should be a bit clearer to the reader.}
 The \code{cost function} can be split into three distinct parts:
 \begin{itemize}
     \item The first component of the cost function (i.e. \Cref{eq:cost-function-1}) aggregates the cost incurred by each task at its assigned time slot. If a task is scheduled the urgency is incorporated automatically, for example through the term $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$. In contrast, if a task is not scheduled the corresponding importance cost is added. An illustrative example of this behavior was already provided in \Cref{sec:formal-framework:data-definition} in the discussion of the \code{time slot function}.
