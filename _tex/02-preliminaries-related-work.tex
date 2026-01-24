@@ -6,62 +6,119 @@
 
 In this chapter we will explain basic concepts such as time theory (cf. \Cref{sec:preliminaries-related-work:time-theory}) in order to understand what scheduling is. Besides, we will describe what time representation (cf. \Cref{subsec:preliminaries-related-work:time-theory:time-representation}) is, and compare hard and soft time constraints \Cref{subsec:preliminaries-related-work:time-theory:time-representation:hard-vs-soft}, in order to be able to understand what the thesis is about. Additionally, fundamental terminology is defined to ensure consistent understanding throughout the thesis. Further, the rationale behind the selected approaches is explained, along with a discussion of the limitations of existing solutions in the context of this thesis.
 
-\section{Scheduling Theory}
-\label{sec:preliminaries-related-work:time-theory}
-Scheduling refers to the task of assigning a finite set of time-constrained events to limited resources under a set of restrictions~\cite{bib:2018-baker}. In the context of this thesis, it denotes the assignment of tasks --- characterized by fixed durations, relative temporal dependencies, and location constraints --- to specific days and time slots, which constitute the limited resources. Further, a valid schedule most adhere to the previously mentioned constraints, while optimizing the cost of an assignment (i.e. mapping of tasks to time slots) for a given problem (cf. \Cref{subsec:preliminaries-related-work:time-theory:assignment-cost}).
-
-\subsection{Time Representation}
+\section{Time representations}
 \label{subsec:preliminaries-related-work:time-theory:time-representation}
 Representing time in a computer is challenging, because one has to handle dates, times, time zones, and the seasonal clock change, while still being efficient. To handle instances of this kind, it is mandatory\todo{it cannot be ``mandatory'' if you solve the problem without doing that!}
 to have enough expressivity to specifically define every possible point in time or time span. This is in conflict with the motivation (cf. \Cref{chapter:introduction})\todo{how?}.
-We want to ensure utmost expressivity\todo{I wouldn't say ``utmost''; there are some things your language doesn't handle, like travelling to a different timezone},
-while also ensuring a minimal language and compatibility with constraint solving. Hence, instead of making the language hardly solvable with a lot of constraints, we decided to omit this representation of time from the language. \\
-Instead, a time slot approach will be used. One time slot is a discretized unit of time, for example 15 minutes or 10 seconds. Relative to the beginning of solving --- starting with zero. So, instead of compiling dates ourselves we rely on receiving time slots relative from the point in time of conversion. To clarify we construct the following example in order to make the example of a time slot clearer: \\
-Let A be an arbitrary Task. A should be scheduled on December the 31\textsuperscript{st} at 6 PM and takes one hour. If we compile this exactly on December $31^{\text{st}}$ at 6 PM and one time slot is discretized to 15 minutes, we can conclude that this task should be scheduled at time slot 4, 5, 6, and 7, as shown in \Cref{tab:preliminaries-related-work:time-theory:time-representation:time-slots}.
+We want to ensure high expressivity, while also maintaining a minimal language and compatibility with constraint solving. Hence, instead of making the language hardly solvable with a lot of constraints, we decided to omit this representation of time from the language.
 
-\begin{table}[!ht]
-      \centering
-      \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-            \hline
-            index & 0     & 1     & 2     & 3     & 4     & 5     & 6     & 7     & \dots \\
-            \hline
-            start & 17:00 & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & \dots \\
-            \hline
-            end   & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & 19:00 & \dots \\
-            \hline
-      \end{tabular}
-      \caption{Ranges of time slots}
-      \label{tab:preliminaries-related-work:time-theory:time-representation:time-slots}
-\end{table}
-When using this approach, we handle only the time of interest (i.e. the future), while ensuring the concept of time is discretized and abstracted away as early as possible in the conversion process of natural language to constraints. \\
-For simplicity, the issue of summer and winter time is omitted, and we suggest using the actual time the task is assigned to, without taking into account the time change when we switch from summer to winter time or vice versa.
-\todo{Clearer: ``we assume the front-end converts timeslots in different timezones to a uniform timezone''}
-
-\subsection{Scheduling Assignment and Cost}
-\label{subsec:preliminaries-related-work:time-theory:assignment-cost}
-A scheduling assignment is defined as a mapping of tasks to specific time slots. Each task has a fixed duration, which determines the number of consecutive time slots required to schedule it. Throughout this thesis, a scheduling assignment is also referred to as a solution. Each solution is associated with a cost, which is defined as a metric that quantifies how preferable a given assignment is compared to other assignments for the same problem (the same set of tasks)~\cite{bib:2022-lester}. Lower cost values indicate better solutions. Ideally, a solution with a cost of zero represents the best achievable outcome; however, such solutions are rarely attainable in practice. Consequently, a solution with a cost of $15$ is considered superior to a solution with a cost of $200$. A precise formal definition of the cost function, along with further explanations, is provided in \Cref{chapter:formal-framework}.
-
-\subsection{Constraints}
-Constraints specify the conditions and limitations that must be satisfied when scheduling tasks~\cite{bib:2017-diveev}. They define what schedules are feasible by restricting the order, timing, and allocation of tasks and resources. Typical constraints arise from resource capacities, task dependencies, deadlines, and mutual exclusivity requirements, ensuring that tasks do not conflict and that system limitations are respected. By formalizing these restrictions, constraints reduce the solution space to schedules that are both valid and practically implementable. \\
-As we are tackling a personal scheduler, we need to cover the most common requirements one might need to define in such everyday scenarios. Therefore, we identified the following basic requirements:
-\begin{itemize}
-      \item Duration defines how long a task will take
-      \item Assignments defines at which point in time the task may be scheduled
-      \item Dependencies: depict that one task has to be scheduled after another
-      \item Locations: emphasize efficiency, as unnecessary traveling can be avoided
-\end{itemize}
-The above constraints were identified as the most important and therefore are covered in the \Ac{IR}. These constraints are explained in detail in \Cref{chapter:methodology-language-design}.
+\section{Constrained optimization}
+\todo[inline]{Constrained optimization as a general concept.}
+\todo[inline]{Incorporate: \\
+    Scheduling refers to the task of assigning a finite set of time-constrained events to limited resources under a set of restrictions~\cite{bib:2018-baker}. In the context of this thesis, it denotes the assignment of tasks --- characterized by fixed durations, relative temporal dependencies, and location constraints --- to specific days and time slots, which constitute the limited resources. Further, a valid schedule most adhere to the previously mentioned constraints, while optimizing the cost of an assignment (i.e. mapping of tasks to time slots) for a given problem (cf. \Cref{subsec:preliminaries-related-work:time-theory:assignment-cost}).}
+\todo[inline]{Incorporate: \\
+    Constraints specify the conditions and limitations that must be satisfied when scheduling tasks~\cite{bib:2017-diveev}. They define what schedules are feasible by restricting the order, timing, and allocation of tasks and resources. Typical constraints arise from resource capacities, task dependencies, deadlines, and mutual exclusivity requirements, ensuring that tasks do not conflict and that system limitations are respected. By formalizing these restrictions, constraints reduce the solution space to schedules that are both valid and practically implementable.}
 
 \subsection{Hard versus Soft Time Constraints}
 \label{subsec:preliminaries-related-work:time-theory:time-representation:hard-vs-soft}
 Hard time constraints, are defined as both hard as in timely restricted, at a specific time and for a specific amount of time~\cite{bib:2017-diveev} and hard as in non-negotiable (i.e. it must be scheduled in order for a solution to be valid for a given problem). \\
 In contrast, when talking about soft time constraints, we tackle both tasks, which can be scheduled in a broader range of time, with possibly differing durations (not part of this thesis). Additionally, soft time constraints address tasks that are desirable but not mandatory to schedule, such as “I would like to read a book every Friday, if possible”. Solutions that include such tasks should be preferred over those in which the tasks are not scheduled. Hence, we introduce the notion of cost as explained in \Cref{subsec:preliminaries-related-work:time-theory:assignment-cost} to quantify the desirability of scheduling such tasks.
 
-\section{Scheduling Language}
-As one needs a way to define and store tasks, we need a language to represent said tasks. For ease of use we decided against defining our own language from scratch. Instead, we use \Ac{JSON} to represent our basic language. The decision is justified by the widespread use and human readability of \Ac{JSON}~\cite{bib:2020-bourhis}. If one wanted to instead use \Ac{XML}, it can be converted to \ac{JSON} and back~\cite{bib:2017-LaFontaine}. \\
-Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is not to be applicable to a specific domain, but rather to be applicable to everyday
-life\todo{I would say your IR is quite domain-specific (as compared to, say MiniZinc).}.
-Since personal scheduling is a lot more prone to change in comparison to business schedules, flexibility is important.\todo{This sentence is great, but probably you should say this already in the introduction!}
+\todo[inline]{Explain the difference between soft and hard constraints here, maybe with examples. Explain this as a specific concept of the broader concept of the constrained optimization.}
+
+\subsection{Scheduling problem}
+\todo[inline]{Scheduling problems as a case of constrained optimization}
+
+\subsection{Solving methods for Constrained Optimization}
+Solving methods for constrained optimization.
+
+\ac{SAT}, \ac{SMT} and \ac{MaxSAT} (as extensions of \ac{SAT}) and \ac{ILP} represent four major paradigms for constraint solving in computer science and optimization. Their differences in expressiveness, solver technology, and application domains justify their inclusion in a comprehensive study of automated reasoning approaches. Especially with \ac{SAT} being one of the most popular paradigms for constraint solving~\cite{bib:2023-ulrich-oltean}, while \ac{SMT} is a required extension to properly cover our language, and \ac{ILP} being a good fit for our problem domain, we will focus on these four paradigms in the following sections.
+
+\todo[inline]{The subsections below are linked through statements like ``X is not the most efficient so we look at Y''.
+    I think you should remove these; what is ``efficient'' or not in each approach is a huge open question
+    (that was basically the focus of my recent trip, so really a \emph{gaping open} question).
+    Moreover, you don't need to make those claims. Just mention that several methods to solve these problems exist.\\[2ex]
+    Also note that, out of the approaches you mention, the only suitable ones for your problem are MaxSAT and ILP,
+    since SAT and SMT cannot express optimization problems. However, you should still explain them as the basis for MaxSAT and MaxSMT.
+    I suggest you make three subsections. The first about MaxSAT (and inside you explain SAT); the second about MaxSMT (and inside you explain SMT);
+    and the third about ILP.}
+The four following chapters will introduce the most basic concept of the respective solver paradigms. The field of possible constraint solvers is vast and far from complete. We restrict ourselves to the four most prominent options, to ensure the focus of the thesis stays on the core concept of our \Ac{IR}.
+
+\subsubsection{Boolean Satisfiability Problem (SAT)}
+\todo[inline]{Some notes here:\\[2ex]
+    The correct reference for SAT being NP-complete is \url{https://dl.acm.org/doi/10.1145/800157.805047}\\[2ex]
+    That's not exactly what SAT being NP-complete means. Rather, it means that any other NP-complete problem
+    can be reduced to SAT via a polynomial-time transformation. \emph{As a separate fact},
+    that means we don't know how to build polynomial-time algorithms for SAT, since that would solve NP = P.\\[2ex]
+    You should probably indicate that, despite the worst-case exponential lower bound for time complexity of SAT,
+    SAT solvers are very efficient over many practical instances and are widely used in the industry.\\[2ex]
+    Since you mention CNF formulas, you should also point out that the satisfiability problem for an arbitrary
+    propositional formula can be reduced to the satisfiability problem for a CNF formula in polynomial time
+    via the Tseitin transformation (I've added the reference to your .bib file as bib:1983-tseitin since it's actually hard to find the original paper).\\[2ex]
+}
+It is proven that \Ac{SAT} is NP-complete~\cite{bib:2008-marques}.
+It means that if a problem can be reduced to \ac{SAT} it can be solved by a \ac{SAT} solver with at worst-case exponential runtime
+complexity.
+Using this approach, we handle propositional logic formulas, which are representations of boolean variables possibly combined with logical operators like \textbf{AND} ($\land$), \textbf{OR} ($\lor$), and \textbf{NOT} ($\lnot$). Most solvers are specialized on formulas in \Ac{CNF}, which means there is a conjunction ($\land$) of clauses, which in turn
+is a disjunction\todo{are disjunctions} ($\lor$) of literals (boolean variable or their negation).
+An example formula in \ac{CNF} would be: $a \land (b \lor \lnot c)$. While \ac{SAT} is also powerful enough to express linear relations in a \ac{CNF} it is not the most efficient way to do so~\cite{bib:2008-marques}. This is why we take a look at \ac{SMT} in the next section.
+
+\subsubsection{Satisfiability Modulo Theories (SMT)}
+\todo[inline]{The current situation is a bit more nuanced than ``the middle ground between first or higher-order-logic and SAT'',
+    but I don't think it makes sense to go into details in your thesis. You can just say that SMT augments SAT by interpreting
+    some propositional variables as predicates over a logical theory.\\[2ex]
+    I suggest you cite \url{https://dl.acm.org/doi/10.1145/1217856.1217859}.\\[2ex]
+    ``it is not the most efficient way to do so'': I wouldn't say that. This is highly dependent on the encoding you use,
+    and the specific constraints you want to express. Maybe remove the sentence, there's nothing to gain from it.\\[2ex]
+    Assignments for SMT are not as simple as assignments for SAT, so I would remove that sentence too.
+    You can just say that $\Phi$ is satisfiable if an suitable interpretation for $x, y, z, f$ can be found that satisfies $\Phi$,
+    and leave it there.\\[2ex]
+}
+\Ac{SMT} is one of the most promising extensions of \ac{SAT}~\cite{bib:2008-marques} hence, we also handle it in this chapter. In particular \ac{SMT} is the middle ground between first or higher-order-logic and \ac{SAT}~\cite{bib:2018-clarke}. It tries to mend the gap between expressiveness and efficiency of automatically solving problems. By introducing the likes of equality, arithmetics and uninterpreted functions we get a more powerful language, which makes expressing problems easier~\cite{bib:2007-demoura}. On the other hand, this expressiveness comes with a trade-off in solver efficiency and hence, we need to introduce specialized theory solvers. Similarly to \ac{SAT}, \ac{SMT} is the conjunction, or disjunction of formulas (or again their negations). An example formula in \ac{SMT} would be: $\Phi = x + y \leq 10 \land (z = x * 2 \lor \lnot (y < 5)) \land f(x) = 4$. Additionally, we define $M$ to be an assignment of the formula $\Phi$, and state that $M \models \Phi$ if $M$ satisfies $\Phi$. In \ac{SMT} we see the usage of arithmetics, which is not possible in \ac{SAT}. This makes \ac{SMT} a more expressive language, which is easier to use for humans. Similar to \ac{SAT}, \ac{SMT} can also express linear relations, but again it is not the most efficient way to do so~\cite{bib:2008-marques}. As \ac{SMT} comes with a cost of efficiency, we will also take a look at \ac{MaxSAT} in the next section, which does not have this drawback with the downside of being as expressive as \ac{SAT}.
+
+\subsubsection{Maximum Satisfiability Problem (MaxSAT)}
+
+\todo[inline]{The reference you use for MaxSMT is not very relevant. Here are some references:\\
+    \url{https://link.springer.com/chapter/10.1007/978-3-662-46681-0_14}\\
+    \url{https://link.springer.com/chapter/10.1007/978-3-319-94205-6_10} \\[2ex]
+    You should explain what the cost of an assignment is (i.e. the sum of the costs of falsified clauses).\\[2ex]
+    A better reference for linear constraints in CNF: \url{https://link.springer.com/chapter/10.1007/978-3-319-09284-3_22}.\\[2ex]
+    I would be careful not to imply that MaxSAT solvers cannot efficiently handle linear constraints.
+    The reason is that MaxSAT solvers are implemented with linear constraints :D}
+
+We already covered \ac{SAT} and extension of it in form of \ac{SMT}. Another prominent extension of \ac{SAT} is \Ac{MaxSAT}~\cite{bib:2013-ansotegui}. Similarly to \ac{SAT} it consists of boolean variables combined using disjunction $\left( \bigvee_{i=1}^N p_i \right)$ --- so-called clauses. In turn these clauses are combined using conjunction $\left( \bigwedge_{j=1}^M c_j \right)$. In contrast to basic \ac{SAT}, \ac{MaxSAT} has the addition of soft clauses. This is a good fit for our definition of the problem, as we also have hard and soft constraints. We define a set of weighted clauses~\cite{bib:2013-ansotegui}
+$$\phi = \{(C_1, w_1), ... (C_m, w_m)\}$$
+If one wants to define hard constraint-clause\todo{just ``hard clause''}, one has to simply set $w = \infty$.
+The goal of \ac{MaxSAT} is to find an assignment for $\phi$ with as little cost as possible\todo{explain what the cost of an assignment is (i.e.\ the sum of the costs of falsified clauses)}.
+This is also\todo{also? what is the other?} a perfect fit for our problem definition, as we want an assignment with as little cost as possible, while still satisfying all hard constraints. \\
+As already mentioned for \ac{SMT} our language mostly consists of linear relations and inequalities.
+While \ac{MaxSAT} can express these relations, it is not the most straight forward way~\cite{bib:2006-nieuwenhuis}.
+Therefore, we note that there is also a combination of \ac{MaxSAT} and \ac{SMT} called \Ac{MaxSMT}, which is basically weighted \ac{SMT}~\cite{bib:2016-pasareanu}.
+Also, as arithmetics is what is needed to express the majority of constraints we defined in our language\todo{grammar}. As such, we will also take a look at \ac{ILP} in the next section, as it is specialized on solving linear relations.
+
+\subsubsection{Integer Linear Programming (ILP)}
+\Ac{ILP} is designed to either minimize or maximize an objective function, while holding inequality and equality constraints or keeping integrality restrictions on variables~\cite{bib:1994-chaudhuri}. Similarly to \ac{SAT} we know that \ac{ILP} is NP-complete. This means that if a problem can be reduced to \ac{ILP} it can be solved by an \ac{ILP} solver with at worst-case exponential runtime complexity. An example of an \ac{ILP} problem would be: $z = \min{(c^Tx | Ax \leq b, x \in \Z^n)}$. Here, $c^Tx$ is the objective function to minimize and $z$ represents the corresponding minimum value. $Ax \leq b$ are the constraints, and $x \in \Z^n$ enforces integrality on the variables. As we can see, \ac{ILP} is specialized on linear relations, which makes it a good fit for our problem domain. Additionally, we have the issue of minimizing cost, which is another point in favor of \ac{ILP} solvers but is also handled in \ac{MaxSAT}.
+
+\todo[inline]{Investigate whether this example should be kept or removed}
+As most of our constraint focus on linear inequality relations ($a + b \leq c$) and minimizing cost ($\min{(c(a))}$) we decided to use \Ac{ILP} as our showcase example. Hence, suggest the following constraints as examples:
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Constraint                          & \ac{ILP}-like Encoding                                                                                                                           \\
+        \hline
+        Task A before Task B                & $\operatorname{a}(A) + \operatorname{dur}(A) \leq \operatorname{a}(B)$                                                                           \\
+        \hline
+        Task A with interval [s, e]         & $s \leq \operatorname{a}(A) \land \operatorname{a}(A) + \operatorname{dur}(A) \leq e$                                                            \\
+        \hline
+        Task A must not overlap with Task B & $\operatorname{a}(A) + \operatorname{dur}(A) \leq \operatorname{a}(B) \lor \operatorname{a}(B) + \operatorname{dur}(B) \leq \operatorname{a}(A)$ \\
+        \hline
+        Minimize cost                       & $\min{(c(a))}$                                                                                                                                   \\
+        \hline
+    \end{tabular}
+    \caption{Constraint conversion table to \ac{ILP}-like constraints.}
+\end{table}\\
+In this case we inserted the function $\operatorname{a}$ instead of using variables to showcase that the output of such a solver would be an assignment of time slots (start times) to each task. It becomes clear that the constraints we defined in our language can be converted quite naturally to \ac{ILP} constraints or at least a form of inequalities. As for the last constraint of minimizing cost, we can instead of looking at the minimization of the whole assignment, also split this with the definition of the cost function on a specific task. Therefore, we can see that we do not need to define a complete assignment which is minimized, but we minimize the cost of each task itself.
 
 
 \section{Existing Scheduling Languages and Standards}
@@ -69,7 +126,15 @@ Since personal scheduling is a lot more prone to change in comparison to busines
 After introducing the basic ideas underlying the \ac{IR}, it is necessary to clarify which formats and standards already exist and why our language still addresses issues that remain unsolved by current approaches. One of the most widely used standards for scheduling is the \textit{iCalendar} format, defined in \textit{RFC 5545}~\cite{bib:rfc5545}. It specifies a set of rules for representing text-based, potentially recurring events and tasks, and is widely adopted in both professional and personal scheduling applications. Owing to its extensive rule set, iCalendar is considerably more expressive than the language (or set of constraints) proposed in this thesis. This expressiveness, however, comes at a cost: the format cannot be easily translated into a representation that can be directly processed by a solver.
 \todo{Also, AFAIK RFC 5545 has only very limited support for dynamically allocated tasks.}
 
-Another relevant format is defined by the \Ac{ITC}~\cite{bib:itc2019format}, whose primary purpose is to specify timetabling problems involving the assignment of courses to dedicated rooms at specific times. Similar to our approach, it relies on discretized time slots. Nevertheless, this format is overly complex for our use case. In particular, the \ac{ITC} format is designed to handle multiple constrained resources simultaneously (e.g., rooms and instructors), whereas our problem involves only a single resource—the individual allocating the tasks. Consequently, our model requires fewer dimensions\todo{degrees of freedom} than the \ac{ITC} format.
+Another relevant format is defined by the \Ac{ITC}~\cite{bib:itc2019format}, whose primary purpose is to specify timetabling problems involving the assignment of courses to dedicated rooms at specific times. Similar to our approach, it relies on discretized time slots. Nevertheless, this format is overly complex for our use case. In particular, the \ac{ITC} format is designed to handle multiple constrained resources simultaneously (e.g., rooms and instructors), whereas our problem involves only a single resource—the individual allocating the tasks. Consequently, our model requires fewer degrees of freedom than the \ac{ITC} format.
+
+\section{Data Interchange Formats for Task Representation}
+As one needs a way to define and store tasks, we need a language to represent said tasks. For ease of use we decided against defining our own language from scratch. Instead, we use \Ac{JSON} to represent our basic language. The decision is justified by the widespread use and human readability of \Ac{JSON}~\cite{bib:2020-bourhis}. If one wanted to instead use \Ac{XML}, it can be converted to \ac{JSON} and back~\cite{bib:2017-LaFontaine}. \\
+Most existing scheduling languages are designed for professional areas such as school time tabling~\cite{bib:2017-dmirovic} and sports time tabling~\cite{bib:2022-lester}. However, the goal of the approach described in this thesis is to be applicable to everyday life.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Scheduling Assignment and Cost}
+\label{subsec:preliminaries-related-work:time-theory:assignment-cost}
+A scheduling assignment is defined as a mapping of tasks to specific time slots. Each task has a fixed duration, which determines the number of consecutive time slots required to schedule it. Throughout this thesis, a scheduling assignment is also referred to as a solution. Each solution is associated with a cost, which is defined as a metric that quantifies how preferable a given assignment is compared to other assignments for the same problem (the same set of tasks)~\cite{bib:2022-lester}. Lower cost values indicate better solutions. Ideally, a solution with a cost of zero represents the best achievable outcome. Consequently, a solution with a cost of $15$ is considered superior to a solution with a cost of $200$. A precise formal definition of the cost function, along with further explanations, is provided in \Cref{chapter:formal-framework}.
