@@ -1,0 +1,2 @@
+{"rule":"EN_A_VS_AN","sentence":"^\\QFor this we propose an \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q interval and an \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q interval.\\E$"}
+{"rule":"PRONOUN_NOUN","sentence":"^\\QAs everyday life is a lot more prone to change in comparison to business schedules, we need to ensure that it compilation is fast\\E$"}
