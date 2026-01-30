@@ -4,7 +4,7 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining tasks with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact time slot upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. \\
+Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining tasks with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact time slot upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. This particular use case is not supported by existing tools, even though the necessary technologies already exist. \\
 Tasks with soft time constraints are tasks that
 \begin{itemize}
     \item have time spans with different levels of preference,
@@ -18,7 +18,7 @@ This application should be able to take natural language inputs via the \textit{
     \begin{tikzpicture}
         % Nodes
         \node[draw, rectangle, minimum width=3cm, minimum height=1cm] (frontend) {Frontend};
-        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, right=3cm of frontend] (ir) {\Ac{IR}};
+        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, right=4cm of frontend] (ir) {\Acl{IR}};
         \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of ir] (solver) {Constraint Solver};
         \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of frontend] (schedule) {Generated Schedule};
 
