@@ -4,8 +4,7 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining tasks with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact time slot upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints.
-\todo[inline]{Include overview of the whole project with some tikz diagram to make it easier to understand where the IR fits in.}
+Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining tasks with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact time slot upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. \\
 Tasks with soft time constraints are tasks that
 \begin{itemize}
     \item have time spans with different levels of preference,
@@ -13,8 +12,26 @@ Tasks with soft time constraints are tasks that
     \item may establish a specific order in which they must be scheduled,
     \item and may define specific locations at which they must be performed.
 \end{itemize}
-This application should be able to take natural language inputs and create tasks from that descriptive inputs, before being scheduled using some form of constraint solving. To narrow down the vast range of possible verbal definitions of such a task we introduce an \Ac{IR}, which is the language proposed in this thesis. Such a \ac{IR} will be used to represent tasks in a formalized manner. This formalization will then be used to define the constraints needed to solve the scheduling problem. These constraints can then be given to a solver to find a solution for said problem. \\
-Such an \ac{IR} is beneficial as it provides a clear and unambiguous representation of tasks and their associated constraints. This clarity is essential for effective communication between users and the scheduling system, ensuring that the system accurately interprets user requirements. Furthermore, a well-defined \ac{IR} facilitates the development of algorithms and tools for scheduling, as it provides a structured framework for representing and manipulating scheduling data, instead of having to deal with multiple formats, which are of high complexity. \Cref{sec:preliminaries-related-work:existing-scheduling-languages-and-standards} discusses existing scheduling languages and standards, highlighting the need for one specialized on the personal scheduling domain.
+This application should be able to take natural language inputs via the \textit{frontend} and create tasks from that descriptive inputs. These tasks will be represented using the \Ac{IR}, before being given to a constraint solver to construct a viable schedule. This schedule will then be displayed back to the user via the \textit{frontend}. A basic overview of this application and the corresponding information flow is given in the figure below.
+\begin{figure}[!ht]
+    \centering
+    \begin{tikzpicture}
+        % Nodes
+        \node[draw, rectangle, minimum width=3cm, minimum height=1cm] (frontend) {Frontend};
+        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, right=3cm of frontend] (ir) {\Ac{IR}};
+        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of ir] (solver) {Constraint Solver};
+        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of frontend] (schedule) {Generated Schedule};
+
+        % Arrows
+        \draw[->] (frontend) -- (ir) node[midway, above] {Reduce};
+        \draw[->] (ir) -- (solver) node[midway, right] {Convert};
+        \draw[->] (solver) -- (schedule) node[midway, below] {Solve/Generate};
+        \draw[->] (schedule) -- (frontend) node[midway, left] {Display};
+    \end{tikzpicture}
+    \caption{Application Overview}
+    \label{fig:application-overview}
+\end{figure} \\
+The focus of this thesis is on the design and formalization of the \ac{IR}. Such a representation is beneficial as it provides a clear and unambiguous description of tasks and their associated constraints. This clarity is essential for effective communication between users and the scheduling system, ensuring that the system accurately interprets user requirements. Furthermore, a well-defined \ac{IR} facilitates the development of algorithms and tools for scheduling, as it provides a structured framework for representing and manipulating scheduling data, instead of having to deal with multiple formats, which are of high complexity. \Cref{sec:preliminaries-related-work:existing-scheduling-languages-and-standards} discusses existing scheduling languages and standards, highlighting the need for one specialized on the personal scheduling domain.
 
 Scheduling is known to be a hard problem, especially constraint scheduling as for example in assigning restricted resources (e.g. rooms) to given professors or courses at a university~\cite{bib:2017-diveev}. The approach presented in this thesis enables the definition of tasks in a minimal form, whilst maintaining expressivity to allow for efficient solving in future work. \\
 We specifically do not define or implement a solver, as the focus of this thesis is on the language design and formalization. Instead, we only provide the needed framework to bridge the gap between possible word-ambiguities, and solvable constraints.
@@ -28,7 +45,7 @@ Specifically, this work tries to answer the following research question:
 \end{itemize}
 We evaluated several approaches to identify a suitable solution for the defined research questions. While alternative formulations of the constraints are possible, this work motivates the selected approach and outlines its advantages over other considered options.
 
-The remainder of the thesis is structured as follows: \Cref{chapter:preliminaries-related-work} introduces the necessary definitions required to understand the subsequent chapters. \Cref{chapter:methodology-language-design} presents the language design, including the key design choices and the formal definition of the language. In \Cref{chapter:formal-framework}, the constraints are defined mathematically to characterize what constitutes a valid solution. \Cref{chapter:solver-relation-framework} discusses suitable logical solvers and motivates the overall design decisions, particularly with respect to transforming the problem into a set of solvable constraints. Finally, \Cref{chapter:conclusion} summarizes the findings and presents the conclusions drawn from this work.
+The remainder of the thesis is structured as follows: \Cref{chapter:preliminaries-related-work} introduces the necessary definitions required to understand the subsequent chapters. \Cref{chapter:methodology-language-design} presents the language design, including the key design choices and the formal definition of the language. In \Cref{chapter:formal-framework}, the constraints are defined mathematically to characterize what constitutes a valid solution. Finally, \Cref{chapter:conclusion} summarizes the findings and presents the conclusions drawn from this work.
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
