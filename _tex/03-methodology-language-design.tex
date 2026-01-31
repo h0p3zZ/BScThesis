@@ -8,10 +8,10 @@
 The aim of this chapter is to describe the design of the proposed language without focusing on semantics. We provide the required constraints alongside detailed design choices for each field contained in our language. \\
 As we are tackling a personal scheduler, we need to cover the most common requirements one might need to define in such everyday scenarios. Therefore, we identified the following basic requirements:
 \begin{itemize}
-      \item Duration defines how long a task will take
-      \item Assignments defines at which point in time the task may be scheduled
-      \item Dependencies: depict that one task has to be scheduled after another
-      \item Locations: emphasize efficiency, as unnecessary traveling can be avoided
+    \item Duration defines how long a task will take
+    \item Assignments defines at which point in time the task may be scheduled
+    \item Dependencies: depict that one task has to be scheduled after another
+    \item Locations: emphasize efficiency, as unnecessary traveling can be avoided
 \end{itemize}
 The above constraints were identified as the most important and therefore are covered in the \Ac{IR}. These constraints are explained in this chapter.
 
@@ -25,14 +25,14 @@ The \texttt{horizon} field is used to specify the length of time (i.e. the numbe
 \todo{incorrect, SMT solvers routinely do this in the LIA theory}. This is reasonable, as most of the time appointments tend to be stacked up towards the near future and become less frequent the further one looks into the future, as their existence is not known yet. Therefore, this method does not noticeably restrict the possible solutions as most of the \texttt{tasks} are bundled towards the near future. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
 
 \todo[inline]{You should clarify whether the horizon is included or not in your allowed time slots.
-      If I understand correctly the semantics you provide in Section 4.3, your set of allowed time slots is
-      $\{ x \in \mathbb{N}_0 \text{ such that } 0 \leq x \leq H \}$, so you should say something like
-      ``the allowed time slots are represented by non-negative integers not greater than $H$''
-      (yes, I know the negations are ridiculous, but this is standard practice because it minimizes ambiguity).
-      Another alternative is that your set of allowed time slots is meant to be
-      $\{ x \in \mathbb{N}_0 \text{ such that } 0 \leq x < H \}$, in which case you should say something like
-      ``the allowed time slots are represented by non-negative integers strictly smaller than $H$''.
-      Either way \emph{please do not} start your arrays at 1, unless you want to be mistaken for a mathematician.}
+    If I understand correctly the semantics you provide in Section 4.3, your set of allowed time slots is
+    $\{ x \in \mathbb{N}_0 \text{ such that } 0 \leq x \leq H \}$, so you should say something like
+    ``the allowed time slots are represented by non-negative integers not greater than $H$''
+    (yes, I know the negations are ridiculous, but this is standard practice because it minimizes ambiguity).
+    Another alternative is that your set of allowed time slots is meant to be
+    $\{ x \in \mathbb{N}_0 \text{ such that } 0 \leq x < H \}$, in which case you should say something like
+    ``the allowed time slots are represented by non-negative integers strictly smaller than $H$''.
+    Either way \emph{please do not} start your arrays at 1, unless you want to be mistaken for a mathematician.}
 
 \subsection*{Tasks}
 The definition of task is provided in \Cref{chapter:methodology-language-design}.\todo{But that's this chapter?} For convenience --- particularly to allow easy access later and to ensure unique identification for \texttt{dependencies} (cf. \Cref{subsubsec:methodology-language-design:dependencies}) --- \texttt{tasks} are stored in a dictionary. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
@@ -51,7 +51,7 @@ In contrast, a task whose inclusion is not critical can be given a minimal\todo{
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
-As stated in \Cref{sec:preliminaries-related-work:time-theory}, \texttt{tasks} tend to bulk in the near future
+As stated in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, \texttt{tasks} tend to bulk in the near future
 \todo{try to use descriptive language: tasks don't bulk in the near future, we \emph{want them} to bulk!}
 and the schedule becomes more or less empty the further into the future we look. This is natural, because most of the \texttt{tasks} are not known beforehand. Hence, we also need to ensure that our schedule handles as many of the \texttt{tasks} as soon as possible to help with the fact that at a later time, one needs space for the \texttt{tasks} one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule \texttt{tasks} as early as possible, while still being able to schedule them later if necessary.
 
@@ -61,27 +61,27 @@ Instead, a time slot approach will be used. One time slot is a discretized unit 
 Let A be an arbitrary Task. A should be scheduled on December the 31\textsuperscript{st} at 6 PM and takes one hour. If we compile this exactly on December $31^{\text{st}}$ at 6 PM and one time slot is discretized to 15 minutes, we can conclude that this task should be scheduled at time slot 4, 5, 6, and 7, as shown in \Cref{tab:preliminaries-related-work:time-theory:time-representation:time-slots}.
 
 \begin{table}[!ht]
-      \centering
-      \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-            \hline
-            index & 0     & 1     & 2     & 3     & 4     & 5     & 6     & 7     & \dots \\
-            \hline
-            start & 17:00 & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & \dots \\
-            \hline
-            end   & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & 19:00 & \dots \\
-            \hline
-      \end{tabular}
-      \caption{Ranges of time slots}
-      \label{tab:preliminaries-related-work:time-theory:time-representation:time-slots}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        index & 0     & 1     & 2     & 3     & 4     & 5     & 6     & 7     & \dots \\
+        \hline
+        start & 17:00 & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & \dots \\
+        \hline
+        end   & 17:15 & 17:30 & 17:45 & 18:00 & 18:15 & 18:30 & 18:45 & 19:00 & \dots \\
+        \hline
+    \end{tabular}
+    \caption{Ranges of time slots}
+    \label{tab:preliminaries-related-work:time-theory:time-representation:time-slots}
 \end{table}
 When using this approach, we handle only the time of interest (i.e. the future), while ensuring the concept of time is discretized and abstracted away as early as possible in the conversion process of natural language to constraints. \\
 For simplicity, the issue of summer and winter time is omitted, we assume the front-end converts time slots in different timezones to a uniform timezone. \\
 Describing the time a given task can be scheduled is represented by the \mbox{\texttt{timeSlots}} field. Without this field, it would not be possible to specify when to schedule a task, when it is preferable to do so, or when it should be avoided. We therefore propose the following options for efficiently defining this
 field\todo{explain what each representation represents, e.g. array of bits, where each position represents a slot, and the stored bit flag represents whether the task is allowed in that time slot}:
 \begin{itemize}
-      \item array of bits,
-      \item array of interval,
-      \item and array of interval-cost pairs.
+    \item array of bits,
+    \item array of interval,
+    \item and array of interval-cost pairs.
 \end{itemize}
 Bit arrays are very easy to handle and efficient to store. However, since storage is not a concerning factor, and the representation scales linearly with the \texttt{horizon} it becomes harder for
 humans\todo{not really a problem: humans are not meant to read the IR!} to understand as the \texttt{horizon} increases. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being human-readable. We use a half-open interval $[0,10)$, meaning 0 is included while 10 is excluded. For expressiveness, we additionally add a cost for each interval and stick with an array of interval-cost pairs.
@@ -89,16 +89,16 @@ humans\todo{not really a problem: humans are not meant to read the IR!} to under
 \subsection*{Dependencies}
 \label{subsubsec:methodology-language-design:dependencies}
 \todo[inline]{This paragraph is quite unclear.
-      A good technique to avoid these issues is try to read it as someone who has only read the thesis
-      up to this point and knows nothing else about your project.
-      Then try to identify ways on which the reader might be confused, and change your writeup to solve that.}
+    A good technique to avoid these issues is try to read it as someone who has only read the thesis
+    up to this point and knows nothing else about your project.
+    Then try to identify ways on which the reader might be confused, and change your writeup to solve that.}
 The field \texttt{dependencies} we depict preceding \texttt{tasks}. It also contains intervals in the same format as \texttt{timeSlots}. Additionally, similarly to the \texttt{importance} of a task, we define a field \texttt{unmetCost} if a task does not conform to its \texttt{dependencies}.
 
 \subsection*{Location}
 Planning a timetable well improves
 throughput\todo{unclear, and unnecessary: just say that some tasks are preferable to be scheduled together,
-      and that we abstract this as ``locations''. You might also want to note that this does not need
-      to refer to physical locations, e.g. I might like to listen to the news while coding.}
+    and that we abstract this as ``locations''. You might also want to note that this does not need
+    to refer to physical locations, e.g. I might like to listen to the news while coding.}
 while simultaneously reducing travel time by grouping \texttt{tasks} in the same area together. Therefore, we define \texttt{location}, by a unique integer alongside with \texttt{unmetCost} when the grouping is not managed properly. This represents the most basic set of fields that we identified as appropriate for this purpose. For the general functionality the \texttt{location} is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
 
 \subsection{Language Specification}

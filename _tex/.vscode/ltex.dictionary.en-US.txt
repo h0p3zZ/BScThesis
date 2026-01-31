@@ -7,3 +7,4 @@ unmetCost
 MaxSAT
 preferability
 timetabling
+MaxSMT
