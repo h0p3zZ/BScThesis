@@ -21,39 +21,21 @@ Since we are dealing with continuous time, we cannot simply run a solver on this
 Below, we present the constraints --- also referred to as fields, because we define language keywords (i.e. fields) --- we ultimately adopted for our language design in the remainder of this chapter.
 
 \subsection*{Horizon}
-The \texttt{horizon} field is used to specify the length of time (i.e. the number of time slots) the solver can define \texttt{tasks} to. Without defining such a stopper, one would have to take infinite time into account which is unnecessary for a scheduling application and is hardly solvable using modern solvers~\cite{bib:2023-parsert,bib:2025-ghosh}
-\todo{incorrect, SMT solvers routinely do this in the LIA theory}. This is reasonable, as most of the time appointments tend to be stacked up towards the near future and become less frequent the further one looks into the future, as their existence is not known yet. Therefore, this method does not noticeably restrict the possible solutions as most of the \texttt{tasks} are bundled towards the near future. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
-
-\todo[inline]{You should clarify whether the horizon is included or not in your allowed time slots.
-    If I understand correctly the semantics you provide in Section 4.3, your set of allowed time slots is
-    $\{ x \in \mathbb{N}_0 \text{ such that } 0 \leq x \leq H \}$, so you should say something like
-    ``the allowed time slots are represented by non-negative integers not greater than $H$''
-    (yes, I know the negations are ridiculous, but this is standard practice because it minimizes ambiguity).
-    Another alternative is that your set of allowed time slots is meant to be
-    $\{ x \in \mathbb{N}_0 \text{ such that } 0 \leq x < H \}$, in which case you should say something like
-    ``the allowed time slots are represented by non-negative integers strictly smaller than $H$''.
-    Either way \emph{please do not} start your arrays at 1, unless you want to be mistaken for a mathematician.}
+The \texttt{horizon} field is used to specify the length of time (i.e. the number of time slots) the solver can define \texttt{tasks} to. Without defining such a stopper, one would have to take infinite time into account which is unnecessary for a scheduling application. In the particular case of the proposed \ac{IR} the allowed time slots are represented by non-negative integers strictly smaller than $H$ (i.e. there are $H$ allowed time slots). This is reasonable, as most of the time appointments tend to be stacked up towards the near future and become less frequent the further one looks into the future, as their existence is not known yet. This goes both ways, as a personal scheduler should also tend to schedule the bulk of tasks in the near future in order to be able to compensate for tasks, which occur later and shorter before their deadline. Therefore, this method does not noticeably restrict the possible solutions as most of the \texttt{tasks} are bundled towards the near future. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
 
 \subsection*{Tasks}
-The definition of task is provided in \Cref{chapter:methodology-language-design}.\todo{But that's this chapter?} For convenience --- particularly to allow easy access later and to ensure unique identification for \texttt{dependencies} (cf. \Cref{subsubsec:methodology-language-design:dependencies}) --- \texttt{tasks} are stored in a dictionary. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
+The \texttt{tasks} field contains all the \texttt{tasks} to be scheduled, such that each \texttt{task} can be uniquely identified by its ID. This is necessary as \texttt{dependencies} (cf. \Cref{subsubsec:methodology-language-design:dependencies}) refer to other \texttt{tasks} by their ID. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
 
 \subsubsection*{Duration}
-The \texttt{duration} field defines the length of a task. It is defined by the number of time slots a task takes\todo{\emph{contiguous} time slots!}.
+The \texttt{duration} field defines the length of a task. It is defined by the number of contiguous time slots a task has to be allocated to.
 
 \subsubsection*{Importance}
 \label{subsubsec:methodology-language-design:importance}
-\texttt{Importance} defines how important a task is as integer (or infinity)\todo{circular definition}.
-Furthermore, \texttt{importance} defines the cost of an unscheduled task.
-A task that must be scheduled without exception\todo{rather, ``a task that must compulsorily be allocated''}
-should be assigned an \texttt{importance} value of or approaching infinity\todo{not ``approaching''}.
-In contrast, a task whose inclusion is not critical can be given a minimal\todo{``small''; ``minimal'' has a different meaning}
-\texttt{importance} score close to zero. This enables the \ac{IR} to handle optional \texttt{tasks} and determine which \texttt{tasks} should be scheduled first and which \texttt{tasks} can be left unscheduled if necessary.
+\texttt{Importance} gives a numerical value or $\infty$ that describes how critical it is to schedule a given \texttt{task}. Furthermore, \texttt{importance} defines the cost of an unscheduled task. A task that must compulsorily be allocated should be assigned an \texttt{importance} value of infinity. In contrast, a task whose inclusion is not critical can be given a small \texttt{importance} score close to zero. This enables the \ac{IR} to handle optional \texttt{tasks} and determine which \texttt{tasks} should be scheduled first and which \texttt{tasks} can be left unscheduled if necessary.
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
-As stated in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, \texttt{tasks} tend to bulk in the near future
-\todo{try to use descriptive language: tasks don't bulk in the near future, we \emph{want them} to bulk!}
-and the schedule becomes more or less empty the further into the future we look. This is natural, because most of the \texttt{tasks} are not known beforehand. Hence, we also need to ensure that our schedule handles as many of the \texttt{tasks} as soon as possible to help with the fact that at a later time, one needs space for the \texttt{tasks} one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule \texttt{tasks} as early as possible, while still being able to schedule them later if necessary.
+As stated in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, we aim to bulk \texttt{tasks} in the near future, leaving the schedule more or less empty the further into the future we look. This is desirable because most of the \texttt{tasks} are not known beforehand.. Hence, we also need to ensure that our schedule handles as many of the \texttt{tasks} as soon as possible to help with the fact that at a later time, one needs space for the \texttt{tasks} one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule \texttt{tasks} as early as possible, while still being able to schedule them later if necessary.
 
 \subsubsection*{Time Slots}
 \label{subsubsec:methodology-language-design:time-slots}
@@ -83,8 +65,7 @@ field\todo{explain what each representation represents, e.g. array of bits, wher
     \item array of interval,
     \item and array of interval-cost pairs.
 \end{itemize}
-Bit arrays are very easy to handle and efficient to store. However, since storage is not a concerning factor, and the representation scales linearly with the \texttt{horizon} it becomes harder for
-humans\todo{not really a problem: humans are not meant to read the IR!} to understand as the \texttt{horizon} increases. Therefore, we use array of intervals as it can be easily converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while still being human-readable. We use a half-open interval $[0,10)$, meaning 0 is included while 10 is excluded. For expressiveness, we additionally add a cost for each interval and stick with an array of interval-cost pairs.
+Bit arrays are very easy to handle and efficient to store. However, storage is not a concerning factor for the proposed representation. However, as the \texttt{horizon} increases, the size of the bit array increases linearly. This is not optimal, as most of the time slots will be grouped together and therefore can be represented more compactly. Therefore, we use array of intervals, which can also easily be converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while being more concise than the bit array approach. We use a half-open interval $[0,10)$, meaning 0 is included while 10 is excluded. For expressiveness, we additionally add a cost for each interval and stick with an array of interval-cost pairs.
 
 \subsection*{Dependencies}
 \label{subsubsec:methodology-language-design:dependencies}
@@ -95,11 +76,7 @@ humans\todo{not really a problem: humans are not meant to read the IR!} to under
 The field \texttt{dependencies} we depict preceding \texttt{tasks}. It also contains intervals in the same format as \texttt{timeSlots}. Additionally, similarly to the \texttt{importance} of a task, we define a field \texttt{unmetCost} if a task does not conform to its \texttt{dependencies}.
 
 \subsection*{Location}
-Planning a timetable well improves
-throughput\todo{unclear, and unnecessary: just say that some tasks are preferable to be scheduled together,
-    and that we abstract this as ``locations''. You might also want to note that this does not need
-    to refer to physical locations, e.g. I might like to listen to the news while coding.}
-while simultaneously reducing travel time by grouping \texttt{tasks} in the same area together. Therefore, we define \texttt{location}, by a unique integer alongside with \texttt{unmetCost} when the grouping is not managed properly. This represents the most basic set of fields that we identified as appropriate for this purpose. For the general functionality the \texttt{location} is not required, but again improves expressively by a lot, while maintaining a minimalistic language.
+As a practitioner might prefer some tasks to be scheduled together, we introduce the \texttt{location} field. This is especially useful when tasks are related to physical locations, but is not limited to this use case, as one might also want to group tasks that can be done in parallel, such as listening to the news while coding. Therefore, we define \texttt{location}, by a unique integer alongside with \texttt{unmetCost} when the grouping is not managed properly.
 
 \subsection{Language Specification}
 The above defined fields form the core of the proposed language, resulting in the following \ac{JSON} structure:
