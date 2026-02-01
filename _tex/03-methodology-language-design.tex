@@ -35,7 +35,7 @@ The \texttt{duration} field defines the length of a task. It is defined by the n
 
 \subsubsection*{Urgency}
 \label{subsubsec:methodology-language-design:urgency}
-As stated in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, we aim to bulk \texttt{tasks} in the near future, leaving the schedule more or less empty the further into the future we look. This is desirable because most of the \texttt{tasks} are not known beforehand.. Hence, we also need to ensure that our schedule handles as many of the \texttt{tasks} as soon as possible to help with the fact that at a later time, one needs space for the \texttt{tasks} one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule \texttt{tasks} as early as possible, while still being able to schedule them later if necessary.
+As stated in \Cref{subsec:preliminaries-related-work:time-theory:time-representation}, we aim to bulk \texttt{tasks} in the near future, leaving the schedule more or less empty the further into the future we look. This is desirable because most of the \texttt{tasks} are not known beforehand. Hence, we also need to ensure that our schedule handles as many of the \texttt{tasks} as soon as possible to help with the fact that at a later time, one needs space for the \texttt{tasks} one does not know yet. This is why we introduced the notion of \texttt{urgency} into our language. The effect is mimicked by using cost. The later a task is schedule, the higher the cost incurred for it. This way, the solver is encouraged to schedule \texttt{tasks} as early as possible, while still being able to schedule them later if necessary.
 
 \subsubsection*{Time Slots}
 \label{subsubsec:methodology-language-design:time-slots}
@@ -58,22 +58,18 @@ Let A be an arbitrary Task. A should be scheduled on December the 31\textsupersc
 \end{table}
 When using this approach, we handle only the time of interest (i.e. the future), while ensuring the concept of time is discretized and abstracted away as early as possible in the conversion process of natural language to constraints. \\
 For simplicity, the issue of summer and winter time is omitted, we assume the front-end converts time slots in different timezones to a uniform timezone. \\
-Describing the time a given task can be scheduled is represented by the \mbox{\texttt{timeSlots}} field. Without this field, it would not be possible to specify when to schedule a task, when it is preferable to do so, or when it should be avoided. We therefore propose the following options for efficiently defining this
-field\todo{explain what each representation represents, e.g. array of bits, where each position represents a slot, and the stored bit flag represents whether the task is allowed in that time slot}:
-\begin{itemize}
-    \item array of bits,
-    \item array of interval,
-    \item and array of interval-cost pairs.
-\end{itemize}
+The \texttt{timeSlots} field defines when a task can be scheduled, identifying preferred windows and periods to avoid. We propose three options for efficiently representing this data:
+
+\begin{description}
+    \item Array of bits where each position represents a specific time slot; the bit flag indicates whether the task is permitted in that slot.
+    \item Array of intervals where each entry represents a contiguous range of time slots available for task allocation.
+    \item Array of pairs, each consisting of an interval and an associated cost, allowing for prioritized scheduling based on preference or resource constraints.
+\end{description}
 Bit arrays are very easy to handle and efficient to store. However, storage is not a concerning factor for the proposed representation. However, as the \texttt{horizon} increases, the size of the bit array increases linearly. This is not optimal, as most of the time slots will be grouped together and therefore can be represented more compactly. Therefore, we use array of intervals, which can also easily be converted to an array of bits\footnote{Interval $[x,y] = [b_0, b_1, \dots]$ where $b_i = \begin{cases}0, & 0 \leq i < x\\ 1 & x \leq i \leq y\\ 0 & \text{else}\end{cases}$ as a bit array}, while being more concise than the bit array approach. We use a half-open interval $[0,10)$, meaning 0 is included while 10 is excluded. For expressiveness, we additionally add a cost for each interval and stick with an array of interval-cost pairs.
 
 \subsection*{Dependencies}
 \label{subsubsec:methodology-language-design:dependencies}
-\todo[inline]{This paragraph is quite unclear.
-    A good technique to avoid these issues is try to read it as someone who has only read the thesis
-    up to this point and knows nothing else about your project.
-    Then try to identify ways on which the reader might be confused, and change your writeup to solve that.}
-The field \texttt{dependencies} we depict preceding \texttt{tasks}. It also contains intervals in the same format as \texttt{timeSlots}. Additionally, similarly to the \texttt{importance} of a task, we define a field \texttt{unmetCost} if a task does not conform to its \texttt{dependencies}.
+The \texttt{dependencies} field defines temporal relations between \texttt{tasks} (by their IDs), such as scheduling task A after task B. Beyond simple ordering, this representation supports relative time frames, allowing task A to be scheduled within a specific window after task B completes. To further improve expressiveness, the \ac{IR} utilizes the interval-cost pairs defined in \Cref{subsubsec:methodology-language-design:time-slots} to express preferred time frames for scheduling the dependent task. Furthermore, dependencies can be made optional via the \texttt{unmetCost} field (see \Cref{subsubsec:methodology-language-design:importance}); this allows the solver to violate the condition if necessary by incurring the defined cost.
 
 \subsection*{Location}
 As a practitioner might prefer some tasks to be scheduled together, we introduce the \texttt{location} field. This is especially useful when tasks are related to physical locations, but is not limited to this use case, as one might also want to group tasks that can be done in parallel, such as listening to the news while coding. Therefore, we define \texttt{location}, by a unique integer alongside with \texttt{unmetCost} when the grouping is not managed properly.
