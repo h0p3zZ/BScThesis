@@ -103,11 +103,11 @@ The above defined fields form the core of the proposed language, resulting in th
     "unmetCost": a JSON integer
 \end{lstlisting}
 
-\section{Exemplary Scheduling Scenario}
-\label{sec:methodology-language-design:scheduling-example}
-For our personal scheduling application, we aim to support the specification of high-level constraints as comprehensively as possible. To illustrate the expressive power of our language, we present the following example. \\
-Consider the task of planning a \Ac{BBQ} with friends. This requires scheduling several interdependent tasks, such as purchasing groceries, setting up the \texttt{location}, preparing the barbecue itself, and cleaning up afterward. In addition, certain temporal constraints must be respected. For example, the groceries should not be purchased too early before the barbecue, as the food may otherwise spoil. Using our language, these high-level constraints can be expressed as follows\footnote{The \ac{BBQ} example can be found in our repository: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/SolutionVerifier/thesis_problem.json}}:
-\begin{lstlisting}[language=json]
+\begin{example}[Exemplary Scheduling Scenario]
+    \label{ex:scheduling-scenario}
+    For our personal scheduling application, we aim to support the specification of high-level constraints as comprehensively as possible. To illustrate the expressive power of our language, we present the following example. \\
+    Consider the task of planning a \Ac{BBQ} with friends. This requires scheduling several interdependent tasks, such as purchasing groceries, setting up the \texttt{location}, preparing the barbecue itself, and cleaning up afterward. In addition, certain temporal constraints must be respected. For example, the groceries should not be purchased too early before the barbecue, as the food may otherwise spoil. Using our language, these high-level constraints can be expressed as follows\footnote{The \ac{BBQ} example can be found in our repository: \url{https://github.com/h0p3zZ/BScThesis/blob/dev/_prog/SolutionVerifier/thesis_problem.json}}:
+    \begin{lstlisting}[language=json]
 {
     "horizon": 50,
     "tasks": {
@@ -168,7 +168,8 @@ Consider the task of planning a \Ac{BBQ} with friends. This requires scheduling 
     }
 }
 \end{lstlisting}
-In this example, three \texttt{tasks} are defined. Intuitively, the ``main'' task is the \ac{BBQ} itself, which has to be scheduled exactly at time slot 35 to 45 (due to the \texttt{duration} of 10 and it being the only valid interval) and \texttt{importance} is infinity. The task ``SetupLocation'' has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals. Furthermore, the task is scheduled with cost zero when scheduled before time slot 6, otherwise a cost of 15 is incurred. Similarly, ``BuyGroceries'' has to be scheduled at time slot 0 to 19, with cost zero when scheduled before time slot 6, otherwise a cost of 100 is incurred. Both \texttt{tasks} have to be scheduled before the \ac{BBQ}, otherwise a high \texttt{unmetCost} (500) of the \texttt{dependencies} is incurred. Although the \texttt{tasks} "SetupLocation" and "BuyGroceries" are not mandatory, but they are important. If it is not possible to schedule these \texttt{tasks}, one can still ask someone else attending the barbecue to do it.
+    In this example, three \texttt{tasks} are defined. Intuitively, the ``main'' task is the \ac{BBQ} itself, which has to be scheduled exactly at time slot 35 to 45 (due to the \texttt{duration} of 10 and it being the only valid interval) and \texttt{importance} is infinity. The task ``SetupLocation'' has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals. Furthermore, the task is scheduled with cost zero when scheduled before time slot 6, otherwise a cost of 15 is incurred. Similarly, ``BuyGroceries'' has to be scheduled at time slot 0 to 19, with cost zero when scheduled before time slot 6, otherwise a cost of 100 is incurred. Both \texttt{tasks} have to be scheduled before the \ac{BBQ}, otherwise a high \texttt{unmetCost} (500) of the \texttt{dependencies} is incurred. Although the \texttt{tasks} "SetupLocation" and "BuyGroceries" are not mandatory, but they are important. If it is not possible to schedule these \texttt{tasks}, one can still ask someone else attending the barbecue to do it.
+\end{example}
 
 \clearpage
 
