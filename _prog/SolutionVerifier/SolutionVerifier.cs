@@ -135,7 +135,7 @@ public class SolutionVerifier
     private static double CalculateWeightedIntervalCost(int start, int end, IEnumerable<IntervalCost> intervals)
     {
         double weightedSum = 0;
-        double totalOverlap = 0;
+        int duration = end - start;
 
         foreach (var interval in intervals)
         {
@@ -149,11 +149,10 @@ public class SolutionVerifier
 
             if (overlapLength > 0)
             {
-                weightedSum += overlapLength * interval.Cost;
-                totalOverlap += overlapLength;
+                weightedSum += interval.Cost * ((double)overlapLength / duration);
             }
         }
 
-        return weightedSum / totalOverlap;
+        return weightedSum;
     }
 }

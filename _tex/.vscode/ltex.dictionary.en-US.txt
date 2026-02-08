@@ -8,3 +8,4 @@ MaxSAT
 preferability
 timetabling
 MaxSMT
+Tseitin

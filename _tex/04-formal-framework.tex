@@ -102,7 +102,7 @@ Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
                    & \operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}) = 32 + 2 = 34 < 50 = H & \text{True} \\
                    & \operatorname{a}(\text{BBQ}) + \operatorname{dur}(\text{BBQ}) = 35 + 10 = 45 < 50 = H                    & \text{True} \\
             \end{align*}
-      \item For a given assignment $a$ we need the \code{cost function}, which is defined in \Cref{subsec:formal-framework:semantics:computing-cost}, to be finite:\\
+      \item For a given assignment $a$ we need the \code{cost function}, to be finite: \\
             $\operatorname{c}(a) \in \N_0$ \\
             For the three components of the cost function this translates to:
             \begin{enumerate}
@@ -121,9 +121,10 @@ Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
                         The second part (i.e. \Cref{eq:cost-function-2}) sums up the dependency costs for every pair of tasks. The first task has to be assigned, because the dependent task cannot hold the dependency. For the second task, it is irrelevant whether it is scheduled or not. This flexibility is useful for expressing constraints such as the following: ``If I have time to buy the food for the BBQ, it should be done at most one day before the barbecue''. \\
                         Accordingly, the associated cost is applied only to the dependent task. This cost is computed based on the relative temporal distance between the assignments of the two tasks. If one of the tasks is not scheduled --- specifically, the second task, since the first must be scheduled --- the corresponding \texttt{unmetCost} is added to the total cost. An example illustrating this mechanism was already provided in \Cref{sec:formal-framework:data-definition}, in the discussion of the \code{dependency function}.
 
-                  \item For every distinct pair of scheduled tasks $t_1$, $t_2 \in T_s$ the location cost must be finite:
+                  \item Before defining the third part of the cost function we introduce the \code{location change function} $\mu(l_1, l_2; n_1, n_2) = (1 - \delta(l_1, l_2)) \cdot \delta(n_1, n_2)$, which is one, iff the location differs but the two specified time slots are the same. With this definition we can now define the third and final part of the cost function $\operatorname{c}(a)$. \\
+                        For every distinct pair of scheduled tasks $t_1$, $t_2 \in T_s$ the location cost must be finite:
                         \begin{align}
-                              \operatorname{c}_3(a) & = \sum_{t_1, t_2 \in T_s} \operatorname{loc}_C(t_2) \cdot (1 - \delta(\operatorname{loc}_L(t_1), \operatorname{loc}_L(t_2))) \cdot \delta(\operatorname{a}(t_1) + \operatorname{dur}(t_1), \operatorname{a}(t_2)) \label{eq:cost-function-3} \\
+                              \operatorname{c}_3(a) & = \sum_{t_1, t_2 \in T_s} \operatorname{loc}_C(t_2) \cdot \mu(\operatorname{loc}_L(t_1), \operatorname{loc}_L(t_2), \operatorname{a}(t_1) + \operatorname{dur}(t_1), \operatorname{a}(t_2))  \label{eq:cost-function-3} \\
                               \operatorname{c}_3(a) & \in \N_0 \notag
                         \end{align}
                         The third part (i.e. \Cref{eq:cost-function-3}) sums up the location costs for each pair of scheduled tasks that follow one another immediately. If both tasks share the same location no cost is added. Otherwise, the cost of driving to the location of the second task is added to the total cost. Additionally, we provide an example for the location by using ``SetupLocation'' and ``BBQ'' from the barbecue example (cf. \Cref{ex:scheduling-scenario}). Assuming both tasks have different locations defined, we calculate:
@@ -139,13 +140,6 @@ Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
 
 \subsection{Computing Cost}
 \label{subsec:formal-framework:semantics:computing-cost}
-
-\todo[inline]{As I mentioned earlier, it might be best to move both the difference operator and the
-      part containing the Kronecker delta to the start of Section 4.3. For the latter, I suggest you define
-      a function called e.g. ``movement condition''
-      that takes two locations and two integers defined by $\mu(l_1, l_2; n_1, n_2) = (1 - \delta(l_1, l_2))\cdot\delta(n_1, n_2)$,
-      and then you describe what it does (it returns 1 for different locations and equal slots, or otherwise 0).
-      Then you can define equation 4.3 in terms of $\mu$, which should be a bit clearer to the reader.}
 The \code{cost function} can be split into three distinct parts:
 
 To enable the comparison of different solutions, we introduce a quantitive evaluation criterion in the form of a cost metric. Specifically, we use the functions defined in \Cref{sec:formal-framework:semantics} (i.e. \Cref{eq:cost-function-1}, \Cref{eq:cost-function-2} and \Cref{eq:cost-function-3}) to define the \code{cost function} $\operatorname{c} \colon A \to \N_{\infty}$:

@@ -167,7 +167,7 @@ public sealed class SolutionVerifierTests
             Console.WriteLine(message);
 
         Assert.IsNotNull(cost);
-        Assert.AreEqual(timeSlotCost, cost.TimeSlotCost);
+        Assert.AreEqual(timeSlotCost, cost.TimeSlotCost, 0.0000001);
     }
 
     [TestMethod]

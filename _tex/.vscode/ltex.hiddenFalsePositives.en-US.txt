@@ -2,3 +2,12 @@
 {"rule":"PRP_VBG","sentence":"^\\QLogically the “main” task is the BBQ itself, which has to be scheduled exactly at time slot 35 to 45 (due to the duration of 10 and it being the only valid interval) and it having infinity for importance.\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QThe tasks “SetupLocation” and “BuyGroceries” both are not mandatory to be scheduled, but have a high importance to be scheduled.\\E$"}
 {"rule":"A_MD_VB","sentence":"^\\QA should be scheduled on December the 31st at 6 PM and takes one hour.\\E$"}
+{"rule":"EN_A_VS_AN","sentence":"^\\QAn example of an \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q problem would be: \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+\\Q.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qindex 0 1 2 3 4 5 6 7 … start 17:00 17:15 17:30 17:45 18:00 18:15 18:30 18:45 … end 17:15 17:30 17:45 18:00 18:15 18:30 18:45 19:00 …\\E$"}
+{"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QArray of pairs, each consisting of an interval and an associated cost, allowing for prioritized scheduling based on preference or resource constraints.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QAlthough the tasks \"SetupLocation\" and \"BuyGroceries\" are not mandatory, but they are important.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QSimilarly, “BuyGroceries” has to be scheduled at time slot 0 to 19, with cost zero when scheduled before time slot 6, otherwise a cost of 100 is incurred.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QThe task “SetupLocation” has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals.\\E$"}
+{"rule":"EN_UNPAIRED_BRACKETS","sentence":"^\\QThe task “SetupLocation” has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals.\\E$"}
+{"rule":"WHITESPACE_RULE","sentence":"^$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QIR Intermediate Representation JSON JavaScript Object Notation ITC International Timetabling Competition NLP Natural Language Processing LLM Large Language Model XML eXtensible Markup Language SMT Satisfiability Modulo Theories SAT Boolean Satisfiability Problem MaxSAT Maximum Satisfiability Problem MaxSMT Maximum Satisfiability Modulo Theories ILP Integer Linear Programming CNF Conjunctive Normal Form BBQ Barbecue\\E$"}
