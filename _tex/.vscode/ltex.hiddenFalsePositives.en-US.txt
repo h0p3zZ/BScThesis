@@ -11,3 +11,6 @@
 {"rule":"EN_UNPAIRED_BRACKETS","sentence":"^\\QThe task “SetupLocation” has to be scheduled at time slot 0 to 9, because valid intervals are [0,10), when combining the two intervals.\\E$"}
 {"rule":"WHITESPACE_RULE","sentence":"^$"}
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QIR Intermediate Representation JSON JavaScript Object Notation ITC International Timetabling Competition NLP Natural Language Processing LLM Large Language Model XML eXtensible Markup Language SMT Satisfiability Modulo Theories SAT Boolean Satisfiability Problem MaxSAT Maximum Satisfiability Problem MaxSMT Maximum Satisfiability Modulo Theories ILP Integer Linear Programming CNF Conjunctive Normal Form BBQ Barbecue\\E$"}
+{"rule":"SENTENCE_WHITESPACE","sentence":"^\\QJson.\\E$"}
+{"rule":"SENTENCE_WHITESPACE","sentence":"^\\QSchema library: \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-|Dummy\\+|Dummy's\\+)[0-9]+$"}
+{"rule":"SENTENCE_WHITESPACE","sentence":"^\\QSchema library for our implementation to verify the input files.\\E$"}
