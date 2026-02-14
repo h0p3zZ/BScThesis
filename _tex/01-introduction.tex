@@ -7,29 +7,29 @@
 Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining tasks with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact time slot upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. This particular use case is not supported by existing tools, even though the necessary technologies already exist. \\
 Tasks with soft time constraints are tasks that
 \begin{itemize}
-    \item have time spans with different levels of preference,
-    \item may be optional,
-    \item may establish a specific order in which they must be scheduled,
-    \item and may define specific locations at which they must be performed.
+      \item have time spans with different levels of preference,
+      \item may be optional,
+      \item may establish a specific order in which they must be scheduled,
+      \item and may define specific locations at which they must be performed.
 \end{itemize}
 This application should be able to take natural language inputs via the \textit{frontend} and create tasks from that descriptive inputs. These tasks will be represented using the \Ac{IR}, before being given to a constraint solver to construct a viable schedule. This schedule will then be displayed back to the user via the \textit{frontend}. A basic overview of this application and the corresponding information flow is given in the figure below.
 \begin{figure}[!ht]
-    \centering
-    \begin{tikzpicture}
-        % Nodes
-        \node[draw, rectangle, minimum width=3cm, minimum height=1cm] (frontend) {Frontend};
-        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, right=4cm of frontend] (ir) {\Acl*{IR}};
-        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of ir] (solver) {Constraint Solver};
-        \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of frontend] (schedule) {Generated Schedule};
+      \centering
+      \begin{tikzpicture}
+            % Nodes
+            \node[draw, rectangle, minimum width=3cm, minimum height=1cm] (frontend) {Frontend};
+            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, right=4cm of frontend] (ir) {\Acl*{IR}};
+            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of ir] (solver) {Constraint Solver};
+            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of frontend] (schedule) {Generated Schedule};
 
-        % Arrows
-        \draw[->] (frontend) -- (ir) node[midway, above] {Reduce};
-        \draw[->] (ir) -- (solver) node[midway, right] {Convert};
-        \draw[->] (solver) -- (schedule) node[midway, below] {Solve/Generate};
-        \draw[->] (schedule) -- (frontend) node[midway, left] {Display};
-    \end{tikzpicture}
-    \caption{Application Overview}
-    \label{fig:application-overview}
+            % Arrows
+            \draw[->] (frontend) -- (ir) node[midway, above] {Reduce};
+            \draw[->] (ir) -- (solver) node[midway, right] {Convert};
+            \draw[->] (solver) -- (schedule) node[midway, below] {Solve/Generate};
+            \draw[->] (schedule) -- (frontend) node[midway, left] {Display};
+      \end{tikzpicture}
+      \caption{Application Overview}
+      \label{fig:application-overview}
 \end{figure} \\
 The focus of this thesis is on the design and formalization of the \ac{IR}. Such a representation is beneficial as it provides a clear and unambiguous description of tasks and their associated constraints. This clarity is essential for effective communication between users and the scheduling system, ensuring that the system accurately interprets user requirements. Furthermore, a well-defined \ac{IR} facilitates the development of algorithms and tools for scheduling, as it provides a structured framework for representing and manipulating scheduling data, instead of having to deal with multiple formats, which are of high complexity. \Cref{sec:preliminaries-related-work:existing-scheduling-languages-and-standards} discusses existing scheduling languages and standards, highlighting the need for one specialized on the personal scheduling domain.
 
@@ -38,12 +38,12 @@ We specifically do not define or implement a solver, as the focus of this thesis
 
 Specifically, this work tries to answer the following research question:
 \begin{itemize}
-    \item finding a language that provides sufficient expressivity while remaining as simple as feasible,
-    \item giving a notion of solution for a given problem (input language),
-    \item defining how to compare given solutions,
-    \item and showing the relation between the constraints of the language and constraints of solvers.
+      \item finding a language that provides sufficient expressivity while remaining as simple as feasible,
+      \item giving a notion of solution for a given problem (input language),
+      \item defining how to compare given solutions,
+      \item and showing the relation between the constraints of the language and constraints of solvers.
 \end{itemize}
-We evaluated several approaches to identify a suitable solution for the defined research questions. While alternative formulations of the constraints are possible, this work motivates the selected approach and outlines its advantages over other considered options.
+We evaluated several approaches to identify a suitable solution for the defined research questions. While alternative formulations of the constraints are possible, this work motivates the selected approach and outlines its advantages over other considered options. Additionally, ample examples are provided to illustrate the expressiveness of the proposed representation.
 
 The remainder of the thesis is structured as follows: \Cref{chapter:preliminaries-related-work} introduces the necessary definitions required to understand the subsequent chapters. \Cref{chapter:methodology-language-design} presents the language design, including the key design choices and the formal definition of the language. In \Cref{chapter:formal-framework}, the constraints are defined mathematically to characterize what constitutes a valid solution. Finally, \Cref{chapter:conclusion} summarizes the findings and presents the conclusions drawn from this work.
 

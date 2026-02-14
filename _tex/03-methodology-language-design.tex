@@ -24,7 +24,7 @@ Below, we present the constraints --- also referred to as fields, because we def
 The \texttt{horizon} field is used to specify the length of time (i.e. the number of time slots) the solver can define \texttt{tasks} to. Without defining such a stopper, one would have to take infinite time into account which is unnecessary for a scheduling application. In the particular case of the proposed \ac{IR} the allowed time slots are represented by non-negative integers strictly smaller than $H$ (i.e. there are $H$ allowed time slots). This is reasonable, as most of the time appointments tend to be stacked up towards the near future and become less frequent the further one looks into the future, as their existence is not known yet. This goes both ways, as a personal scheduler should also tend to schedule the bulk of tasks in the near future in order to be able to compensate for tasks, which occur later and shorter before their deadline. Therefore, this method does not noticeably restrict the possible solutions as most of the \texttt{tasks} are bundled towards the near future. When one wants to schedule further into the future one can increase this maximum time slot, while dealing with possibly increased runtimes. This --- beyond other design choices --- will be explained in the remainder of this chapter.
 
 \subsection*{Tasks}
-The \texttt{tasks} field contains all the \texttt{tasks} to be scheduled, such that each \texttt{task} can be uniquely identified by its ID. This is necessary as \texttt{dependencies} (cf. \Cref{subsubsec:methodology-language-design:dependencies}) refer to other \texttt{tasks} by their ID. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
+The \texttt{tasks} field contains all the \texttt{tasks} to be scheduled, such that each \texttt{task} can be uniquely identified by its ID. This is necessary as \texttt{dependencies} (see \Cref{subsubsec:methodology-language-design:dependencies}) refer to other \texttt{tasks} by their ID. The ID is also required to later map the solution back to the high-level language. Each task represents an object with the following fields.
 
 \subsubsection*{Duration}
 The \texttt{duration} field defines the length of a task. It is defined by the number of contiguous time slots a task has to be allocated to.
@@ -108,8 +108,8 @@ The above defined fields form the core of the proposed language, resulting in th
     "importance": a JSON integer or the JSON string "Infinity"
     "urgency": a JSON integer
     "timeSlots": a JSON array of type <interval>
-    "dependencies": a JSON array of type <dependency>
-    "location": a JSON object of type <location>
+    "dependencies": a JSON array of type <dependency> (optional)
+    "location": a JSON object of type <location> (optional)
 
 <interval> a JSON object with exactly the following fields:
     "interval": a JSON array of type JSON integer of exactly two numbers

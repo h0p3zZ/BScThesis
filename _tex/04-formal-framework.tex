@@ -6,46 +6,46 @@
 
 For the definitions introduced in \Cref{chapter:methodology-language-design} to be well-defined, we need to establish formal mathematical semantics. The proposed semantics are specified in three levels of abstraction:
 \begin{enumerate}
-      \item \nameref{sec:formal-framework:data-definition}, which specifies the data required to uniquely define a problem instance.
-      \item \nameref{sec:formal-framework:search-space}, which describes the space of all feasible solution configurations.
-      \item \nameref{sec:formal-framework:semantics}, which formally specifies what constitutes a valid solution for a problem defined in \Cref{sec:formal-framework:data-definition}. In addition, this level defines the computation of cost described in \Cref{subsec:formal-framework:semantics:computing-cost}.
+    \item \nameref{sec:formal-framework:data-definition}, which specifies the data required to uniquely define a problem instance.
+    \item \nameref{sec:formal-framework:search-space}, which describes the space of all feasible solution configurations.
+    \item \nameref{sec:formal-framework:semantics}, which formally specifies what constitutes a valid solution for a problem defined in \Cref{sec:formal-framework:data-definition}. In addition, this level defines the computation of cost described in \Cref{subsec:formal-framework:semantics:computing-cost}.
 \end{enumerate}
 
 For global use and notational simplicity, we introduce the following definitions:
 \begin{itemize}
-      \item $\N_u = \N_0 \cup \{ u \}$, where $u$ denotes an undefined or unscheduled value.
-      \item $\Z_u = \Z \cup \{ u \}$, where $u$ denotes an undefined or unscheduled value.
-      \item $\N_{\infty} = \N_0 \cup \{ \infty \}$, where $\infty$ denotes infinite cost.
+    \item $\N_u = \N_0 \cup \{ u \}$, where $u$ denotes an undefined or unscheduled value.
+    \item $\Z_u = \Z \cup \{ u \}$, where $u$ denotes an undefined or unscheduled value.
+    \item $\N_{\infty} = \N_0 \cup \{ \infty \}$, where $\infty$ denotes infinite cost.
 \end{itemize}
 
 \section{Data Definition}
 \label{sec:formal-framework:data-definition}
 It is necessary to specify the information required by the solver to enable the solution of a given problem. Therefore, we define the following functions both in natural language and mathematical terms.
 \begin{itemize}
-      \item \code{tasks}: $T$ is a finite set of tasks. \\
-            The set naturally translates to the dictionary of tasks contained in the
-            \ac{JSON} representation. Each $t \in T$ represents a unique task.
-            For example, ``SetupLocation'' corresponds to a task defined in
-            \Cref{ex:scheduling-scenario}.
+    \item \code{tasks}: $T$ is a finite set of tasks. \\
+          The set naturally translates to the dictionary of tasks contained in the
+          \ac{JSON} representation. Each $t \in T$ represents a unique task.
+          For example, ``SetupLocation'' corresponds to a task defined in
+          \Cref{ex:scheduling-scenario}.
 
-      \item \code{horizon}: $H \in \N_0$ \\
-            This is a direct mapping to the \texttt{horizon} key in the \ac{JSON}. In the example defined in \Cref{ex:scheduling-scenario} the \texttt{horizon} is set to 50.
+    \item \code{horizon}: $H \in \N_0$ \\
+          This is a direct mapping to the \texttt{horizon} key in the \ac{JSON}. In the example defined in \Cref{ex:scheduling-scenario} the \texttt{horizon} is set to 50.
 
-      \item \code{duration}: $\operatorname{dur} \colon T \longrightarrow \N_0$\\
-            Is the duration of a task in time slots, directly mapping to the \texttt{duration} key in the \ac{JSON}. In our example, we have $\operatorname{dur}(\text{SetupLocation}) = 2$.
+    \item \code{duration}: $\operatorname{dur} \colon T \longrightarrow \N_0$\\
+          Is the duration of a task in time slots, directly mapping to the \texttt{duration} key in the \ac{JSON}. In our example, we have $\operatorname{dur}(\text{SetupLocation}) = 2$.
 
-      \item \code{time slot function}: $\operatorname{slot} \colon T \times \N_u \longrightarrow \N_{\infty}$\\
-            which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled), and the urgency given the corresponding assignment. The function is a combination of multiple fields in the \Ac{IR}. If task $T$ is not scheduled ($\operatorname{slot}(T, u)$) the \texttt{importance} cost is incurred. Otherwise, it checks all defined time slots for the task and if the given time slot $x \in N_0$ is within at least one of the defined intervals, it returns the cost of all overlapping intervals accumulated plus an \texttt{urgency} cost calculated as
-            $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$. Particularly, if task A is scheduled at $x$ and multiple intervals match this assignment, all of them are weighted by their overlap and accumulated. This means $\sum_{\text{overlapping tasks}} \textit{interval.cost} \cdot (\textit{overlap} \div \textit{task.duration})$, where over \textit{overlap} is the amount of overlap the interval has relative to the assignment and duration of the task. Considering the example specified in \Cref{ex:scheduling-scenario}, we construct $\operatorname{slot}(\text{BuyGroceries}, 29) = \textit{interval.cost} + \textit{urgency} = 0 + (29 + 1) \cdot 1 = 30$ as an example, which provides a cost of $30$ for this exact input. The example assignment used in the example is the same as in \Cref{sec:formal-framework:search-space}.
+    \item \code{time slot function}: $\operatorname{slot} \colon T \times \N_u \longrightarrow \N_{\infty}$\\
+          which maps every task at a given time slot to a cost. This cost includes the time slot cost at the given time, the importance cost (if not scheduled), and the urgency given the corresponding assignment. The function is a combination of multiple fields in the \Ac{IR}. If task $T$ is not scheduled ($\operatorname{slot}(T, u)$) the \texttt{importance} cost is incurred. Otherwise, it checks all defined time slots for the task and if the given time slot $x \in N_0$ is within at least one of the defined intervals, it returns the cost of all overlapping intervals accumulated plus an \texttt{urgency} cost calculated as
+          $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$. Particularly, if task A is scheduled at $x$ and multiple intervals match this assignment, all of them are weighted by their overlap and accumulated. This means $\sum_{\text{overlapping tasks}} \textit{interval.cost} \cdot (\textit{overlap} \div \textit{task.duration})$, where over \textit{overlap} is the amount of overlap the interval has relative to the assignment and duration of the task. Considering the example specified in \Cref{ex:scheduling-scenario}, we construct $\operatorname{slot}(\text{BuyGroceries}, 29) = \textit{interval.cost} + \textit{urgency} = 0 + (29 + 1) \cdot 1 = 30$ as an example, which provides a cost of $30$ for this exact input. The example assignment used in the example is the same as in \Cref{sec:formal-framework:search-space}.
 
-      \item \code{dependency function}: $\operatorname{dep} \colon T \times T_a \longrightarrow \Z_u \longrightarrow \N_{\infty}$
-            It returns the cost of a task's dependencies, given another task --- if a dependency exists between them. This cost can also be infinite, if specified as such in the \texttt{unmetCost}. If the second task is not scheduled, the dependency function does not incur any cost, as the dependency itself is not violated. However, if the first task is not scheduled, but the second task is, the \texttt{unmetCost} is added to the total cost. This function maps every pair of tasks, where the second one has to be scheduled to another function, which in turn maps the relative distance of their assignments to a cost. The function checks all defined intervals for the dependency and if the relative distance of the assignments is within one of the defined intervals, it returns the cost of that interval. If multiple intervals are found, the costs of all applicable intervals are accumulated. If no valid interval is found it again returns the \texttt{unmetCost}. Also, if the tasks do not share a dependency, the resulting cost function is just a constant function to zero. In this case, when looking at the \ac{BBQ} example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
+    \item \code{dependency function}: $\operatorname{dep} \colon T \times T_a \longrightarrow \Z_u \longrightarrow \N_{\infty}$
+          It returns the cost of a task's dependencies, given another task --- if a dependency exists between them. This cost can also be infinite, if specified as such in the \texttt{unmetCost}. If the second task is not scheduled, the dependency function does not incur any cost, as the dependency itself is not violated. However, if the first task is not scheduled, but the second task is, the \texttt{unmetCost} is added to the total cost. This function maps every pair of tasks, where the second one has to be scheduled to another function, which in turn maps the relative distance of their assignments to a cost. The function checks all defined intervals for the dependency and if the relative distance of the assignments is within one of the defined intervals, it returns the cost of that interval. If multiple intervals are found, the costs of all applicable intervals are accumulated. If no valid interval is found it again returns the \texttt{unmetCost}. Also, if the tasks do not share a dependency, the resulting cost function is just a constant function to zero. In this case, when looking at the \ac{BBQ} example, we have for example $\operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(35 - (29 + 3)) = \operatorname{dep}(\text{BuyGroceries}, \text{BBQ})(3) = 0$.
 
-      \item \code{locations}: $L$ is a finite set. \\
-            The set contains all unique location IDs defined for all tasks. In the example in \Cref{ex:scheduling-scenario}, we have $L = \{ 1, 2 \}$, assuming ``SetupLocation'' has location ID 1 and ``BBQ'' has location ID 2.
+    \item \code{locations}: $L$ is a finite set. \\
+          The set contains all unique location IDs defined for all tasks. In the example in \Cref{ex:scheduling-scenario}, we have $L = \{ 1, 2 \}$, assuming ``SetupLocation'' has location ID 1 and ``BBQ'' has location ID 2.
 
-      \item \code{location function}: $\operatorname{loc} \colon T \longrightarrow L \times \N_{\infty }$
-            The function specifies whether a task has a set location and what the cost would be of going to this specific Location. Specifically, the cost is infered, if the location of the task is different from the location of the previous task and both tasks are scheduled immediately after one another. For convenience, we define $\operatorname{loc}(t) = (\operatorname{loc}_L(t), \operatorname{loc}_c(t))$. The set of locations is defined by all unique location IDs for all tasks. Additionally, the \code{location function} maps every task to a tuple of both the location ID and the cost of going there. If a task has no defined location, the function returns $(null, 0)$, meaning there is no \textit{location} and therefore no cost.
+    \item \code{location function}: $\operatorname{loc} \colon T \longrightarrow L \times \N_{\infty}$
+          The function specifies whether a task has a set location and what the cost would be of going to this specific Location. Specifically, the cost is inferred, if the location of the task is different from the location of the previous task and both tasks are scheduled immediately after one another. For convenience, we define $\operatorname{loc}(t) = (\operatorname{loc}_L(t), \operatorname{loc}_c(t))$. The set of locations is defined by all unique location IDs for all tasks. Additionally, the \code{location function} maps every task to a tuple of both the location ID and the cost of going there. If a task has no defined location, the function returns $(null, 0)$, meaning there is no \textit{location} and therefore no cost.
 \end{itemize}
 These definitions provide a comprehensive framework for representing the necessary data to define a scheduling problem unambiguously. The above functions and sets form the basis of the problem, in order to be able to define valid solutions and semantics in the subsequent sections. The specific representation defined in \Cref{chapter:methodology-language-design} can be directly mapped to these formal definitions, as definition above is strictly more expressive than the keywords defined in the \ac{IR}. Thus, every valid \ac{IR} specification can be translated into a well-defined problem instance using the above definitions.
 
@@ -54,78 +54,78 @@ These definitions provide a comprehensive framework for representing the necessa
 Having established the information required to solve the problem, we now characterize the general structure of a solution. A solution is represented by an assignment function that maps each task to either a concrete time slot or an undefined value indicating that the task is not scheduled. Formally, we define an assignment as a function \code{assignments} $\operatorname{a} \colon T \longrightarrow \N_u$ and $A$ is the set of all possible functions $T \longrightarrow \N_u$.
 
 \begin{example}[Exemplary Assignment]
-      \label{ex:exemplary-assignment}
-      Recall \Cref{ex:scheduling-scenario}, which defines a scheduling problem for a barbecue. We can now illustrate a possible assignment for this problem.
-      \begin{lstlisting}[language=json]
+    \label{ex:exemplary-assignment}
+    Recall \Cref{ex:scheduling-scenario}, which defines a scheduling problem for a barbecue. We can now illustrate a possible assignment for this problem.
+    \begin{lstlisting}[language=json]
 {
     "BuyGroceries": 29,
     "SetupLocation": 32,
     "BBQ": 35
 }
 \end{lstlisting}
-      In this representation, each task is associated with a specific time slot, or u if it is not scheduled. In the present example, all tasks are assigned to concrete time slots. Consequently, the corresponding assignment function $\operatorname{a}$ satisfies, for example, $\operatorname{a}(\text{BuyGroceries}) = 29$.
+    In this representation, each task is associated with a specific time slot, or u if it is not scheduled. In the present example, all tasks are assigned to concrete time slots. Consequently, the corresponding assignment function $\operatorname{a}$ satisfies, for example, $\operatorname{a}(\text{BuyGroceries}) = 29$.
 \end{example}
 
 \section{Semantics}
 \label{sec:formal-framework:semantics}
-We can now bring together the problem definition and the notion of a solution by specifying the conditions under which a candidate solution is considered valid. To this end, we define $T^a = \{ t \in T \text{ such that } \operatorname{a}(t) \neq u \}$, i.e., the set of tasks that are scheduled in the assignment $\operatorname{a}$. \\
+We can now bring together the problem definition and the notion of a solution by specifying the conditions under which a candidate solution is considered valid. To this end, we define $T_a = \{ t \in T \text{ such that } \operatorname{a}(t) \neq u \}$, i.e., the set of tasks that are scheduled in the assignment $\operatorname{a}$. \\
 Additionally, we employ the Kronecker delta function $\delta$ to support the computation of location-related costs. This function compares two values and returns $1$, if they are the equal, and $0$ otherwise. \\
 For notational simplicity, we also define a notion of difference between two values in $\N_u$:\\
 ${}-{} \colon \N_u \times \N_u \longrightarrow \Z_u$ \\
 $n_1 - n_2 = \begin{cases} n_1 - n_2 & \text{for }n_1, n_2 \in \N_0 \\ u & \text{else}\end{cases}$ \\
 Conceptually, an assignment $\operatorname{a} \in A$ is valid iff:
 \begin{itemize}
-      \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap. \\
-            $\operatorname{a}(t_1) + \operatorname{dur}(t_1) \leq \operatorname{a}(t_2) \lor \operatorname{a}(t_2) + \operatorname{dur}(t_2) \leq \operatorname{a}(t_1)$
+    \item For all pairs of distinct assigned tasks $t_1$, $t_2$ the durations must not overlap. \\
+          $\operatorname{a}(t_1) + \operatorname{dur}(t_1) \leq \operatorname{a}(t_2) \lor \operatorname{a}(t_2) + \operatorname{dur}(t_2) \leq \operatorname{a}(t_1)$
 
-            To illustrate we perform the calculations on barbecue example (cf. \Cref{ex:scheduling-scenario}) assignments:
-            \begin{align*}
-                   & \operatorname{a}(\text{BuyGroceries}) + \operatorname{dur}(\text{BuyGroceries}) = 29 + 3 = 32 \leq 32 = \operatorname{a}(\text{SetupLocation}) & \text{True} \\
-                   & \operatorname{a}(\text{BuyGroceries}) + \operatorname{dur}(\text{BuyGroceries}) = 29 + 3 = 32 \leq 35 = \operatorname{a}(\text{BBQ})           & \text{True} \\
-                   & \operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}) = 32 + 2 = 34 \leq 35 = \operatorname{a}(\text{BBQ})         & \text{True} \\
-            \end{align*}
-      \item For every assigned task $t$ the assigned time slots must not exceed the horizon.\\
-            $\operatorname{a}(t) + \textit{dur}(t) < H$ \\
-            Again, considering assignments of the barbecue example defined in \Cref{sec:formal-framework:search-space}:
-            \begin{align*}
-                   & \operatorname{a}(\text{BuyGroceries}) + \operatorname{dur}(\text{BuyGroceries}) = 29 + 3 = 32 < 50 = H   & \text{True} \\
-                   & \operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}) = 32 + 2 = 34 < 50 = H & \text{True} \\
-                   & \operatorname{a}(\text{BBQ}) + \operatorname{dur}(\text{BBQ}) = 35 + 10 = 45 < 50 = H                    & \text{True} \\
-            \end{align*}
-      \item For a given assignment $a$ we need the \code{cost function}, to be finite: \\
-            $\operatorname{c}(a) \in \N_0$ \\
-            For the three components of the cost function this translates to:
-            \begin{enumerate}
-                  \item Every task $t \in T$ must have a finite cost at its assigned time slot:
-                        \begin{align}
-                              \operatorname{c}_1(a) & = \sum_{t \in T} \operatorname{slot}(t, \operatorname{a}(t)) \label{eq:cost-function-1} \\
-                              \operatorname{c}_1(a) & \in \N_0 \notag
-                        \end{align}
-                        The first component of the cost function (i.e. \Cref{eq:cost-function-1}) aggregates the cost incurred by each task at its assigned time slot. If a task is scheduled the urgency is incorporated automatically, for example through the term $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$. In contrast, if a task is not scheduled the corresponding importance cost is added. An illustrative example of this behavior was already provided in \Cref{sec:formal-framework:data-definition} in the discussion of the \code{time slot function}.
+          To illustrate we perform the calculations on barbecue example (see \Cref{ex:scheduling-scenario}) assignments:
+          \begin{align*}
+               & \operatorname{a}(\text{BuyGroceries}) + \operatorname{dur}(\text{BuyGroceries}) = 29 + 3 = 32 \leq 32 = \operatorname{a}(\text{SetupLocation}) & \text{True} \\
+               & \operatorname{a}(\text{BuyGroceries}) + \operatorname{dur}(\text{BuyGroceries}) = 29 + 3 = 32 \leq 35 = \operatorname{a}(\text{BBQ})           & \text{True} \\
+               & \operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}) = 32 + 2 = 34 \leq 35 = \operatorname{a}(\text{BBQ})         & \text{True} \\
+          \end{align*}
+    \item For every assigned task $t$ the assigned time slots must not exceed the horizon.\\
+          $\operatorname{a}(t) + \textit{dur}(t) < H$ \\
+          Again, considering assignments of the barbecue example defined in \Cref{sec:formal-framework:search-space}:
+          \begin{align*}
+               & \operatorname{a}(\text{BuyGroceries}) + \operatorname{dur}(\text{BuyGroceries}) = 29 + 3 = 32 < 50 = H   & \text{True} \\
+               & \operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}) = 32 + 2 = 34 < 50 = H & \text{True} \\
+               & \operatorname{a}(\text{BBQ}) + \operatorname{dur}(\text{BBQ}) = 35 + 10 = 45 < 50 = H                    & \text{True} \\
+          \end{align*}
+    \item For a given assignment $a$ we need the \code{cost function}, to be finite: \\
+          $\operatorname{c}(a) \in \N_0$ \\
+          For the three components of the cost function this translates to:
+          \begin{enumerate}
+              \item Every task $t \in T$ must have a finite cost at its assigned time slot:
+                    \begin{align}
+                        \operatorname{c}_1(a) & = \sum_{t \in T} \operatorname{slot}(t, \operatorname{a}(t)) \label{eq:cost-function-1} \\
+                        \operatorname{c}_1(a) & \in \N_0 \notag
+                    \end{align}
+                    The first component of the cost function (i.e. \Cref{eq:cost-function-1}) aggregates the cost incurred by each task at its assigned time slot. If a task is scheduled the urgency is incorporated automatically, for example through the term $(\operatorname{a}(t) + 1) \cdot \textit{urgency}$. In contrast, if a task is not scheduled the corresponding importance cost is added. An illustrative example of this behavior was already provided in \Cref{sec:formal-framework:data-definition} in the discussion of the \code{time slot function}.
 
-                  \item For every distinct pair of tasks $t_1 \in T_a$ and $t_2 \in T$ where the first task is scheduled, the dependency cost must be finite:
-                        \begin{align}
-                              \operatorname{c}_2(a) & = \sum_{t_1 \in T, t_2 \in T_a} \operatorname{dep}(t_1, t_2)(\operatorname{a}(t_2) - (\operatorname{a}(t_1) + \operatorname{dur}(t_1)))   \label{eq:cost-function-2} \\
-                              \operatorname{c}_2(a) & \in \N_0 \notag
-                        \end{align}
-                        The second part (i.e. \Cref{eq:cost-function-2}) sums up the dependency costs for every pair of tasks. The second task has to be assigned, because the task it holds the dependency. For the first task, it is irrelevant whether it is scheduled or not. This flexibility is useful for expressing constraints such as the following: ``If I have time to buy the food for the \ac{BBQ}, it should be done at most one day before it''. In this case the task chronologically scheduled sooner can be committed but also enforced, if needed. \\
-                        Accordingly, the associated cost is applied only to the dependent task. This cost is computed based on the relative temporal distance between the assignments of the two tasks. If one of the tasks is not scheduled --- specifically, the second task, since the first must be scheduled --- the corresponding \texttt{unmetCost} is added to the total cost. An example illustrating this mechanism was already provided in \Cref{sec:formal-framework:data-definition}, in the discussion of the \code{dependency function}.
+              \item For every distinct pair of tasks $t_1 \in T_a$ and $t_2 \in T$ where the first task is scheduled, the dependency cost must be finite:
+                    \begin{align}
+                        \operatorname{c}_2(a) & = \sum_{t_1 \in T, t_2 \in T_a} \operatorname{dep}(t_1, t_2)(\operatorname{a}(t_2) - (\operatorname{a}(t_1) + \operatorname{dur}(t_1)))   \label{eq:cost-function-2} \\
+                        \operatorname{c}_2(a) & \in \N_0 \notag
+                    \end{align}
+                    The second part (i.e. \Cref{eq:cost-function-2}) sums up the dependency costs for every pair of tasks. The second task has to be assigned, because the task it holds the dependency. For the first task, it is irrelevant whether it is scheduled or not. This flexibility is useful for expressing constraints such as the following: ``If I have time to buy the food for the \ac{BBQ}, it should be done at most one day before it''. In this case the task chronologically scheduled sooner can be committed but also enforced, if needed. \\
+                    Accordingly, the associated cost is applied only to the dependent task. This cost is computed based on the relative temporal distance between the assignments of the two tasks. If one of the tasks is not scheduled --- specifically, the second task, since the first must be scheduled --- the corresponding \texttt{unmetCost} is added to the total cost. An example illustrating this mechanism was already provided in \Cref{sec:formal-framework:data-definition}, in the discussion of the \code{dependency function}.
 
-                  \item Before defining the third part of the cost function we introduce the \code{location change function} $\mu(l_1, l_2; n_1, n_2) = (1 - \delta(l_1, l_2)) \cdot \delta(n_1, n_2)$, which is one, iff the location differs but the two specified time slots are the same. With this definition we can now define the third and final part of the cost function $\operatorname{c}(a)$. \\
-                        For every distinct pair of scheduled tasks $t_1$, $t_2 \in T_a$ the location cost must be finite:
-                        \begin{align}
-                              \operatorname{c}_3(a) & = \sum_{t_1, t_2 \in T_a} \operatorname{loc}_C(t_2) \cdot \mu(\operatorname{loc}_L(t_1), \operatorname{loc}_L(t_2), \operatorname{a}(t_1) + \operatorname{dur}(t_1), \operatorname{a}(t_2))  \label{eq:cost-function-3} \\
-                              \operatorname{c}_3(a) & \in \N_0 \notag
-                        \end{align}
-                        The third part (i.e. \Cref{eq:cost-function-3}) sums up the location costs for each pair of scheduled tasks that follow one another immediately. If both tasks share the same location no cost is added. Otherwise, the cost of driving to the location of the second task is added to the total cost. Additionally, we provide an example for the location by using ``SetupLocation'' and ``BBQ'' from the barbecue example (cf. \Cref{ex:scheduling-scenario}). Assuming both tasks have different locations defined, we calculate:
-                        \begin{align*}
-                                & \operatorname{loc}_C(\text{BBQ}) \cdot (1 - \delta(\operatorname{loc}_L(\text{SetupLocation}), \operatorname{loc}_L(\text{BBQ}))) \\
-                                & \cdot \delta(\operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}), \operatorname{a}(\text{BBQ}))     \\
-                              = & 10 \cdot (1 - \delta(1, 1)) \cdot \delta(32 + 2, 35)                                                                              \\
-                              = & 10 \cdot (1 - 1) \cdot \delta(34, 35)                                                                                             \\
-                              = & 10 \cdot 0 \cdot 0 = 0
-                        \end{align*}
-            \end{enumerate}
+              \item Before defining the third part of the cost function we introduce the \code{location change function} $\mu(l_1, l_2; n_1, n_2) = (1 - \delta(l_1, l_2)) \cdot \delta(n_1, n_2) \cdot (1 - \delta(\text{null}, l_2))$, which is one, iff neither location is ``null'', as no cost can be inferred when a \textit{task} has no \textit{location}, and locations differ but the two specified time slots are the same. With this definition we can now define the third and final part of the cost function $\operatorname{c}(a)$. \\
+                    For every distinct pair of scheduled tasks $t_1$, $t_2 \in T_a$ the location cost must be finite:
+                    \begin{align}
+                        \operatorname{c}_3(a) & = \sum_{t_1, t_2 \in T_a} \operatorname{loc}_C(t_2) \cdot \mu(\operatorname{loc}_L(t_1), \operatorname{loc}_L(t_2), \operatorname{a}(t_1) + \operatorname{dur}(t_1), \operatorname{a}(t_2))  \label{eq:cost-function-3} \\
+                        \operatorname{c}_3(a) & \in \N_0 \notag
+                    \end{align}
+                    The third part (i.e. \Cref{eq:cost-function-3}) sums up the location costs for each pair of scheduled tasks that follow one another immediately. If both tasks share the same location no cost is added. Otherwise, the cost of driving to the location of the second task is added to the total cost. Additionally, we provide an example for the location by using ``SetupLocation'' and ``BBQ'' from the barbecue example (see \Cref{ex:scheduling-scenario}). Assuming both tasks have different locations defined, we calculate:
+                    \begin{align*}
+                          & \operatorname{loc}_C(\text{BBQ}) \cdot (1 - \delta(\operatorname{loc}_L(\text{SetupLocation}), \operatorname{loc}_L(\text{BBQ}))) \\
+                          & \cdot \delta(\operatorname{a}(\text{SetupLocation}) + \operatorname{dur}(\text{SetupLocation}), \operatorname{a}(\text{BBQ}))     \\
+                        = & 10 \cdot (1 - \delta(1, 1)) \cdot \delta(32 + 2, 35)                                                                              \\
+                        = & 10 \cdot (1 - 1) \cdot \delta(34, 35)                                                                                             \\
+                        = & 10 \cdot 0 \cdot 0 = 0
+                    \end{align*}
+          \end{enumerate}
 \end{itemize}
 
 \subsection{Computing Cost}
