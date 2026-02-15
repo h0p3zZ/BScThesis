@@ -4,15 +4,15 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining tasks with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact time slot upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. This particular use case is not supported by existing tools, even though the necessary technologies already exist. \\
-Tasks with soft time constraints are tasks that
+Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining \emph{tasks} with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact \emph{time slot} upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. This particular use case is not supported by existing tools, even though the necessary technologies already exist. \\
+\emph{Tasks} with soft time constraints are tasks that
 \begin{itemize}
       \item have time spans with different levels of preference,
       \item may be optional,
       \item may establish a specific order in which they must be scheduled,
       \item and may define specific locations at which they must be performed.
 \end{itemize}
-This application should be able to take natural language inputs via the \textit{frontend} and create tasks from that descriptive inputs. These tasks will be represented using the \Ac{IR}, before being given to a constraint solver to construct a viable schedule. This schedule will then be displayed back to the user via the \textit{frontend}. A basic overview of this application and the corresponding information flow is given in the figure below.
+This application should be able to take natural language inputs via the \emph{frontend} and create tasks from that descriptive inputs. These tasks will be represented using the \Ac{IR}, before being given to a constraint solver to construct a viable schedule. This schedule will then be displayed back to the user via the \emph{frontend}. A basic overview of this application and the corresponding information flow is given in the figure below.
 \begin{figure}[!ht]
       \centering
       \begin{tikzpicture}
