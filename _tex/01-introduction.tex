@@ -4,7 +4,7 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining \emph{tasks} with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain window --- without committing to an exact \emph{time slot} upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. This particular use case is not supported by existing tools, even though the necessary technologies already exist. \\
+Currently, most scheduling applications, such as Microsoft Outlook or Google Calendar, only supply the options for defining \emph{tasks} with known start times and lengths. These restrictions might not be sufficient for a range of practitioners, as users often need to ensure a task is executed --- possibly within a certain time window --- without committing to an exact \emph{time slot} upfront. This is especially true for people with time management issues. These individuals struggle to effectively sequence and schedule their tasks, leading to difficulties in determining when and how each task should be completed~\cite{bib:2015-rabinovici}. Additionally, since personal scheduling is a lot more prone to change in comparison to business schedules, the importance of flexibility is emphasized. Hence, we want to define a scheduling application, which also allows for soft time constraints. This particular use case is not supported by existing tools, even though the necessary technologies already exist. \\
 \emph{Tasks} with soft time constraints are tasks that
 \begin{itemize}
       \item have time spans with different levels of preference,
@@ -12,15 +12,15 @@ Currently, most scheduling applications, such as Microsoft Outlook or Google Cal
       \item may establish a specific order in which they must be scheduled,
       \item and may define specific locations at which they must be performed.
 \end{itemize}
-This application should be able to take natural language inputs via the \emph{frontend} and create tasks from that descriptive inputs. These tasks will be represented using the \Ac{IR}, before being given to a constraint solver to construct a viable schedule. This schedule will then be displayed back to the user via the \emph{frontend}. A basic overview of this application and the corresponding information flow is given in the figure below.
+This application should be able to take natural language inputs via the \emph{frontend} and create tasks from that descriptive inputs. These tasks will be represented using the \Ac{IR}, before being given to a constraint solver to construct a viable schedule. This schedule will then be displayed back to the user via the \emph{frontend}. A basic overview of this application and the corresponding information flow is given in \Cref{fig:application-overview}.
 \begin{figure}[!ht]
       \centering
       \begin{tikzpicture}
             % Nodes
             \node[draw, rectangle, minimum width=3cm, minimum height=1cm] (frontend) {Frontend};
             \node[draw, rectangle, minimum width=3cm, minimum height=1cm, right=4cm of frontend] (ir) {\Acl*{IR}};
-            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of ir] (solver) {Constraint Solver};
-            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=3cm of frontend] (schedule) {Generated Schedule};
+            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=2.5cm of ir] (solver) {Constraint Solver};
+            \node[draw, rectangle, minimum width=3cm, minimum height=1cm, below=2.5cm of frontend] (schedule) {Generated Schedule};
 
             % Arrows
             \draw[->] (frontend) -- (ir) node[midway, above] {Reduce};
@@ -30,13 +30,14 @@ This application should be able to take natural language inputs via the \emph{fr
       \end{tikzpicture}
       \caption{Application Overview}
       \label{fig:application-overview}
-\end{figure} \\
+\end{figure}
+\\
 The focus of this thesis is on the design and formalization of the \ac{IR}. Such a representation is beneficial as it provides a clear and unambiguous description of tasks and their associated constraints. This clarity is essential for effective communication between users and the scheduling system, ensuring that the system accurately interprets user requirements. Furthermore, a well-defined \ac{IR} facilitates the development of algorithms and tools for scheduling, as it provides a structured framework for representing and manipulating scheduling data, instead of having to deal with multiple formats, which are of high complexity. \Cref{sec:preliminaries-related-work:existing-scheduling-languages-and-standards} discusses existing scheduling languages and standards, highlighting the need for one specialized on the personal scheduling domain.
 
 Scheduling is known to be a hard problem, especially constraint scheduling as for example in assigning restricted resources (e.g. rooms) to given professors or courses at a university~\cite{bib:2017-diveev}. The approach presented in this thesis enables the definition of tasks in a minimal form, whilst maintaining expressivity to allow for efficient solving in future work. \\
-We specifically do not define or implement a solver, as the focus of this thesis is on the language design and formalization. Instead, we only provide the needed framework to bridge the gap between possible word-ambiguities, and solvable constraints.
+We do not define or implement a solver, as the focus of this thesis is on the language design and its formalization. Instead, we provide the necessary framework to bridge the gap between potential ambiguities in wording and solvable constraints.
 
-Specifically, this work tries to answer the following research question:
+Specifically, this work tries to answer the following research questions:
 \begin{itemize}
       \item finding a language that provides sufficient expressivity while remaining as simple as feasible,
       \item giving a notion of solution for a given problem (input language),
